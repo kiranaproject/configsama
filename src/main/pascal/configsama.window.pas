@@ -149,6 +149,7 @@ type
     procedure SelectCategoryByName(const AName: string);
 
     property Settings: TConfigSettings read FSettings;
+    property AppTitle: TFtLabel read FAppTitle;
     property SectionTitle: TFtLabel read FSectionTitle;
     property CategoryTree: TFtTreeView read FCategoryTree;
     property SearchEntry: TFtEntry read FSearchEntry;
@@ -204,10 +205,18 @@ var
 begin
   // Header
   w := FindWidget('appTitle');
-  if w is TFtLabel then FAppTitle := TFtLabel(w);
+  if w is TFtLabel then
+  begin
+    FAppTitle := TFtLabel(w);
+    FAppTitle.Selectable := False;
+  end;
 
   w := FindWidget('sectionTitle');
-  if w is TFtLabel then FSectionTitle := TFtLabel(w);
+  if w is TFtLabel then
+  begin
+    FSectionTitle := TFtLabel(w);
+    FSectionTitle.Selectable := False;
+  end;
 
   // Sidebar
   w := FindWidget('searchEntry');

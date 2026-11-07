@@ -27,6 +27,7 @@ Window {
       anchors.verticalCenter: parent.verticalCenter;
       text: "Settings";
       font: "Sans:bold 12";
+      selectable: false;
     }
 
     Text {
@@ -36,6 +37,7 @@ Window {
       anchors.verticalCenter: parent.verticalCenter;
       text: "Appearance";
       font: "Sans:bold 12";
+      selectable: false;
     }
   }
 

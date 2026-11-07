@@ -63,6 +63,7 @@ begin
   AssertNotNull('Window must be created', FWindow);
   AssertNotNull('CategoryTree must be resolved from FTML', FWindow.CategoryTree);
   AssertNotNull('SearchEntry must be resolved from FTML', FWindow.SearchEntry);
+  AssertNotNull('AppTitle must be resolved from FTML', FWindow.AppTitle);
   AssertNotNull('SectionTitle must be resolved from FTML', FWindow.SectionTitle);
   AssertNotNull('SwDarkMode must be resolved from FTML', FWindow.SwDarkMode);
   AssertNotNull('CmbAccent must be resolved from FTML', FWindow.CmbAccent);
@@ -70,6 +71,8 @@ begin
   AssertNotNull('SlVolume must be resolved from FTML', FWindow.SlVolume);
   AssertNotNull('SwMute must be resolved from FTML', FWindow.SwMute);
 
+  AssertFalse('AppTitle must not be selectable', FWindow.AppTitle.Selectable);
+  AssertFalse('SectionTitle must not be selectable', FWindow.SectionTitle.Selectable);
   AssertEquals('Initial section title is Appearance', 'Appearance', FWindow.SectionTitle.Text);
 end;
 
