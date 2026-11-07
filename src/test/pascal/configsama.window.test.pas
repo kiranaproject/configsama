@@ -73,7 +73,7 @@ begin
 
   AssertFalse('AppTitle must not be selectable', FWindow.AppTitle.Selectable);
   AssertFalse('SectionTitle must not be selectable', FWindow.SectionTitle.Selectable);
-  AssertEquals('Initial section title is Appearance', 'Appearance', FWindow.SectionTitle.Text);
+  AssertEquals('Initial section title is WLAN', 'WLAN', FWindow.SectionTitle.Text);
 end;
 
 procedure TConfigWindowTest.TestExtendedClientAreaEnabled();

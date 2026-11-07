@@ -19,6 +19,7 @@ type
   private
     FSettings: TConfigSettings;
     FUpdatingControls: Boolean;
+    FSelectingCategory: Boolean;
 
     // Header controls
     FAppTitle: TFtLabel;
@@ -29,15 +30,25 @@ type
     FCategoryTree: TFtTreeView;
 
     // Content Pages
-    FPageAppearance: TFtWidget;
+    FPageWlan: TFtWidget;
+    FPageWired: TFtWidget;
     FPageDisplays: TFtWidget;
+    FPageAppearance: TFtWidget;
+    FPageBackground: TFtWidget;
     FPageDesktop: TFtWidget;
+    FPageUser: TFtWidget;
+    FPageLanguage: TFtWidget;
+    FPageBattery: TFtWidget;
     FPageSound: TFtWidget;
     FPagePower: TFtWidget;
     FPageMouse: TFtWidget;
     FPageKeyboard: TFtWidget;
     FPageApps: TFtWidget;
     FPageAbout: TFtWidget;
+
+    // WLAN & Wired page controls
+    FSwWlan: TFtSwitch;
+    FSwWired: TFtSwitch;
 
     // Appearance page controls
     FSwDarkMode: TFtSwitch;
@@ -158,6 +169,8 @@ type
     property TxtWallpaperPath: TFtEntry read FTxtWallpaperPath;
     property SlVolume: TFtSlider read FSlVolume;
     property SwMute: TFtSwitch read FSwMute;
+    property SwWlan: TFtSwitch read FSwWlan;
+    property SwWired: TFtSwitch read FSwWired;
   end;
 
 implementation
@@ -231,18 +244,36 @@ begin
   begin
     FCategoryTree := TFtTreeView(w);
     FCategoryTree.OnSelect := @HandleCategorySelect;
+    if (FCategoryTree.Root <> nil) and (FCategoryTree.Root.ChildCount > 0) then
+    begin
+      if FCategoryTree.Root.Children[0].ChildCount > 0 then
+        FCategoryTree.SelectedNode := FCategoryTree.Root.Children[0].Children[0];
+    end;
   end;
 
   // Content Pages
-  FPageAppearance := FindWidget('pageAppearance');
+  FPageWlan := FindWidget('pageWlan');
+  FPageWired := FindWidget('pageWired');
   FPageDisplays := FindWidget('pageDisplays');
+  FPageAppearance := FindWidget('pageAppearance');
+  FPageBackground := FindWidget('pageBackground');
   FPageDesktop := FindWidget('pageDesktop');
+  FPageUser := FindWidget('pageUser');
+  FPageLanguage := FindWidget('pageLanguage');
+  FPageBattery := FindWidget('pageBattery');
   FPageSound := FindWidget('pageSound');
   FPagePower := FindWidget('pagePower');
   FPageMouse := FindWidget('pageMouse');
   FPageKeyboard := FindWidget('pageKeyboard');
   FPageApps := FindWidget('pageApps');
   FPageAbout := FindWidget('pageAbout');
+
+  // WLAN & Wired controls
+  w := FindWidget('swWlan');
+  if w is TFtSwitch then FSwWlan := TFtSwitch(w);
+
+  w := FindWidget('swWired');
+  if w is TFtSwitch then FSwWired := TFtSwitch(w);
 
   // Appearance controls
   w := FindWidget('swDarkMode');
@@ -647,23 +678,60 @@ begin
 end;
 
 procedure TConfigSamaWindow.SelectCategoryByName(const AName: string);
+var
+  i, j: Integer;
+  hNode, cNode: TFtTreeNode;
 begin
-  if FPageAppearance <> nil then FPageAppearance.Visible := SameText(AName, 'Appearance');
-  if FPageDisplays <> nil then FPageDisplays.Visible := SameText(AName, 'Displays');
-  if FPageDesktop <> nil then FPageDesktop.Visible := SameText(AName, 'Desktop & Dock');
-  if FPageSound <> nil then FPageSound.Visible := SameText(AName, 'Sound');
-  if FPagePower <> nil then FPagePower.Visible := SameText(AName, 'Power');
-  if FPageMouse <> nil then FPageMouse.Visible := SameText(AName, 'Mouse & Touchpad');
-  if FPageKeyboard <> nil then
-    FPageKeyboard.Visible := SameText(AName, 'Keyboard & Shortcuts') or SameText(AName, 'Keyboard');
-  if FPageApps <> nil then
-    FPageApps.Visible := SameText(AName, 'Default Applications') or SameText(AName, 'Applications');
-  if FPageAbout <> nil then FPageAbout.Visible := SameText(AName, 'About');
+  if FSelectingCategory then Exit;
+  FSelectingCategory := True;
+  try
+    if FPageWlan <> nil then FPageWlan.Visible := SameText(AName, 'WLAN') or SameText(AName, 'Wi-Fi');
+    if FPageWired <> nil then FPageWired.Visible := SameText(AName, 'Wired');
+    if FPageDisplays <> nil then FPageDisplays.Visible := SameText(AName, 'Display') or SameText(AName, 'Displays');
+    if FPageAppearance <> nil then FPageAppearance.Visible := SameText(AName, 'Appearance');
+    if FPageBackground <> nil then FPageBackground.Visible := SameText(AName, 'Background');
+    if FPageDesktop <> nil then FPageDesktop.Visible := SameText(AName, 'Dock') or SameText(AName, 'Desktop & Dock');
+    if FPageUser <> nil then FPageUser.Visible := SameText(AName, 'User') or SameText(AName, 'Users');
+    if FPageLanguage <> nil then FPageLanguage.Visible := SameText(AName, 'Language');
+    if FPageBattery <> nil then FPageBattery.Visible := SameText(AName, 'Battery') or SameText(AName, 'Power');
+    if FPageSound <> nil then FPageSound.Visible := SameText(AName, 'Sound');
+    if FPagePower <> nil then FPagePower.Visible := SameText(AName, 'Power') or SameText(AName, 'Battery');
+    if FPageMouse <> nil then FPageMouse.Visible := SameText(AName, 'Mouse & Touchpad');
+    if FPageKeyboard <> nil then
+      FPageKeyboard.Visible := SameText(AName, 'Keyboard & Shortcuts') or SameText(AName, 'Keyboard');
+    if FPageApps <> nil then
+      FPageApps.Visible := SameText(AName, 'Default Applications') or SameText(AName, 'Applications');
+    if FPageAbout <> nil then FPageAbout.Visible := SameText(AName, 'About');
 
-  if FSectionTitle <> nil then
-    FSectionTitle.Text := AName;
+    if FSectionTitle <> nil then
+      FSectionTitle.Text := AName;
 
-  Invalidate();
+    // Sync selected node in tree if available
+    if (FCategoryTree <> nil) and (FCategoryTree.Root <> nil) then
+    begin
+      for i := 0 to FCategoryTree.Root.ChildCount - 1 do
+      begin
+        hNode := FCategoryTree.Root.Children[i];
+        for j := 0 to hNode.ChildCount - 1 do
+        begin
+          cNode := hNode.Children[j];
+          if SameText(cNode.Text, AName) or
+             (SameText(AName, 'Displays') and SameText(cNode.Text, 'Display')) or
+             (SameText(AName, 'Desktop & Dock') and SameText(cNode.Text, 'Dock')) or
+             (SameText(AName, 'Power') and SameText(cNode.Text, 'Battery')) then
+          begin
+            if FCategoryTree.SelectedNode <> cNode then
+              FCategoryTree.SelectedNode := cNode;
+            Break;
+          end;
+        end;
+      end;
+    end;
+
+    Invalidate();
+  finally
+    FSelectingCategory := False;
+  end;
 end;
 
 procedure TConfigSamaWindow.HandleCategorySelect(Sender: TFtTreeView; Node: TFtTreeNode);
@@ -679,9 +747,14 @@ begin
   q := LowerCase(Trim(AText));
   if q = '' then Exit();
 
-  if Pos('appear', q) > 0 then SelectCategoryByName('Appearance')
+  if (Pos('wifi', q) > 0) or (Pos('wlan', q) > 0) or (Pos('wirel', q) > 0) then SelectCategoryByName('WLAN')
+  else if (Pos('ether', q) > 0) or (Pos('wired', q) > 0) or (Pos('lan', q) > 0) then SelectCategoryByName('Wired')
+  else if (Pos('appear', q) > 0) or (Pos('theme', q) > 0) then SelectCategoryByName('Appearance')
   else if (Pos('disp', q) > 0) or (Pos('screen', q) > 0) or (Pos('resolut', q) > 0) then SelectCategoryByName('Displays')
+  else if (Pos('wall', q) > 0) or (Pos('backg', q) > 0) then SelectCategoryByName('Background')
   else if (Pos('dock', q) > 0) or (Pos('panel', q) > 0) or (Pos('desk', q) > 0) then SelectCategoryByName('Desktop & Dock')
+  else if (Pos('user', q) > 0) or (Pos('acc', q) > 0) then SelectCategoryByName('User')
+  else if (Pos('lang', q) > 0) or (Pos('loc', q) > 0) then SelectCategoryByName('Language')
   else if (Pos('sound', q) > 0) or (Pos('vol', q) > 0) or (Pos('audio', q) > 0) then SelectCategoryByName('Sound')
   else if (Pos('power', q) > 0) or (Pos('batt', q) > 0) or (Pos('sleep', q) > 0) then SelectCategoryByName('Power')
   else if (Pos('mouse', q) > 0) or (Pos('touch', q) > 0) or (Pos('cursor', q) > 0) then SelectCategoryByName('Mouse & Touchpad')

@@ -9,55 +9,37 @@ Window {
   extendedClientArea: true;
   width: 960;
   height: 640;
-
-  // ── Unified Headerbar (ECA) ──
-  Container {
-    id: headerBar;
-    anchors.top: parent.top;
-    anchors.left: parent.left;
-    anchors.right: parent.right;
-    height: 48;
-    drawFrame: false;
-    style: "border-bottom: 1px solid rgba(128, 128, 128, 0.25);";
-
-    Text {
-      id: appTitle;
-      anchors.left: parent.left;
-      anchors.leftMargin: 84;
-      anchors.verticalCenter: parent.verticalCenter;
-      text: "Settings";
-      font: "Sans:bold 12";
-      selectable: false;
-    }
-
-    Text {
-      id: sectionTitle;
-      anchors.left: parent.left;
-      anchors.leftMargin: 260;
-      anchors.verticalCenter: parent.verticalCenter;
-      text: "Appearance";
-      font: "Sans:bold 12";
-      selectable: false;
-    }
-  }
+  style: "background-color: #f4f5f8;";
 
   // ── Left Sidebar Pane ──
   Container {
     id: sidebar;
-    anchors.top: headerBar.bottom;
+    anchors.top: parent.top;
     anchors.left: parent.left;
     anchors.bottom: parent.bottom;
     width: 240;
     padding: 0;
     drawFrame: false;
-    style: "border-right: 1px solid rgba(128, 128, 128, 0.25);";
+    style: "background-color: #ebedf2; border-right: 1px solid rgba(0, 0, 0, 0.08);";
+
+    Text {
+      id: appTitle;
+      anchors.top: parent.top;
+      anchors.topMargin: 18;
+      anchors.left: parent.left;
+      anchors.leftMargin: 20;
+      text: "Settings";
+      font: "Sans:bold 14";
+      selectable: false;
+    }
 
     Container {
       id: searchContainer;
-      anchors.top: parent.top;
+      anchors.top: appTitle.bottom;
+      anchors.topMargin: 12;
       anchors.left: parent.left;
       anchors.right: parent.right;
-      height: 44;
+      height: 36;
       padding: 0;
       drawFrame: false;
 
@@ -65,510 +47,1137 @@ Window {
         id: searchEntry;
         anchors.left: parent.left;
         anchors.right: parent.right;
-        anchors.leftMargin: 12;
-        anchors.rightMargin: 12;
+        anchors.leftMargin: 16;
+        anchors.rightMargin: 16;
         anchors.verticalCenter: parent.verticalCenter;
         height: 28;
         placeholder: "Search settings...";
+        style: "background-color: #ffffff; border-radius: 6px; border: 1px solid rgba(0, 0, 0, 0.1);";
       }
     }
 
     TreeView {
       id: categoryTree;
       anchors.top: searchContainer.bottom;
+      anchors.topMargin: 8;
       anchors.left: parent.left;
+      anchors.leftMargin: 10;
       anchors.right: parent.right;
+      anchors.rightMargin: 10;
       anchors.bottom: parent.bottom;
-      paddingX: 8;
-      paddingY: 6;
-      itemHeight: 32;
-      indentWidth: 12;
+      itemHeight: 38;
+      indentWidth: 10;
       drawFrame: false;
       style: "background-color: transparent; border: none;";
 
-      TreeNode { text: "Appearance"; expanded: true; }
-      TreeNode { text: "Displays"; expanded: true; }
-      TreeNode { text: "Desktop & Dock"; expanded: true; }
-      TreeNode { text: "Sound"; expanded: true; }
-      TreeNode { text: "Power"; expanded: true; }
-      TreeNode { text: "Mouse & Touchpad"; expanded: true; }
-      TreeNode { text: "Keyboard & Shortcuts"; expanded: true; }
-      TreeNode { text: "Default Applications"; expanded: true; }
-      TreeNode { text: "About"; expanded: true; }
+      TreeNode {
+        text: "Network and connection";
+        isHeader: true;
+        expanded: true;
+        TreeNode { text: "WLAN"; icon: "wlan"; iconSelected: "wlan-white"; }
+        TreeNode { text: "Wired"; icon: "wired"; iconSelected: "wired-white"; }
+      }
+      TreeNode {
+        text: "Display and appearance";
+        isHeader: true;
+        expanded: true;
+        TreeNode { text: "Display"; icon: "display"; iconSelected: "display-white"; }
+        TreeNode { text: "Appearance"; icon: "appearance"; iconSelected: "appearance-white"; }
+        TreeNode { text: "Background"; icon: "background"; iconSelected: "background-white"; }
+        TreeNode { text: "Dock"; icon: "dock"; iconSelected: "dock-white"; }
+      }
+      TreeNode {
+        text: "System";
+        isHeader: true;
+        expanded: true;
+        TreeNode { text: "User"; icon: "user"; iconSelected: "user-white"; }
+        TreeNode { text: "Language"; icon: "language"; iconSelected: "language-white"; }
+        TreeNode { text: "Battery"; icon: "battery"; iconSelected: "battery-white"; }
+        TreeNode { text: "About"; icon: "about"; iconSelected: "about-white"; }
+      }
     }
   }
 
   // ── Right Content Area ──
   Container {
     id: contentArea;
-    anchors.top: headerBar.bottom;
+    anchors.top: parent.top;
     anchors.left: sidebar.right;
     anchors.right: parent.right;
     anchors.bottom: parent.bottom;
     padding: 0;
     drawFrame: false;
+    style: "background-color: #f4f5f8;";
 
-    // ── 1. Appearance Page ──
-    FormGrid {
-      id: pageAppearance;
-      anchors.fill: parent;
-      anchors.leftMargin: 24;
-      anchors.topMargin: 16;
-      anchors.rightMargin: 24;
-      anchors.bottomMargin: 16;
-      visible: true;
+    Container {
+      id: contentHeader;
+      anchors.top: parent.top;
+      anchors.left: parent.left;
+      anchors.right: parent.right;
+      height: 58;
+      drawFrame: false;
 
-      FormSection { title: "Style"; }
-      FormRow {
-        label: "Dark Mode";
-        Row {
-          Switch { id: swDarkMode; width: 50; height: 28; }
-        }
+      Text {
+        id: sectionTitle;
+        anchors.left: parent.left;
+        anchors.leftMargin: 36;
+        anchors.verticalCenter: parent.verticalCenter;
+        text: "WLAN";
+        font: "Sans:bold 16";
+        selectable: false;
       }
-      FormRow {
-        label: "Accent Color";
-        ComboBox {
-          id: cmbAccent;
-          items: "Blue, Purple, Emerald, Amber, Crimson, Slate";
-        }
-      }
+    }
 
-      FormSection { title: "Desktop Background"; }
-      FormRow {
-        label: "Wallpaper Mode";
-        ComboBox {
-          id: cmbWallpaperMode;
-          items: "Fill, Fit, Stretch, Center, Tile";
-        }
-      }
-      FormRow {
-        label: "Current Wallpaper";
-        Entry {
-          id: txtWallpaperPath;
-          width: 320;
-          height: 30;
-          readOnly: true;
-        }
-      }
-      FormRow {
-        label: "Change Wallpaper";
-        Row {
-          Button {
-            id: btnChooseWallpaper;
-            width: 160;
-            height: 30;
-            text: "Choose Wallpaper...";
+    Container {
+      id: pageContainer;
+      anchors.top: contentHeader.bottom;
+      anchors.left: parent.left;
+      anchors.right: parent.right;
+      anchors.bottom: parent.bottom;
+      drawFrame: false;
+
+      // ── 1. WLAN Page ──
+      Container {
+        id: pageWlan;
+        anchors.fill: parent;
+        visible: true;
+        drawFrame: false;
+
+        Container {
+          id: cardWlan;
+          anchors.top: parent.top;
+          anchors.topMargin: 4;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 256;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
+
+          // Row 0: WLAN toggle
+          Container {
+            id: rowWlanStatus;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 52;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "WLAN";
+              font: "Sans:bold 12";
+              selectable: false;
+            }
+
+            Switch {
+              id: swWlan;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
+              checked: true;
+            }
           }
-        }
-      }
-    }
 
-    // ── 2. Displays Page ──
-    FormGrid {
-      id: pageDisplays;
-      anchors.fill: parent;
-      anchors.leftMargin: 24;
-      anchors.topMargin: 16;
-      anchors.rightMargin: 24;
-      anchors.bottomMargin: 16;
-      visible: false;
-
-      FormSection { title: "Display Configuration"; }
-      FormRow {
-        label: "Active Display";
-        ComboBox {
-          id: cmbDisplay;
-          items: "eDP-1 (Built-in Display), HDMI-1, Virtual-1";
-        }
-      }
-      FormRow {
-        label: "Resolution";
-        ComboBox {
-          id: cmbResolution;
-          items: "1920x1080 (16:9), 1600x900 (16:9), 1366x768 (16:9), 1280x720 (16:9), 1024x768 (4:3)";
-        }
-      }
-      FormRow {
-        label: "Refresh Rate";
-        ComboBox {
-          id: cmbRefreshRate;
-          items: "60 Hz, 75 Hz, 120 Hz, 144 Hz";
-        }
-      }
-      FormRow {
-        label: "UI Scaling";
-        ComboBox {
-          id: cmbScale;
-          items: "100%, 125%, 150%, 200%";
-        }
-      }
-
-      FormSection { title: "Eye Comfort"; }
-      FormRow {
-        label: "Night Light";
-        Row {
-          Switch { id: swNightLight; width: 50; height: 28; }
-        }
-      }
-    }
-
-    // ── 3. Desktop & Dock Page ──
-    FormGrid {
-      id: pageDesktop;
-      anchors.fill: parent;
-      anchors.leftMargin: 24;
-      anchors.topMargin: 16;
-      anchors.rightMargin: 24;
-      anchors.bottomMargin: 16;
-      visible: false;
-
-      FormSection { title: "Dock Configuration"; }
-      FormRow {
-        label: "Position on Screen";
-        ComboBox {
-          id: cmbDockPosition;
-          items: "Bottom, Left, Right";
-        }
-      }
-      FormRow {
-        label: "Icon Size";
-        ComboBox {
-          id: cmbDockIconSize;
-          items: "24 px, 32 px, 48 px, 64 px";
-        }
-      }
-      FormRow {
-        label: "Auto-hide Dock";
-        Row {
-          Switch { id: swDockAutoHide; width: 50; height: 28; }
-        }
-      }
-      FormRow {
-        label: "Dock Strut Margins";
-        ComboBox {
-          id: cmbDockMargin;
-          items: "0 px, 2 px, 3 px (Standard), 5 px, 8 px";
-        }
-      }
-
-      FormSection { title: "Top Panel & Desktop"; }
-      FormRow {
-        label: "Show Desktop Button";
-        Row {
-          Switch { id: swShowDesktopBtn; width: 50; height: 28; }
-        }
-      }
-      FormRow {
-        label: "Clock 24-hour Format";
-        Row {
-          Switch { id: swClock24h; width: 50; height: 28; }
-        }
-      }
-    }
-
-    // ── 4. Sound Page ──
-    FormGrid {
-      id: pageSound;
-      anchors.fill: parent;
-      anchors.leftMargin: 24;
-      anchors.topMargin: 16;
-      anchors.rightMargin: 24;
-      anchors.bottomMargin: 16;
-      visible: false;
-
-      FormSection { title: "Sound Output"; }
-      FormRow {
-        label: "Output Device";
-        ComboBox {
-          id: cmbOutputDevice;
-          items: "Default Audio Sink, Analog Stereo, HDMI / DisplayPort Audio";
-        }
-      }
-      FormRow {
-        label: "Output Volume";
-        Row {
-          Slider {
-            id: slVolume;
-            width: 220;
-            height: 24;
+          Container {
+            anchors.top: rowWlanStatus.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 1;
+            drawFrame: false;
+            style: "background-color: rgba(0, 0, 0, 0.06);";
           }
-        }
-      }
-      FormRow {
-        label: "Mute Output";
-        Row {
-          Switch { id: swMute; width: 50; height: 28; }
-        }
-      }
 
-      FormSection { title: "Feedback"; }
-      FormRow {
-        label: "System Alert Sounds";
-        Row {
-          Switch { id: swSoundEffects; width: 50; height: 28; }
-        }
-      }
-    }
+          // Row 1: "Purr" network (connected)
+          Container {
+            id: rowWifiPurr;
+            anchors.top: rowWlanStatus.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 50;
+            drawFrame: false;
 
-    // ── 5. Power Page ──
-    FormGrid {
-      id: pagePower;
-      anchors.fill: parent;
-      anchors.leftMargin: 24;
-      anchors.topMargin: 16;
-      anchors.rightMargin: 24;
-      anchors.bottomMargin: 16;
-      visible: false;
+            Image {
+              icon: "wlan";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
 
-      FormSection { title: "Power Management"; }
-      FormRow {
-        label: "Power Mode";
-        ComboBox {
-          id: cmbPowerMode;
-          items: "Performance, Balanced, Power Saver";
-        }
-      }
-      FormRow {
-        label: "Blank Screen After";
-        ComboBox {
-          id: cmbScreenBlank;
-          items: "1 minute, 5 minutes, 10 minutes, 15 minutes, Never";
-        }
-      }
-      FormRow {
-        label: "Automatic Suspend";
-        Row {
-          Switch { id: swAutoSuspend; width: 50; height: 28; }
-        }
-      }
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Purr";
+              font: "Sans 12";
+              selectable: false;
+            }
 
-      FormSection { title: "Battery & Energy"; }
-      FormRow {
-        label: "Power Status";
-        Entry {
-          id: txtPowerStatus;
-          width: 260;
-          height: 30;
-          text: "AC Power Connected (100%)";
-          readOnly: true;
-        }
-      }
-    }
+            Image {
+              icon: "lock";
+              width: 14;
+              height: 14;
+              anchors.right: imgCheckPurr.left;
+              anchors.rightMargin: 14;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
 
-    // ── 6. Mouse & Touchpad Page ──
-    FormGrid {
-      id: pageMouse;
-      anchors.fill: parent;
-      anchors.leftMargin: 24;
-      anchors.topMargin: 16;
-      anchors.rightMargin: 24;
-      anchors.bottomMargin: 16;
-      visible: false;
+            Image {
+              id: imgCheckPurr;
+              icon: "dialog-success";
+              width: 16;
+              height: 16;
+              anchors.right: btnPurrInfo.left;
+              anchors.rightMargin: 12;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
 
-      FormSection { title: "Mouse"; }
-      FormRow {
-        label: "Primary Button";
-        ComboBox {
-          id: cmbPrimaryBtn;
-          items: "Left, Right";
-        }
-      }
-      FormRow {
-        label: "Pointer Speed";
-        Row {
-          Slider {
-            id: slPointerSpeed;
-            width: 220;
-            height: 24;
+            Button {
+              id: btnPurrInfo;
+              icon: "about";
+              width: 24;
+              height: 24;
+              drawFrame: false;
+              style: "background-color: transparent; border: none;";
+              anchors.right: parent.right;
+              anchors.rightMargin: 16;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
           }
-        }
-      }
-      FormRow {
-        label: "Natural Scrolling";
-        Row {
-          Switch { id: swNaturalScroll; width: 50; height: 28; }
-        }
-      }
 
-      FormSection { title: "Touchpad"; }
-      FormRow {
-        label: "Tap to Click";
-        Row {
-          Switch { id: swTapToClick; width: 50; height: 28; }
-        }
-      }
-    }
-
-    // ── 7. Keyboard & Shortcuts Page ──
-    FormGrid {
-      id: pageKeyboard;
-      anchors.fill: parent;
-      anchors.leftMargin: 24;
-      anchors.topMargin: 16;
-      anchors.rightMargin: 24;
-      anchors.bottomMargin: 16;
-      visible: false;
-
-      FormSection { title: "Input & Layout"; }
-      FormRow {
-        label: "Keyboard Layout";
-        ComboBox {
-          id: cmbKeyboardLayout;
-          items: "English (US), Indonesian, Japanese, German, French";
-        }
-      }
-      FormRow {
-        label: "Key Repeat Delay";
-        Row {
-          Slider {
-            id: slKeyDelay;
-            width: 220;
-            height: 24;
+          Container {
+            anchors.top: rowWifiPurr.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 1;
+            drawFrame: false;
+            style: "background-color: rgba(0, 0, 0, 0.06);";
           }
-        }
-      }
-      FormRow {
-        label: "Key Repeat Speed";
-        Row {
-          Slider {
-            id: slKeyRate;
-            width: 220;
-            height: 24;
+
+          // Row 2: "Meow" network
+          Container {
+            id: rowWifiMeow;
+            anchors.top: rowWifiPurr.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 50;
+            drawFrame: false;
+
+            Image {
+              icon: "wlan";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Meow";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Image {
+              icon: "lock";
+              width: 14;
+              height: 14;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+          }
+
+          Container {
+            anchors.top: rowWifiMeow.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 1;
+            drawFrame: false;
+            style: "background-color: rgba(0, 0, 0, 0.06);";
+          }
+
+          // Row 3: "Virgin Media" network
+          Container {
+            id: rowWifiVirgin;
+            anchors.top: rowWifiMeow.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 50;
+            drawFrame: false;
+
+            Image {
+              icon: "wlan";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Virgin Media";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Image {
+              icon: "lock";
+              width: 14;
+              height: 14;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+          }
+
+          Container {
+            anchors.top: rowWifiVirgin.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 1;
+            drawFrame: false;
+            style: "background-color: rgba(0, 0, 0, 0.06);";
+          }
+
+          // Row 4: "VM6974871" network
+          Container {
+            id: rowWifiVM;
+            anchors.top: rowWifiVirgin.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 50;
+            drawFrame: false;
+
+            Image {
+              icon: "wlan";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "VM6974871";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Image {
+              icon: "lock";
+              width: 14;
+              height: 14;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
           }
         }
       }
 
-      FormSection { title: "Desktop Shortcuts"; }
-      FormRow {
-        label: "Super Key Opens Launcher";
-        Row {
-          Switch { id: swSuperLauncher; width: 50; height: 28; }
-        }
-      }
-    }
+      // ── 2. Wired Page ──
+      Container {
+        id: pageWired;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
 
-    // ── 8. Default Applications Page ──
-    FormGrid {
-      id: pageApps;
-      anchors.fill: parent;
-      anchors.leftMargin: 24;
-      anchors.topMargin: 16;
-      anchors.rightMargin: 24;
-      anchors.bottomMargin: 16;
-      visible: false;
+        Container {
+          anchors.top: parent.top;
+          anchors.topMargin: 8;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 160;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
 
-      FormSection { title: "Default Applications"; }
-      FormRow {
-        label: "Web Browser";
-        ComboBox {
-          id: cmbBrowser;
-          items: "Default Web Browser, Mozilla Firefox, Chromium";
-        }
-      }
-      FormRow {
-        label: "File Manager";
-        ComboBox {
-          id: cmbFileManager;
-          items: "filesama (Samarinda Files), Standard File Manager";
-        }
-      }
-      FormRow {
-        label: "Terminal Emulator";
-        ComboBox {
-          id: cmbTerminal;
-          items: "samarinda-terminal, XTerm";
-        }
-      }
-      FormRow {
-        label: "Text Editor";
-        ComboBox {
-          id: cmbEditor;
-          items: "Default Text Editor, Nano, Gedit";
-        }
-      }
-    }
+          Container {
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 52;
+            drawFrame: false;
 
-    // ── 9. About Page ──
-    FormGrid {
-      id: pageAbout;
-      anchors.fill: parent;
-      anchors.leftMargin: 24;
-      anchors.topMargin: 16;
-      anchors.rightMargin: 24;
-      anchors.bottomMargin: 16;
-      visible: false;
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Wired Connection";
+              font: "Sans:bold 12";
+              selectable: false;
+            }
 
-      FormSection { title: "System Details"; }
-      FormRow {
-        label: "Operating System";
-        Entry {
-          id: txtAboutOs;
-          width: 320;
-          height: 30;
-          text: "Samarinda OS 1.0 (Kutai Edition)";
-          readOnly: true;
-        }
-      }
-      FormRow {
-        label: "Desktop Shell";
-        Entry {
-          id: txtAboutShell;
-          width: 320;
-          height: 30;
-          text: "shellsama (Native X11 Shell)";
-          readOnly: true;
-        }
-      }
-      FormRow {
-        label: "Window Manager";
-        Entry {
-          id: txtAboutWm;
-          width: 320;
-          height: 30;
-          text: "wmsama (Compositing Window Manager)";
-          readOnly: true;
-        }
-      }
-      FormRow {
-        label: "Toolkit";
-        Entry {
-          id: txtAboutToolkit;
-          width: 320;
-          height: 30;
-          text: "Floria Toolkit 0.0.1 (libft / ftpas)";
-          readOnly: true;
+            Switch {
+              id: swWired;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
+              checked: true;
+            }
+          }
+
+          Container {
+            anchors.top: parent.top;
+            anchors.topMargin: 52;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 1;
+            drawFrame: false;
+            style: "background-color: rgba(0, 0, 0, 0.06);";
+          }
+
+          Container {
+            anchors.top: parent.top;
+            anchors.topMargin: 53;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 52;
+            drawFrame: false;
+
+            Image {
+              icon: "wired";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Connected — 1000 Mb/s (Full Duplex)";
+              font: "Sans 12";
+              selectable: false;
+            }
+          }
+
+          Container {
+            anchors.top: parent.top;
+            anchors.topMargin: 105;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 1;
+            drawFrame: false;
+            style: "background-color: rgba(0, 0, 0, 0.06);";
+          }
+
+          Container {
+            anchors.top: parent.top;
+            anchors.topMargin: 106;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 52;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "IPv4: 192.168.1.100  •  Gateway: 192.168.1.1";
+              font: "Sans 11";
+              selectable: false;
+            }
+          }
         }
       }
 
-      FormSection { title: "Hardware Information"; }
-      FormRow {
-        label: "Linux Kernel";
-        Entry {
-          id: txtAboutKernel;
-          width: 320;
-          height: 30;
-          text: "Linux";
-          readOnly: true;
+      // ── 3. Display Page ──
+      Container {
+        id: pageDisplays;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        Container {
+          anchors.top: parent.top;
+          anchors.topMargin: 8;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 320;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
+
+          FormGrid {
+            anchors.fill: parent;
+            anchors.leftMargin: 20;
+            anchors.topMargin: 16;
+            anchors.rightMargin: 20;
+            anchors.bottomMargin: 16;
+
+            FormSection { title: "Display Configuration"; }
+            FormRow {
+              label: "Active Display";
+              ComboBox {
+                id: cmbDisplay;
+                items: "eDP-1 (Built-in Display), HDMI-1, Virtual-1";
+              }
+            }
+            FormRow {
+              label: "Resolution";
+              ComboBox {
+                id: cmbResolution;
+                items: "1920x1080 (16:9), 1600x900 (16:9), 1366x768 (16:9), 1280x720 (16:9), 1024x768 (4:3)";
+              }
+            }
+            FormRow {
+              label: "Refresh Rate";
+              ComboBox {
+                id: cmbRefreshRate;
+                items: "60 Hz, 75 Hz, 120 Hz, 144 Hz";
+              }
+            }
+            FormRow {
+              label: "UI Scaling";
+              ComboBox {
+                id: cmbScale;
+                items: "100%, 125%, 150%, 200%";
+              }
+            }
+            FormRow {
+              label: "Night Light";
+              Row {
+                Switch { id: swNightLight; width: 50; height: 28; }
+              }
+            }
+          }
         }
       }
-      FormRow {
-        label: "Processor";
-        Entry {
-          id: txtAboutCpu;
-          width: 320;
-          height: 30;
-          text: "x86_64 Processor";
-          readOnly: true;
+
+      // ── 4. Appearance Page ──
+      Container {
+        id: pageAppearance;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        Container {
+          anchors.top: parent.top;
+          anchors.topMargin: 8;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 320;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
+
+          FormGrid {
+            anchors.fill: parent;
+            anchors.leftMargin: 20;
+            anchors.topMargin: 16;
+            anchors.rightMargin: 20;
+            anchors.bottomMargin: 16;
+
+            FormSection { title: "Theme & Colors"; }
+            FormRow {
+              label: "Dark Mode";
+              Row {
+                Switch { id: swDarkMode; width: 50; height: 28; }
+              }
+            }
+            FormRow {
+              label: "Accent Color";
+              ComboBox {
+                id: cmbAccent;
+                items: "Blue, Purple, Emerald, Amber, Crimson, Slate";
+              }
+            }
+
+            FormSection { title: "Desktop Background"; }
+            FormRow {
+              label: "Wallpaper Mode";
+              ComboBox {
+                id: cmbWallpaperMode;
+                items: "Fill, Fit, Stretch, Center, Tile";
+              }
+            }
+            FormRow {
+              label: "Current Wallpaper";
+              Entry {
+                id: txtWallpaperPath;
+                width: 300;
+                height: 30;
+                readOnly: true;
+              }
+            }
+            FormRow {
+              label: "Change Wallpaper";
+              Row {
+                Button {
+                  id: btnChooseWallpaper;
+                  width: 160;
+                  height: 30;
+                  text: "Choose Wallpaper...";
+                }
+              }
+            }
+          }
         }
       }
-      FormRow {
-        label: "System Memory";
-        Entry {
-          id: txtAboutMem;
-          width: 320;
-          height: 30;
-          text: "8.0 GiB";
-          readOnly: true;
+
+      // ── 5. Background Page ──
+      Container {
+        id: pageBackground;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        Container {
+          anchors.top: parent.top;
+          anchors.topMargin: 8;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 220;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
+
+          FormGrid {
+            anchors.fill: parent;
+            anchors.leftMargin: 20;
+            anchors.topMargin: 16;
+            anchors.rightMargin: 20;
+            anchors.bottomMargin: 16;
+
+            FormSection { title: "Wallpaper Settings"; }
+            FormRow {
+              label: "Background Mode";
+              ComboBox {
+                id: cmbWallpaperModeBg;
+                items: "Fill, Fit, Stretch, Center, Tile";
+              }
+            }
+            FormRow {
+              label: "Select Image";
+              Row {
+                Button {
+                  id: btnChooseWallpaperBg;
+                  width: 160;
+                  height: 30;
+                  text: "Browse Image...";
+                }
+              }
+            }
+          }
+        }
+      }
+
+      // ── 6. Dock Page ──
+      Container {
+        id: pageDesktop;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        Container {
+          anchors.top: parent.top;
+          anchors.topMargin: 8;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 340;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
+
+          FormGrid {
+            anchors.fill: parent;
+            anchors.leftMargin: 20;
+            anchors.topMargin: 16;
+            anchors.rightMargin: 20;
+            anchors.bottomMargin: 16;
+
+            FormSection { title: "Dock Configuration"; }
+            FormRow {
+              label: "Position on Screen";
+              ComboBox {
+                id: cmbDockPosition;
+                items: "Bottom, Left, Right";
+              }
+            }
+            FormRow {
+              label: "Icon Size";
+              ComboBox {
+                id: cmbDockIconSize;
+                items: "24 px, 32 px, 48 px, 64 px";
+              }
+            }
+            FormRow {
+              label: "Auto-hide Dock";
+              Row {
+                Switch { id: swDockAutoHide; width: 50; height: 28; }
+              }
+            }
+            FormRow {
+              label: "Dock Strut Margins";
+              ComboBox {
+                id: cmbDockMargin;
+                items: "0 px, 2 px, 3 px (Standard), 5 px, 8 px";
+              }
+            }
+
+            FormSection { title: "Desktop Panel"; }
+            FormRow {
+              label: "Show Desktop Button";
+              Row {
+                Switch { id: swShowDesktopBtn; width: 50; height: 28; }
+              }
+            }
+            FormRow {
+              label: "Clock 24-hour Format";
+              Row {
+                Switch { id: swClock24h; width: 50; height: 28; }
+              }
+            }
+          }
+        }
+      }
+
+      // ── 7. User Page ──
+      Container {
+        id: pageUser;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        Container {
+          anchors.top: parent.top;
+          anchors.topMargin: 8;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 220;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
+
+          FormGrid {
+            anchors.fill: parent;
+            anchors.leftMargin: 20;
+            anchors.topMargin: 16;
+            anchors.rightMargin: 20;
+            anchors.bottomMargin: 16;
+
+            FormSection { title: "User Account"; }
+            FormRow {
+              label: "Current User";
+              Entry {
+                id: txtUserAccount;
+                width: 280;
+                height: 30;
+                text: "afumi (Administrator)";
+                readOnly: true;
+              }
+            }
+            FormRow {
+              label: "Account Password";
+              Row {
+                Button {
+                  id: btnChangePassword;
+                  width: 140;
+                  height: 30;
+                  text: "Change Password...";
+                }
+              }
+            }
+            FormRow {
+              label: "Automatic Login";
+              Row {
+                Switch { id: swAutoLogin; width: 50; height: 28; checked: true; }
+              }
+            }
+          }
+        }
+      }
+
+      // ── 8. Language Page ──
+      Container {
+        id: pageLanguage;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        Container {
+          anchors.top: parent.top;
+          anchors.topMargin: 8;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 220;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
+
+          FormGrid {
+            anchors.fill: parent;
+            anchors.leftMargin: 20;
+            anchors.topMargin: 16;
+            anchors.rightMargin: 20;
+            anchors.bottomMargin: 16;
+
+            FormSection { title: "Language & Regional Formats"; }
+            FormRow {
+              label: "Display Language";
+              ComboBox {
+                id: cmbDisplayLanguage;
+                items: "English (United States), Indonesian, Japanese, German, French";
+              }
+            }
+            FormRow {
+              label: "Regional Formats";
+              ComboBox {
+                id: cmbRegionalFormats;
+                items: "United States (en_US.UTF-8), Indonesia (id_ID.UTF-8), Japan (ja_JP.UTF-8)";
+              }
+            }
+          }
+        }
+      }
+
+      // ── 9. Battery Page ──
+      Container {
+        id: pageBattery;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        Container {
+          anchors.top: parent.top;
+          anchors.topMargin: 8;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 280;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
+
+          FormGrid {
+            anchors.fill: parent;
+            anchors.leftMargin: 20;
+            anchors.topMargin: 16;
+            anchors.rightMargin: 20;
+            anchors.bottomMargin: 16;
+
+            FormSection { title: "Power Management"; }
+            FormRow {
+              label: "Power Mode";
+              ComboBox {
+                id: cmbPowerMode;
+                items: "Performance, Balanced, Power Saver";
+              }
+            }
+            FormRow {
+              label: "Blank Screen After";
+              ComboBox {
+                id: cmbScreenBlank;
+                items: "1 minute, 5 minutes, 10 minutes, 15 minutes, Never";
+              }
+            }
+            FormRow {
+              label: "Automatic Suspend";
+              Row {
+                Switch { id: swAutoSuspend; width: 50; height: 28; }
+              }
+            }
+
+            FormSection { title: "Battery Status"; }
+            FormRow {
+              label: "Current Power";
+              Entry {
+                id: txtPowerStatus;
+                width: 260;
+                height: 30;
+                text: "AC Power Connected (100%)";
+                readOnly: true;
+              }
+            }
+          }
+        }
+      }
+
+      // ── 10. About Page ──
+      Container {
+        id: pageAbout;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        Container {
+          anchors.top: parent.top;
+          anchors.topMargin: 8;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 380;
+          drawFrame: false;
+          style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
+
+          FormGrid {
+            anchors.fill: parent;
+            anchors.leftMargin: 20;
+            anchors.topMargin: 16;
+            anchors.rightMargin: 20;
+            anchors.bottomMargin: 16;
+
+            FormSection { title: "System Details"; }
+            FormRow {
+              label: "Operating System";
+              Entry {
+                id: txtAboutOs;
+                width: 300;
+                height: 30;
+                text: "Samarinda OS 1.0 (Kutai Edition)";
+                readOnly: true;
+              }
+            }
+            FormRow {
+              label: "Desktop Shell";
+              Entry {
+                id: txtAboutShell;
+                width: 300;
+                height: 30;
+                text: "shellsama (Native X11 Shell)";
+                readOnly: true;
+              }
+            }
+            FormRow {
+              label: "Window Manager";
+              Entry {
+                id: txtAboutWm;
+                width: 300;
+                height: 30;
+                text: "wmsama (Compositing Window Manager)";
+                readOnly: true;
+              }
+            }
+            FormRow {
+              label: "Toolkit";
+              Entry {
+                id: txtAboutToolkit;
+                width: 300;
+                height: 30;
+                text: "Floria Toolkit 0.0.1 (libft / ftpas)";
+                readOnly: true;
+              }
+            }
+
+            FormSection { title: "Hardware Information"; }
+            FormRow {
+              label: "Linux Kernel";
+              Entry {
+                id: txtAboutKernel;
+                width: 300;
+                height: 30;
+                text: "Linux";
+                readOnly: true;
+              }
+            }
+            FormRow {
+              label: "Processor";
+              Entry {
+                id: txtAboutCpu;
+                width: 300;
+                height: 30;
+                text: "x86_64 Processor";
+                readOnly: true;
+              }
+            }
+            FormRow {
+              label: "System Memory";
+              Entry {
+                id: txtAboutMem;
+                width: 300;
+                height: 30;
+                text: "8.0 GiB";
+                readOnly: true;
+              }
+            }
+          }
+        }
+      }
+
+      // ── Backward-Compatibility Pages (Hidden by default) ──
+      Container {
+        id: pageSound;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        FormGrid {
+          anchors.fill: parent;
+          anchors.leftMargin: 24;
+          anchors.topMargin: 16;
+          anchors.rightMargin: 24;
+          anchors.bottomMargin: 16;
+
+          FormSection { title: "Sound Output"; }
+          FormRow {
+            label: "Output Device";
+            ComboBox {
+              id: cmbOutputDevice;
+              items: "Default Audio Sink, Analog Stereo, HDMI / DisplayPort Audio";
+            }
+          }
+          FormRow {
+            label: "Output Volume";
+            Row {
+              Slider {
+                id: slVolume;
+                width: 220;
+                height: 24;
+              }
+            }
+          }
+          FormRow {
+            label: "Mute Output";
+            Row {
+              Switch { id: swMute; width: 50; height: 28; }
+            }
+          }
+          FormRow {
+            label: "System Alert Sounds";
+            Row {
+              Switch { id: swSoundEffects; width: 50; height: 28; }
+            }
+          }
+        }
+      }
+
+      Container {
+        id: pagePower;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+      }
+
+      Container {
+        id: pageMouse;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        FormGrid {
+          anchors.fill: parent;
+          anchors.leftMargin: 24;
+          anchors.topMargin: 16;
+          anchors.rightMargin: 24;
+          anchors.bottomMargin: 16;
+
+          FormSection { title: "Mouse"; }
+          FormRow {
+            label: "Primary Button";
+            ComboBox { id: cmbPrimaryBtn; items: "Left, Right"; }
+          }
+          FormRow {
+            label: "Pointer Speed";
+            Row { Slider { id: slPointerSpeed; width: 220; height: 24; } }
+          }
+          FormRow {
+            label: "Natural Scrolling";
+            Row { Switch { id: swNaturalScroll; width: 50; height: 28; } }
+          }
+          FormRow {
+            label: "Tap to Click";
+            Row { Switch { id: swTapToClick; width: 50; height: 28; } }
+          }
+        }
+      }
+
+      Container {
+        id: pageKeyboard;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        FormGrid {
+          anchors.fill: parent;
+          anchors.leftMargin: 24;
+          anchors.topMargin: 16;
+          anchors.rightMargin: 24;
+          anchors.bottomMargin: 16;
+
+          FormSection { title: "Input & Layout"; }
+          FormRow {
+            label: "Keyboard Layout";
+            ComboBox { id: cmbKeyboardLayout; items: "English (US), Indonesian, Japanese, German, French"; }
+          }
+          FormRow {
+            label: "Key Repeat Delay";
+            Row { Slider { id: slKeyDelay; width: 220; height: 24; } }
+          }
+          FormRow {
+            label: "Key Repeat Speed";
+            Row { Slider { id: slKeyRate; width: 220; height: 24; } }
+          }
+          FormRow {
+            label: "Super Key Opens Launcher";
+            Row { Switch { id: swSuperLauncher; width: 50; height: 28; } }
+          }
+        }
+      }
+
+      Container {
+        id: pageApps;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        FormGrid {
+          anchors.fill: parent;
+          anchors.leftMargin: 24;
+          anchors.topMargin: 16;
+          anchors.rightMargin: 24;
+          anchors.bottomMargin: 16;
+
+          FormSection { title: "Default Applications"; }
+          FormRow {
+            label: "Web Browser";
+            ComboBox { id: cmbBrowser; items: "Default Web Browser, Mozilla Firefox, Chromium"; }
+          }
+          FormRow {
+            label: "File Manager";
+            ComboBox { id: cmbFileManager; items: "filesama (Samarinda Files), Standard File Manager"; }
+          }
+          FormRow {
+            label: "Terminal Emulator";
+            ComboBox { id: cmbTerminal; items: "samarinda-terminal, XTerm"; }
+          }
+          FormRow {
+            label: "Text Editor";
+            ComboBox { id: cmbEditor; items: "Default Text Editor, Nano, Gedit"; }
+          }
         }
       }
     }
