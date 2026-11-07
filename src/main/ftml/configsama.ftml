@@ -1,0 +1,574 @@
+// @form TConfigSamaWindow
+//
+// configsama — desktop settings application modelled in FTML with ECA.
+// Left sidebar with category navigation; right content area with grouped settings cards.
+//
+Window {
+  id: mainWindow;
+  title: "Settings";
+  extendedClientArea: true;
+  width: 960;
+  height: 640;
+
+  // ── Unified Headerbar (ECA) ──
+  Container {
+    id: headerBar;
+    anchors.top: parent.top;
+    anchors.left: parent.left;
+    anchors.right: parent.right;
+    height: 48;
+    drawFrame: false;
+    style: "border-bottom: 1px solid rgba(128, 128, 128, 0.25);";
+
+    Text {
+      id: appTitle;
+      anchors.left: parent.left;
+      anchors.leftMargin: 84;
+      anchors.verticalCenter: parent.verticalCenter;
+      text: "Settings";
+      font: "Sans:bold 12";
+    }
+
+    Text {
+      id: sectionTitle;
+      anchors.left: parent.left;
+      anchors.leftMargin: 260;
+      anchors.verticalCenter: parent.verticalCenter;
+      text: "Appearance";
+      font: "Sans:bold 12";
+    }
+  }
+
+  // ── Left Sidebar Pane ──
+  Container {
+    id: sidebar;
+    anchors.top: headerBar.bottom;
+    anchors.left: parent.left;
+    anchors.bottom: parent.bottom;
+    width: 240;
+    padding: 0;
+    drawFrame: false;
+    style: "border-right: 1px solid rgba(128, 128, 128, 0.25);";
+
+    Container {
+      id: searchContainer;
+      anchors.top: parent.top;
+      anchors.left: parent.left;
+      anchors.right: parent.right;
+      height: 44;
+      padding: 0;
+      drawFrame: false;
+
+      Entry {
+        id: searchEntry;
+        anchors.left: parent.left;
+        anchors.right: parent.right;
+        anchors.leftMargin: 12;
+        anchors.rightMargin: 12;
+        anchors.verticalCenter: parent.verticalCenter;
+        height: 28;
+        placeholder: "Search settings...";
+      }
+    }
+
+    TreeView {
+      id: categoryTree;
+      anchors.top: searchContainer.bottom;
+      anchors.left: parent.left;
+      anchors.right: parent.right;
+      anchors.bottom: parent.bottom;
+      paddingX: 8;
+      paddingY: 6;
+      itemHeight: 32;
+      indentWidth: 12;
+      drawFrame: false;
+      style: "background-color: transparent; border: none;";
+
+      TreeNode { text: "Appearance"; expanded: true; }
+      TreeNode { text: "Displays"; expanded: true; }
+      TreeNode { text: "Desktop & Dock"; expanded: true; }
+      TreeNode { text: "Sound"; expanded: true; }
+      TreeNode { text: "Power"; expanded: true; }
+      TreeNode { text: "Mouse & Touchpad"; expanded: true; }
+      TreeNode { text: "Keyboard & Shortcuts"; expanded: true; }
+      TreeNode { text: "Default Applications"; expanded: true; }
+      TreeNode { text: "About"; expanded: true; }
+    }
+  }
+
+  // ── Right Content Area ──
+  Container {
+    id: contentArea;
+    anchors.top: headerBar.bottom;
+    anchors.left: sidebar.right;
+    anchors.right: parent.right;
+    anchors.bottom: parent.bottom;
+    padding: 0;
+    drawFrame: false;
+
+    // ── 1. Appearance Page ──
+    FormGrid {
+      id: pageAppearance;
+      anchors.fill: parent;
+      anchors.leftMargin: 24;
+      anchors.topMargin: 16;
+      anchors.rightMargin: 24;
+      anchors.bottomMargin: 16;
+      visible: true;
+
+      FormSection { title: "Style"; }
+      FormRow {
+        label: "Dark Mode";
+        Row {
+          Switch { id: swDarkMode; width: 50; height: 28; }
+        }
+      }
+      FormRow {
+        label: "Accent Color";
+        ComboBox {
+          id: cmbAccent;
+          items: "Blue, Purple, Emerald, Amber, Crimson, Slate";
+        }
+      }
+
+      FormSection { title: "Desktop Background"; }
+      FormRow {
+        label: "Wallpaper Mode";
+        ComboBox {
+          id: cmbWallpaperMode;
+          items: "Fill, Fit, Stretch, Center, Tile";
+        }
+      }
+      FormRow {
+        label: "Current Wallpaper";
+        Entry {
+          id: txtWallpaperPath;
+          width: 320;
+          height: 30;
+          readOnly: true;
+        }
+      }
+      FormRow {
+        label: "Change Wallpaper";
+        Row {
+          Button {
+            id: btnChooseWallpaper;
+            width: 160;
+            height: 30;
+            text: "Choose Wallpaper...";
+          }
+        }
+      }
+    }
+
+    // ── 2. Displays Page ──
+    FormGrid {
+      id: pageDisplays;
+      anchors.fill: parent;
+      anchors.leftMargin: 24;
+      anchors.topMargin: 16;
+      anchors.rightMargin: 24;
+      anchors.bottomMargin: 16;
+      visible: false;
+
+      FormSection { title: "Display Configuration"; }
+      FormRow {
+        label: "Active Display";
+        ComboBox {
+          id: cmbDisplay;
+          items: "eDP-1 (Built-in Display), HDMI-1, Virtual-1";
+        }
+      }
+      FormRow {
+        label: "Resolution";
+        ComboBox {
+          id: cmbResolution;
+          items: "1920x1080 (16:9), 1600x900 (16:9), 1366x768 (16:9), 1280x720 (16:9), 1024x768 (4:3)";
+        }
+      }
+      FormRow {
+        label: "Refresh Rate";
+        ComboBox {
+          id: cmbRefreshRate;
+          items: "60 Hz, 75 Hz, 120 Hz, 144 Hz";
+        }
+      }
+      FormRow {
+        label: "UI Scaling";
+        ComboBox {
+          id: cmbScale;
+          items: "100%, 125%, 150%, 200%";
+        }
+      }
+
+      FormSection { title: "Eye Comfort"; }
+      FormRow {
+        label: "Night Light";
+        Row {
+          Switch { id: swNightLight; width: 50; height: 28; }
+        }
+      }
+    }
+
+    // ── 3. Desktop & Dock Page ──
+    FormGrid {
+      id: pageDesktop;
+      anchors.fill: parent;
+      anchors.leftMargin: 24;
+      anchors.topMargin: 16;
+      anchors.rightMargin: 24;
+      anchors.bottomMargin: 16;
+      visible: false;
+
+      FormSection { title: "Dock Configuration"; }
+      FormRow {
+        label: "Position on Screen";
+        ComboBox {
+          id: cmbDockPosition;
+          items: "Bottom, Left, Right";
+        }
+      }
+      FormRow {
+        label: "Icon Size";
+        ComboBox {
+          id: cmbDockIconSize;
+          items: "24 px, 32 px, 48 px, 64 px";
+        }
+      }
+      FormRow {
+        label: "Auto-hide Dock";
+        Row {
+          Switch { id: swDockAutoHide; width: 50; height: 28; }
+        }
+      }
+      FormRow {
+        label: "Dock Strut Margins";
+        ComboBox {
+          id: cmbDockMargin;
+          items: "0 px, 2 px, 3 px (Standard), 5 px, 8 px";
+        }
+      }
+
+      FormSection { title: "Top Panel & Desktop"; }
+      FormRow {
+        label: "Show Desktop Button";
+        Row {
+          Switch { id: swShowDesktopBtn; width: 50; height: 28; }
+        }
+      }
+      FormRow {
+        label: "Clock 24-hour Format";
+        Row {
+          Switch { id: swClock24h; width: 50; height: 28; }
+        }
+      }
+    }
+
+    // ── 4. Sound Page ──
+    FormGrid {
+      id: pageSound;
+      anchors.fill: parent;
+      anchors.leftMargin: 24;
+      anchors.topMargin: 16;
+      anchors.rightMargin: 24;
+      anchors.bottomMargin: 16;
+      visible: false;
+
+      FormSection { title: "Sound Output"; }
+      FormRow {
+        label: "Output Device";
+        ComboBox {
+          id: cmbOutputDevice;
+          items: "Default Audio Sink, Analog Stereo, HDMI / DisplayPort Audio";
+        }
+      }
+      FormRow {
+        label: "Output Volume";
+        Row {
+          Slider {
+            id: slVolume;
+            width: 220;
+            height: 24;
+          }
+        }
+      }
+      FormRow {
+        label: "Mute Output";
+        Row {
+          Switch { id: swMute; width: 50; height: 28; }
+        }
+      }
+
+      FormSection { title: "Feedback"; }
+      FormRow {
+        label: "System Alert Sounds";
+        Row {
+          Switch { id: swSoundEffects; width: 50; height: 28; }
+        }
+      }
+    }
+
+    // ── 5. Power Page ──
+    FormGrid {
+      id: pagePower;
+      anchors.fill: parent;
+      anchors.leftMargin: 24;
+      anchors.topMargin: 16;
+      anchors.rightMargin: 24;
+      anchors.bottomMargin: 16;
+      visible: false;
+
+      FormSection { title: "Power Management"; }
+      FormRow {
+        label: "Power Mode";
+        ComboBox {
+          id: cmbPowerMode;
+          items: "Performance, Balanced, Power Saver";
+        }
+      }
+      FormRow {
+        label: "Blank Screen After";
+        ComboBox {
+          id: cmbScreenBlank;
+          items: "1 minute, 5 minutes, 10 minutes, 15 minutes, Never";
+        }
+      }
+      FormRow {
+        label: "Automatic Suspend";
+        Row {
+          Switch { id: swAutoSuspend; width: 50; height: 28; }
+        }
+      }
+
+      FormSection { title: "Battery & Energy"; }
+      FormRow {
+        label: "Power Status";
+        Entry {
+          id: txtPowerStatus;
+          width: 260;
+          height: 30;
+          text: "AC Power Connected (100%)";
+          readOnly: true;
+        }
+      }
+    }
+
+    // ── 6. Mouse & Touchpad Page ──
+    FormGrid {
+      id: pageMouse;
+      anchors.fill: parent;
+      anchors.leftMargin: 24;
+      anchors.topMargin: 16;
+      anchors.rightMargin: 24;
+      anchors.bottomMargin: 16;
+      visible: false;
+
+      FormSection { title: "Mouse"; }
+      FormRow {
+        label: "Primary Button";
+        ComboBox {
+          id: cmbPrimaryBtn;
+          items: "Left, Right";
+        }
+      }
+      FormRow {
+        label: "Pointer Speed";
+        Row {
+          Slider {
+            id: slPointerSpeed;
+            width: 220;
+            height: 24;
+          }
+        }
+      }
+      FormRow {
+        label: "Natural Scrolling";
+        Row {
+          Switch { id: swNaturalScroll; width: 50; height: 28; }
+        }
+      }
+
+      FormSection { title: "Touchpad"; }
+      FormRow {
+        label: "Tap to Click";
+        Row {
+          Switch { id: swTapToClick; width: 50; height: 28; }
+        }
+      }
+    }
+
+    // ── 7. Keyboard & Shortcuts Page ──
+    FormGrid {
+      id: pageKeyboard;
+      anchors.fill: parent;
+      anchors.leftMargin: 24;
+      anchors.topMargin: 16;
+      anchors.rightMargin: 24;
+      anchors.bottomMargin: 16;
+      visible: false;
+
+      FormSection { title: "Input & Layout"; }
+      FormRow {
+        label: "Keyboard Layout";
+        ComboBox {
+          id: cmbKeyboardLayout;
+          items: "English (US), Indonesian, Japanese, German, French";
+        }
+      }
+      FormRow {
+        label: "Key Repeat Delay";
+        Row {
+          Slider {
+            id: slKeyDelay;
+            width: 220;
+            height: 24;
+          }
+        }
+      }
+      FormRow {
+        label: "Key Repeat Speed";
+        Row {
+          Slider {
+            id: slKeyRate;
+            width: 220;
+            height: 24;
+          }
+        }
+      }
+
+      FormSection { title: "Desktop Shortcuts"; }
+      FormRow {
+        label: "Super Key Opens Launcher";
+        Row {
+          Switch { id: swSuperLauncher; width: 50; height: 28; }
+        }
+      }
+    }
+
+    // ── 8. Default Applications Page ──
+    FormGrid {
+      id: pageApps;
+      anchors.fill: parent;
+      anchors.leftMargin: 24;
+      anchors.topMargin: 16;
+      anchors.rightMargin: 24;
+      anchors.bottomMargin: 16;
+      visible: false;
+
+      FormSection { title: "Default Applications"; }
+      FormRow {
+        label: "Web Browser";
+        ComboBox {
+          id: cmbBrowser;
+          items: "Default Web Browser, Mozilla Firefox, Chromium";
+        }
+      }
+      FormRow {
+        label: "File Manager";
+        ComboBox {
+          id: cmbFileManager;
+          items: "filesama (Samarinda Files), Standard File Manager";
+        }
+      }
+      FormRow {
+        label: "Terminal Emulator";
+        ComboBox {
+          id: cmbTerminal;
+          items: "samarinda-terminal, XTerm";
+        }
+      }
+      FormRow {
+        label: "Text Editor";
+        ComboBox {
+          id: cmbEditor;
+          items: "Default Text Editor, Nano, Gedit";
+        }
+      }
+    }
+
+    // ── 9. About Page ──
+    FormGrid {
+      id: pageAbout;
+      anchors.fill: parent;
+      anchors.leftMargin: 24;
+      anchors.topMargin: 16;
+      anchors.rightMargin: 24;
+      anchors.bottomMargin: 16;
+      visible: false;
+
+      FormSection { title: "System Details"; }
+      FormRow {
+        label: "Operating System";
+        Entry {
+          id: txtAboutOs;
+          width: 320;
+          height: 30;
+          text: "Samarinda OS 1.0 (Kutai Edition)";
+          readOnly: true;
+        }
+      }
+      FormRow {
+        label: "Desktop Shell";
+        Entry {
+          id: txtAboutShell;
+          width: 320;
+          height: 30;
+          text: "shellsama (Native X11 Shell)";
+          readOnly: true;
+        }
+      }
+      FormRow {
+        label: "Window Manager";
+        Entry {
+          id: txtAboutWm;
+          width: 320;
+          height: 30;
+          text: "wmsama (Compositing Window Manager)";
+          readOnly: true;
+        }
+      }
+      FormRow {
+        label: "Toolkit";
+        Entry {
+          id: txtAboutToolkit;
+          width: 320;
+          height: 30;
+          text: "Floria Toolkit 0.0.1 (libft / ftpas)";
+          readOnly: true;
+        }
+      }
+
+      FormSection { title: "Hardware Information"; }
+      FormRow {
+        label: "Linux Kernel";
+        Entry {
+          id: txtAboutKernel;
+          width: 320;
+          height: 30;
+          text: "Linux";
+          readOnly: true;
+        }
+      }
+      FormRow {
+        label: "Processor";
+        Entry {
+          id: txtAboutCpu;
+          width: 320;
+          height: 30;
+          text: "x86_64 Processor";
+          readOnly: true;
+        }
+      }
+      FormRow {
+        label: "System Memory";
+        Entry {
+          id: txtAboutMem;
+          width: 320;
+          height: 30;
+          text: "8.0 GiB";
+          readOnly: true;
+        }
+      }
+    }
+  }
+}
