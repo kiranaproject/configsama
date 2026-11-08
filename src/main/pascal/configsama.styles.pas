@@ -73,7 +73,14 @@ const
     '    color: #f1f5f9;' + LineEnding +
     '    border-radius: 6px;' + LineEnding +
     '    border: 1px solid rgba(255, 255, 255, 0.12);' + LineEnding +
-    '}';
+    '}' + LineEnding +
+    'label, text {' + LineEnding +
+    '    color: #1e293b;' + LineEnding +
+    '}' + LineEnding +
+    'window.dark label, window.dark text, .dark label, .dark text, label.dark, text.dark {' + LineEnding +
+    '    color: #f1f5f9;' + LineEnding +
+    '}' + LineEnding +
+    '';
 
 procedure ApplyConfigSamaStyles();
 begin
