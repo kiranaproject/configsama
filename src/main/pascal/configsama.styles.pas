@@ -80,6 +80,23 @@ const
     'window.dark label, window.dark text, .dark label, .dark text, label.dark, text.dark {' + LineEnding +
     '    color: #f1f5f9;' + LineEnding +
     '}' + LineEnding +
+    'button#btnPurrInfo, #btnPurrInfo, button.flat, .flat {' + LineEnding +
+    '    background-color: transparent;' + LineEnding +
+    '    border: none;' + LineEnding +
+    '    box-shadow: none;' + LineEnding +
+    '}' + LineEnding +
+    'button#btnPurrInfo:hover, #btnPurrInfo:hover {' + LineEnding +
+    '    background-color: rgba(59, 130, 246, 0.12);' + LineEnding +
+    '    border-radius: 12px;' + LineEnding +
+    '    border: none;' + LineEnding +
+    '    box-shadow: none;' + LineEnding +
+    '}' + LineEnding +
+    'button#btnPurrInfo.dark:hover, #btnPurrInfo.dark:hover {' + LineEnding +
+    '    background-color: rgba(96, 165, 250, 0.18);' + LineEnding +
+    '    border-radius: 12px;' + LineEnding +
+    '    border: none;' + LineEnding +
+    '    box-shadow: none;' + LineEnding +
+    '}' + LineEnding +
     '';
 
 procedure ApplyConfigSamaStyles();

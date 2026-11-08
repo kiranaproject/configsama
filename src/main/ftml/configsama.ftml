@@ -231,11 +231,12 @@ Window {
 
             Button {
               id: btnPurrInfo;
-              icon: "about";
+              icon: "info-accent";
               width: 24;
               height: 24;
+              flat: true;
               drawFrame: false;
-              style: "background-color: transparent; border: none;";
+              style: "background-color: transparent; border: none; box-shadow: none;";
               anchors.right: parent.right;
               anchors.rightMargin: 16;
               anchors.verticalCenter: parent.verticalCenter;

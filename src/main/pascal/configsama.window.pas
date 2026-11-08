@@ -298,7 +298,11 @@ begin
   if w is TFtImage then FImgCheckPurr := TFtImage(w);
 
   w := FindWidget('btnPurrInfo');
-  if w is TFtButton then FBtnPurrInfo := TFtButton(w);
+  if w is TFtButton then
+  begin
+    FBtnPurrInfo := TFtButton(w);
+    FBtnPurrInfo.Flat := True;
+  end;
 
   w := FindWidget('imgWifiMeow');
   if w is TFtImage then FImgWifiMeow := TFtImage(w);
@@ -821,7 +825,7 @@ begin
   if FImgWifiVM <> nil then FImgWifiVM.LoadSVGString(FtApp.GetIconSvg('wlan', FtApp.DarkMode));
   if FImgLockVM <> nil then FImgLockVM.LoadSVGString(FtApp.GetIconSvg('lock', FtApp.DarkMode));
   if FImgWired <> nil then FImgWired.LoadSVGString(FtApp.GetIconSvg('wired', FtApp.DarkMode));
-  if FBtnPurrInfo <> nil then FBtnPurrInfo.SetIconSVG(FtApp.GetIconSvg('about', FtApp.DarkMode));
+  if FBtnPurrInfo <> nil then FBtnPurrInfo.SetIconSVG(FtApp.GetIconSvg('info-accent', FtApp.DarkMode));
   if FCategoryTree <> nil then FCategoryTree.Invalidate();
 end;
 
