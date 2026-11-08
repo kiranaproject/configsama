@@ -8,12 +8,13 @@ program configsama;
 uses
   Classes, SysUtils,
   ftpas, ftpas.app,
-  ConfigSama.Settings, ConfigSama.Window;
+  ConfigSama.Settings, ConfigSama.Styles, ConfigSama.Window;
 
 var
   AppWindow: TConfigSamaWindow;
 
 begin
+  ApplyConfigSamaStyles();
   AppWindow := TConfigSamaWindow.Create();
   try
     AppWindow.Show();

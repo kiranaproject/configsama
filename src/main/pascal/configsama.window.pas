@@ -11,7 +11,7 @@ uses
   Classes, SysUtils,
   ftpas, ftpas.types, ftpas.api, ftpas.app, ftpas.canvas, ftpas.widget, ftpas.controls,
   ftpas.layouts, ftpas.views, ftpas.dialogs, ftpas.ftml,
-  ConfigSama.Settings;
+  ConfigSama.Settings, ConfigSama.Styles;
 
 type
   { TConfigSamaWindow — GNOME Settings styled application with FTML and ECA }
@@ -49,6 +49,17 @@ type
     // WLAN & Wired page controls
     FSwWlan: TFtSwitch;
     FSwWired: TFtSwitch;
+    FImgWifiPurr: TFtImage;
+    FImgLockPurr: TFtImage;
+    FImgCheckPurr: TFtImage;
+    FBtnPurrInfo: TFtButton;
+    FImgWifiMeow: TFtImage;
+    FImgLockMeow: TFtImage;
+    FImgWifiVirgin: TFtImage;
+    FImgLockVirgin: TFtImage;
+    FImgWifiVM: TFtImage;
+    FImgLockVM: TFtImage;
+    FImgWired: TFtImage;
 
     // Appearance page controls
     FSwDarkMode: TFtSwitch;
@@ -113,6 +124,7 @@ type
 
     procedure SetupUI();
     procedure PopulateControls();
+    procedure UpdateThemeIcons();
 
     // Event Handlers
     procedure HandleCategorySelect(Sender: TFtTreeView; Node: TFtTreeNode);
@@ -181,6 +193,7 @@ implementation
 
 constructor TConfigSamaWindow.Create();
 begin
+  ApplyConfigSamaStyles();
   inherited Create(960, 640, 'Settings', 'TConfigSamaWindow');
 
   FSettings := TConfigSettings.Create();
@@ -274,6 +287,39 @@ begin
 
   w := FindWidget('swWired');
   if w is TFtSwitch then FSwWired := TFtSwitch(w);
+
+  w := FindWidget('imgWifiPurr');
+  if w is TFtImage then FImgWifiPurr := TFtImage(w);
+
+  w := FindWidget('imgLockPurr');
+  if w is TFtImage then FImgLockPurr := TFtImage(w);
+
+  w := FindWidget('imgCheckPurr');
+  if w is TFtImage then FImgCheckPurr := TFtImage(w);
+
+  w := FindWidget('btnPurrInfo');
+  if w is TFtButton then FBtnPurrInfo := TFtButton(w);
+
+  w := FindWidget('imgWifiMeow');
+  if w is TFtImage then FImgWifiMeow := TFtImage(w);
+
+  w := FindWidget('imgLockMeow');
+  if w is TFtImage then FImgLockMeow := TFtImage(w);
+
+  w := FindWidget('imgWifiVirgin');
+  if w is TFtImage then FImgWifiVirgin := TFtImage(w);
+
+  w := FindWidget('imgLockVirgin');
+  if w is TFtImage then FImgLockVirgin := TFtImage(w);
+
+  w := FindWidget('imgWifiVM');
+  if w is TFtImage then FImgWifiVM := TFtImage(w);
+
+  w := FindWidget('imgLockVM');
+  if w is TFtImage then FImgLockVM := TFtImage(w);
+
+  w := FindWidget('imgWired');
+  if w is TFtImage then FImgWired := TFtImage(w);
 
   // Appearance controls
   w := FindWidget('swDarkMode');
@@ -561,6 +607,7 @@ begin
   FUpdatingControls := True;
   try
     FtApp.DarkMode := FSettings.DarkMode;
+    UpdateThemeIcons();
 
     // Appearance
     if Assigned(FSwDarkMode) then
@@ -763,12 +810,28 @@ begin
   else if (Pos('about', q) > 0) or (Pos('sys', q) > 0) or (Pos('info', q) > 0) then SelectCategoryByName('About');
 end;
 
+procedure TConfigSamaWindow.UpdateThemeIcons();
+begin
+  if FImgWifiPurr <> nil then FImgWifiPurr.LoadSVGString(FtApp.GetIconSvg('wlan', FtApp.DarkMode));
+  if FImgLockPurr <> nil then FImgLockPurr.LoadSVGString(FtApp.GetIconSvg('lock', FtApp.DarkMode));
+  if FImgWifiMeow <> nil then FImgWifiMeow.LoadSVGString(FtApp.GetIconSvg('wlan', FtApp.DarkMode));
+  if FImgLockMeow <> nil then FImgLockMeow.LoadSVGString(FtApp.GetIconSvg('lock', FtApp.DarkMode));
+  if FImgWifiVirgin <> nil then FImgWifiVirgin.LoadSVGString(FtApp.GetIconSvg('wlan', FtApp.DarkMode));
+  if FImgLockVirgin <> nil then FImgLockVirgin.LoadSVGString(FtApp.GetIconSvg('lock', FtApp.DarkMode));
+  if FImgWifiVM <> nil then FImgWifiVM.LoadSVGString(FtApp.GetIconSvg('wlan', FtApp.DarkMode));
+  if FImgLockVM <> nil then FImgLockVM.LoadSVGString(FtApp.GetIconSvg('lock', FtApp.DarkMode));
+  if FImgWired <> nil then FImgWired.LoadSVGString(FtApp.GetIconSvg('wired', FtApp.DarkMode));
+  if FBtnPurrInfo <> nil then FBtnPurrInfo.SetIconSVG(FtApp.GetIconSvg('about', FtApp.DarkMode));
+  if FCategoryTree <> nil then FCategoryTree.Invalidate();
+end;
+
 procedure TConfigSamaWindow.HandleDarkModeToggle(Sender: TFtSwitch; AToggled: Boolean);
 begin
   if FUpdatingControls or (FSettings = nil) then Exit();
   FSettings.DarkMode := AToggled;
   FSettings.Save();
   FtApp.DarkMode := AToggled;
+  UpdateThemeIcons();
   Invalidate();
 end;
 
