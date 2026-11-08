@@ -463,67 +463,269 @@ Window {
         }
       }
 
-      // ── 3. Display Page ──
+      // ── 3. Displays Page ──
       Container {
         id: pageDisplays;
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
 
+        // Card 1: Brightness
         Container {
-          id: cardDisplays;
+          id: cardBrightness;
           styleClass: "settings-card";
           anchors.top: parent.top;
-          anchors.topMargin: 8;
+          anchors.topMargin: 4;
           anchors.left: parent.left;
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 320;
+          height: 80;
           drawFrame: false;
 
-          FormGrid {
-            anchors.fill: parent;
-            anchors.leftMargin: 20;
-            anchors.topMargin: 16;
-            anchors.rightMargin: 20;
-            anchors.bottomMargin: 16;
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Brightness";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
 
-            FormSection { title: "Display Configuration"; }
-            FormRow {
-              label: "Active Display";
-              ComboBox {
-                id: cmbDisplay;
-                items: "eDP-1 (Built-in Display), HDMI-1, Virtual-1";
+          Image {
+            id: imgBrightnessLow;
+            icon: "brightness-low";
+            width: 16;
+            height: 16;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 16;
+          }
+
+          Slider {
+            id: sldBrightness;
+            anchors.left: imgBrightnessLow.right;
+            anchors.leftMargin: 12;
+            anchors.right: imgBrightnessHigh.left;
+            anchors.rightMargin: 12;
+            anchors.verticalCenter: imgBrightnessLow.verticalCenter;
+            height: 24;
+            min: 0;
+            max: 100;
+            value: 80;
+          }
+
+          Image {
+            id: imgBrightnessHigh;
+            icon: "brightness-high";
+            width: 16;
+            height: 16;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            anchors.verticalCenter: imgBrightnessLow.verticalCenter;
+          }
+        }
+
+        // Card 2: Screen Configuration
+        Container {
+          id: cardScreen;
+          styleClass: "settings-card";
+          anchors.top: cardBrightness.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 196;
+          drawFrame: false;
+
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Screen";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+
+          // Row 1: Resolution
+          Container {
+            id: rowResolution;
+            anchors.top: parent.top;
+            anchors.topMargin: 38;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Resolution";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbResolution;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 220;
+              height: 30;
+              items: "1920 × 1080 (Default), 1680 × 1050, 1440 × 900, 1280 × 800";
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowResolution.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Refresh Rate
+          Container {
+            id: rowRefreshRate;
+            anchors.top: rowResolution.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Refresh rate";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbRefreshRate;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 140;
+              height: 30;
+              items: "60.00 Hz, 75.00 Hz, 120.00 Hz, 144.00 Hz";
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowRefreshRate.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: Rotation
+          Container {
+            id: rowRotation;
+            anchors.top: rowRefreshRate.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Rotation";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Row {
+              id: rowRotationBtns;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              height: 30;
+              spacing: 6;
+
+              Button {
+                id: btnRotate0;
+                width: 38;
+                height: 28;
+                icon: "rotate-0";
+                styleClass: "segmented-btn";
+              }
+              Button {
+                id: btnRotate90;
+                width: 38;
+                height: 28;
+                icon: "rotate-90";
+                styleClass: "segmented-btn";
+              }
+              Button {
+                id: btnRotate180;
+                width: 38;
+                height: 28;
+                icon: "rotate-180";
+                styleClass: "segmented-btn";
+              }
+              Button {
+                id: btnRotate270;
+                width: 38;
+                height: 28;
+                icon: "rotate-270";
+                styleClass: "segmented-btn";
               }
             }
-            FormRow {
-              label: "Resolution";
-              ComboBox {
-                id: cmbResolution;
-                items: "1920x1080 (16:9), 1600x900 (16:9), 1366x768 (16:9), 1280x720 (16:9), 1024x768 (4:3)";
-              }
-            }
-            FormRow {
-              label: "Refresh Rate";
-              ComboBox {
-                id: cmbRefreshRate;
-                items: "60 Hz, 75 Hz, 120 Hz, 144 Hz";
-              }
-            }
-            FormRow {
-              label: "UI Scaling";
-              ComboBox {
-                id: cmbScale;
-                items: "100%, 125%, 150%, 200%";
-              }
-            }
-            FormRow {
-              label: "Night Light";
-              Row {
-                Switch { id: swNightLight; width: 50; height: 28; }
-              }
-            }
+          }
+        }
+
+        // Card 3: Scale
+        Container {
+          id: cardScale;
+          styleClass: "settings-card";
+          anchors.top: cardScreen.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 96;
+          drawFrame: false;
+
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Scale";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+
+          SegmentedControl {
+            id: segScale;
+            anchors.top: parent.top;
+            anchors.topMargin: 42;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 36;
+            items: "100%, 125%, 150%, 175%, 200%";
+            selectedIndex: 0;
           }
         }
       }
@@ -535,67 +737,317 @@ Window {
         visible: false;
         drawFrame: false;
 
+        // Card 1: Theme
         Container {
-          id: cardAppearance;
+          id: cardTheme;
           styleClass: "settings-card";
           anchors.top: parent.top;
-          anchors.topMargin: 8;
+          anchors.topMargin: 4;
           anchors.left: parent.left;
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 320;
+          height: 180;
           drawFrame: false;
 
-          FormGrid {
-            anchors.fill: parent;
-            anchors.leftMargin: 20;
-            anchors.topMargin: 16;
-            anchors.rightMargin: 20;
-            anchors.bottomMargin: 16;
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Theme";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
 
-            FormSection { title: "Theme & Colors"; }
-            FormRow {
-              label: "Dark Mode";
-              Row {
-                Switch { id: swDarkMode; width: 50; height: 28; }
+          // Row of theme preview cards
+          Row {
+            id: rowThemePreviews;
+            anchors.top: parent.top;
+            anchors.topMargin: 38;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            height: 78;
+            spacing: 20;
+
+            Container {
+              id: cardThemeLight;
+              width: 104;
+              height: 74;
+              styleClass: "theme-choice";
+              drawFrame: false;
+
+              Button {
+                id: btnThemeLight;
+                anchors.top: parent.top;
+                anchors.horizontalCenter: parent.horizontalCenter;
+                width: 96;
+                height: 48;
+                icon: "theme-light";
+                styleClass: "theme-preview-btn";
               }
-            }
-            FormRow {
-              label: "Accent Color";
-              ComboBox {
-                id: cmbAccent;
-                items: "Blue, Purple, Emerald, Amber, Crimson, Slate";
+
+              Text {
+                anchors.bottom: parent.bottom;
+                anchors.horizontalCenter: parent.horizontalCenter;
+                text: "Light";
+                font: "Sans 11";
+                selectable: false;
               }
             }
 
-            FormSection { title: "Desktop Background"; }
-            FormRow {
-              label: "Wallpaper Mode";
-              ComboBox {
-                id: cmbWallpaperMode;
-                items: "Fill, Fit, Stretch, Center, Tile";
+            Container {
+              id: cardThemeDark;
+              width: 104;
+              height: 74;
+              styleClass: "theme-choice";
+              drawFrame: false;
+
+              Button {
+                id: btnThemeDark;
+                anchors.top: parent.top;
+                anchors.horizontalCenter: parent.horizontalCenter;
+                width: 96;
+                height: 48;
+                icon: "theme-dark";
+                styleClass: "theme-preview-btn";
+              }
+
+              Text {
+                anchors.bottom: parent.bottom;
+                anchors.horizontalCenter: parent.horizontalCenter;
+                text: "Dark";
+                font: "Sans 11";
+                selectable: false;
               }
             }
-            FormRow {
-              label: "Current Wallpaper";
-              Entry {
-                id: txtWallpaperPath;
-                width: 300;
-                height: 30;
-                readOnly: true;
-              }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowThemePreviews.bottom;
+            anchors.topMargin: 10;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Dim in dark mode row
+          Container {
+            id: rowDimDark;
+            anchors.bottom: parent.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 46;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Dim window titlebar in dark mode";
+              font: "Sans 12";
+              selectable: false;
             }
-            FormRow {
-              label: "Change Wallpaper";
-              Row {
-                Button {
-                  id: btnChooseWallpaper;
-                  width: 160;
-                  height: 30;
-                  text: "Choose Wallpaper...";
-                }
-              }
+
+            Switch {
+              id: swDarkMode;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
+              checked: false;
+            }
+          }
+        }
+
+        // Card 2: Accent color
+        Container {
+          id: cardAccent;
+          styleClass: "settings-card";
+          anchors.top: cardTheme.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 94;
+          drawFrame: false;
+
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Accent color";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+
+          Row {
+            id: rowAccentSwatches;
+            anchors.top: parent.top;
+            anchors.topMargin: 42;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            height: 36;
+            spacing: 12;
+
+            Button {
+              id: btnAccentMulti;
+              width: 28;
+              height: 28;
+              styleClass: "swatch-btn swatch-multi";
+            }
+            Button {
+              id: btnAccentBlue;
+              width: 28;
+              height: 28;
+              styleClass: "swatch-btn swatch-blue";
+            }
+            Button {
+              id: btnAccentPurple;
+              width: 28;
+              height: 28;
+              styleClass: "swatch-btn swatch-purple";
+            }
+            Button {
+              id: btnAccentPink;
+              width: 28;
+              height: 28;
+              styleClass: "swatch-btn swatch-pink";
+            }
+            Button {
+              id: btnAccentRed;
+              width: 28;
+              height: 28;
+              styleClass: "swatch-btn swatch-red";
+            }
+            Button {
+              id: btnAccentOrange;
+              width: 28;
+              height: 28;
+              styleClass: "swatch-btn swatch-orange";
+            }
+            Button {
+              id: btnAccentYellow;
+              width: 28;
+              height: 28;
+              styleClass: "swatch-btn swatch-yellow";
+            }
+            Button {
+              id: btnAccentGreen;
+              width: 28;
+              height: 28;
+              styleClass: "swatch-btn swatch-green";
+            }
+          }
+
+          // Backwards-compatible hidden ComboBox
+          ComboBox {
+            id: cmbAccent;
+            visible: false;
+            items: "Blue, Purple, Emerald, Amber, Crimson, Slate";
+          }
+        }
+
+        // Card 3: Font
+        Container {
+          id: cardFont;
+          styleClass: "settings-card";
+          anchors.top: cardAccent.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 140;
+          drawFrame: false;
+
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Font";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+
+          // Row 1: Standard Font
+          Container {
+            id: rowStandardFont;
+            anchors.top: parent.top;
+            anchors.topMargin: 38;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 46;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Standard Font";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Button {
+              id: btnStandardFont;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 170;
+              height: 30;
+              text: "Inter 11";
+              styleClass: "font-btn";
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowStandardFont.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Monospace Font
+          Container {
+            id: rowMonospaceFont;
+            anchors.top: rowStandardFont.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 46;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Monospace Font";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Button {
+              id: btnMonospaceFont;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 170;
+              height: 30;
+              text: "JetBrains Mono 10";
+              styleClass: "font-btn";
             }
           }
         }
@@ -608,43 +1060,180 @@ Window {
         visible: false;
         drawFrame: false;
 
+        // Card 1: Current Wallpaper
         Container {
-          id: cardBackground;
+          id: cardWallpaperPreview;
           styleClass: "settings-card";
           anchors.top: parent.top;
-          anchors.topMargin: 8;
+          anchors.topMargin: 4;
           anchors.left: parent.left;
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 220;
+          height: 190;
           drawFrame: false;
 
-          FormGrid {
-            anchors.fill: parent;
-            anchors.leftMargin: 20;
-            anchors.topMargin: 16;
-            anchors.rightMargin: 20;
-            anchors.bottomMargin: 16;
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Wallpaper";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
 
-            FormSection { title: "Wallpaper Settings"; }
-            FormRow {
-              label: "Background Mode";
-              ComboBox {
-                id: cmbWallpaperModeBg;
-                items: "Fill, Fit, Stretch, Center, Tile";
-              }
+          Container {
+            id: contWallpaperThumb;
+            anchors.top: parent.top;
+            anchors.topMargin: 38;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            width: 140;
+            height: 80;
+            styleClass: "wallpaper-thumb";
+            drawFrame: false;
+
+            Image {
+              id: imgWallpaperThumb;
+              anchors.fill: parent;
             }
-            FormRow {
-              label: "Select Image";
-              Row {
-                Button {
-                  id: btnChooseWallpaperBg;
-                  width: 160;
-                  height: 30;
-                  text: "Browse Image...";
-                }
-              }
+          }
+
+          Text {
+            id: lblWallpaperName;
+            anchors.top: parent.top;
+            anchors.topMargin: 40;
+            anchors.left: contWallpaperThumb.right;
+            anchors.leftMargin: 18;
+            height: 20;
+            text: "Samarinda Desktop";
+            font: "Sans:bold 13";
+            selectable: false;
+          }
+
+          Entry {
+            id: txtWallpaperPath;
+            anchors.top: lblWallpaperName.bottom;
+            anchors.topMargin: 8;
+            anchors.left: lblWallpaperName.left;
+            width: 320;
+            height: 28;
+            text: "/usr/share/backgrounds/samarinda.jpg";
+            readOnly: true;
+          }
+
+          Button {
+            id: btnChooseWallpaper;
+            anchors.left: txtWallpaperPath.right;
+            anchors.leftMargin: 12;
+            anchors.verticalCenter: txtWallpaperPath.verticalCenter;
+            width: 140;
+            height: 30;
+            text: "Add Picture...";
+          }
+
+          Container {
+            id: divWallpaper;
+            styleClass: "card-divider";
+            anchors.top: contWallpaperThumb.bottom;
+            anchors.topMargin: 16;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          Container {
+            id: rowWallpaperMode;
+            anchors.top: divWallpaper.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Background Style";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbWallpaperMode;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 140;
+              height: 30;
+              items: "Fill, Fit, Stretch, Center, Tile";
+            }
+          }
+        }
+
+        // Card 2: Wallpaper Presets
+        Container {
+          id: cardWallpaperPresets;
+          styleClass: "settings-card";
+          anchors.top: cardWallpaperPreview.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 126;
+          drawFrame: false;
+
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Default Wallpapers";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+
+          Row {
+            id: rowWallpaperPresets;
+            anchors.top: parent.top;
+            anchors.topMargin: 38;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            height: 72;
+            spacing: 14;
+
+            Button {
+              id: btnWallSamarinda;
+              width: 106;
+              height: 64;
+              styleClass: "theme-preview-btn";
+              text: "Samarinda";
+            }
+            Button {
+              id: btnWallMountains;
+              width: 106;
+              height: 64;
+              styleClass: "theme-preview-btn";
+              text: "Mountains";
+            }
+            Button {
+              id: btnWallSunset;
+              width: 106;
+              height: 64;
+              styleClass: "theme-preview-btn";
+              text: "Sunset";
+            }
+            Button {
+              id: btnWallAurora;
+              width: 106;
+              height: 64;
+              styleClass: "theme-preview-btn";
+              text: "Aurora";
             }
           }
         }
@@ -657,66 +1246,348 @@ Window {
         visible: false;
         drawFrame: false;
 
+        // Card 1: Dock Configuration
         Container {
-          id: cardDesktop;
+          id: cardDockConfig;
           styleClass: "settings-card";
           anchors.top: parent.top;
-          anchors.topMargin: 8;
+          anchors.topMargin: 4;
           anchors.left: parent.left;
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 340;
+          height: 262;
           drawFrame: false;
 
-          FormGrid {
-            anchors.fill: parent;
-            anchors.leftMargin: 20;
-            anchors.topMargin: 16;
-            anchors.rightMargin: 20;
-            anchors.bottomMargin: 16;
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Dock";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
 
-            FormSection { title: "Dock Configuration"; }
-            FormRow {
-              label: "Position on Screen";
-              ComboBox {
-                id: cmbDockPosition;
-                items: "Bottom, Left, Right";
-              }
-            }
-            FormRow {
-              label: "Icon Size";
-              ComboBox {
-                id: cmbDockIconSize;
-                items: "24 px, 32 px, 48 px, 64 px";
-              }
-            }
-            FormRow {
-              label: "Auto-hide Dock";
-              Row {
-                Switch { id: swDockAutoHide; width: 50; height: 28; }
-              }
-            }
-            FormRow {
-              label: "Dock Strut Margins";
-              ComboBox {
-                id: cmbDockMargin;
-                items: "0 px, 2 px, 3 px (Standard), 5 px, 8 px";
-              }
+          // Row 1: Position on Screen
+          Container {
+            id: rowDockPosition;
+            anchors.top: parent.top;
+            anchors.topMargin: 36;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Position on Screen";
+              font: "Sans 12";
+              selectable: false;
             }
 
-            FormSection { title: "Desktop Panel"; }
-            FormRow {
-              label: "Show Desktop Button";
-              Row {
-                Switch { id: swShowDesktopBtn; width: 50; height: 28; }
-              }
+            SegmentedControl {
+              id: segDockPosition;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 220;
+              height: 32;
+              items: "Left, Bottom, Right";
+              selectedIndex: 1;
             }
-            FormRow {
-              label: "Clock 24-hour Format";
-              Row {
-                Switch { id: swClock24h; width: 50; height: 28; }
-              }
+
+            ComboBox {
+              id: cmbDockPosition;
+              visible: false;
+              items: "Bottom, Left, Right";
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowDockPosition.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Icon Size
+          Container {
+            id: rowDockIconSize;
+            anchors.top: rowDockPosition.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 54;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              height: 18;
+              text: "Icon Size";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
+              height: 16;
+              text: "Size of application icons in the dock";
+              font: "Sans 9";
+              opacity: 0.65;
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbDockIconSize;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 110;
+              height: 30;
+              items: "24 px, 32 px, 48 px, 64 px";
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowDockIconSize.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: Auto-hide Dock
+          Container {
+            id: rowDockAutoHide;
+            anchors.top: rowDockIconSize.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 54;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              height: 18;
+              text: "Auto-hide the Dock";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
+              height: 16;
+              text: "The dock hides when windows overlap with it";
+              font: "Sans 9";
+              opacity: 0.65;
+              selectable: false;
+            }
+
+            Switch {
+              id: swDockAutoHide;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowDockAutoHide.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 4: Dock Margins
+          Container {
+            id: rowDockMargin;
+            anchors.top: rowDockAutoHide.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 54;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              height: 18;
+              text: "Dock Edge Margin";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
+              height: 16;
+              text: "Space between screen edge and dock bar";
+              font: "Sans 9";
+              opacity: 0.65;
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbDockMargin;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 140;
+              height: 30;
+              items: "0 px, 2 px, 3 px (Standard), 5 px, 8 px";
+            }
+          }
+        }
+
+        // Card 2: Desktop & Top Panel
+        Container {
+          id: cardDesktopPanel;
+          styleClass: "settings-card";
+          anchors.top: cardDockConfig.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 158;
+          drawFrame: false;
+
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Top Panel & Desktop";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+
+          // Row 1: Show Desktop Button
+          Container {
+            id: rowShowDesktopBtn;
+            anchors.top: parent.top;
+            anchors.topMargin: 36;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 54;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              height: 18;
+              text: "Show Desktop Button";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
+              height: 16;
+              text: "Display button on panel edge to minimize all windows";
+              font: "Sans 9";
+              opacity: 0.65;
+              selectable: false;
+            }
+
+            Switch {
+              id: swShowDesktopBtn;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowShowDesktopBtn.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: 24-Hour Time Format
+          Container {
+            id: rowClock24h;
+            anchors.top: rowShowDesktopBtn.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 54;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              height: 18;
+              text: "24-Hour Time Format";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
+              height: 16;
+              text: "Display time using 24-hour notation in top panel";
+              font: "Sans 9";
+              opacity: 0.65;
+              selectable: false;
+            }
+
+            Switch {
+              id: swClock24h;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
             }
           }
         }
@@ -729,52 +1600,237 @@ Window {
         visible: false;
         drawFrame: false;
 
+        // Card 1: User Profile Header
         Container {
-          id: cardUser;
+          id: cardUserProfile;
           styleClass: "settings-card";
           anchors.top: parent.top;
-          anchors.topMargin: 8;
+          anchors.topMargin: 4;
           anchors.left: parent.left;
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 220;
+          height: 86;
           drawFrame: false;
 
-          FormGrid {
-            anchors.fill: parent;
-            anchors.leftMargin: 20;
-            anchors.topMargin: 16;
-            anchors.rightMargin: 20;
-            anchors.bottomMargin: 16;
+          Container {
+            id: contUserAvatar;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 50;
+            height: 50;
+            styleClass: "avatar-badge";
+            drawFrame: false;
 
-            FormSection { title: "User Account"; }
-            FormRow {
-              label: "Current User";
-              Entry {
-                id: txtUserAccount;
-                width: 280;
-                height: 30;
-                text: "afumi (Administrator)";
-                readOnly: true;
-              }
+            Text {
+              anchors.centerIn: parent;
+              text: "A";
+              font: "Sans:bold 20";
+              style: "color: #ffffff;";
+              selectable: false;
             }
-            FormRow {
-              label: "Account Password";
-              Row {
-                Button {
-                  id: btnChangePassword;
-                  width: 140;
-                  height: 30;
-                  text: "Change Password...";
-                }
-              }
+          }
+
+          Text {
+            id: lblUserFullName;
+            anchors.top: parent.top;
+            anchors.topMargin: 20;
+            anchors.left: contUserAvatar.right;
+            anchors.leftMargin: 16;
+            text: "afumi";
+            font: "Sans:bold 15";
+            selectable: false;
+          }
+
+          Text {
+            id: lblUserRoleInfo;
+            anchors.top: lblUserFullName.bottom;
+            anchors.topMargin: 4;
+            anchors.left: lblUserFullName.left;
+            text: "Administrator  •  Currently Logged In";
+            font: "Sans 11";
+            opacity: 0.65;
+            selectable: false;
+          }
+
+          Button {
+            id: btnManageAccounts;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 140;
+            height: 32;
+            text: "Other Users...";
+          }
+        }
+
+        // Card 2: Authentication & Login
+        Container {
+          id: cardUserSecurity;
+          styleClass: "settings-card";
+          anchors.top: cardUserProfile.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 206;
+          drawFrame: false;
+
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Authentication & Login";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+
+          // Row 1: Account Type
+          Container {
+            id: rowUserRole;
+            anchors.top: parent.top;
+            anchors.topMargin: 36;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Account Type";
+              font: "Sans 12";
+              selectable: false;
             }
-            FormRow {
-              label: "Automatic Login";
-              Row {
-                Switch { id: swAutoLogin; width: 50; height: 28; checked: true; }
-              }
+
+            Text {
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Administrator";
+              font: "Sans 12";
+              opacity: 0.7;
+              selectable: false;
+            }
+
+            Entry {
+              id: txtUserAccount;
+              visible: false;
+              text: "afumi (Administrator)";
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowUserRole.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Account Password
+          Container {
+            id: rowUserPassword;
+            anchors.top: rowUserRole.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 54;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              height: 18;
+              text: "Account Password";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
+              height: 16;
+              text: "Set  ••••••••••••";
+              font: "Sans 9";
+              opacity: 0.65;
+              selectable: false;
+            }
+
+            Button {
+              id: btnChangePassword;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 140;
+              height: 30;
+              text: "Change Password...";
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowUserPassword.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: Automatic Login
+          Container {
+            id: rowAutoLogin;
+            anchors.top: rowUserPassword.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 54;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              height: 18;
+              text: "Automatic Login";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
+              height: 16;
+              text: "Log in directly to the desktop session without prompting";
+              font: "Sans 9";
+              opacity: 0.65;
+              selectable: false;
+            }
+
+            Switch {
+              id: swAutoLogin;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
+              checked: true;
             }
           }
         }
@@ -787,39 +1843,261 @@ Window {
         visible: false;
         drawFrame: false;
 
+        // Card 1: Language & Formats
         Container {
-          id: cardLanguage;
+          id: cardLanguageSettings;
           styleClass: "settings-card";
           anchors.top: parent.top;
-          anchors.topMargin: 8;
+          anchors.topMargin: 4;
           anchors.left: parent.left;
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 220;
+          height: 158;
           drawFrame: false;
 
-          FormGrid {
-            anchors.fill: parent;
-            anchors.leftMargin: 20;
-            anchors.topMargin: 16;
-            anchors.rightMargin: 20;
-            anchors.bottomMargin: 16;
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Language & Region";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
 
-            FormSection { title: "Language & Regional Formats"; }
-            FormRow {
-              label: "Display Language";
-              ComboBox {
-                id: cmbDisplayLanguage;
-                items: "English (United States), Indonesian, Japanese, German, French";
-              }
+          // Row 1: Display Language
+          Container {
+            id: rowDisplayLanguage;
+            anchors.top: parent.top;
+            anchors.topMargin: 36;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 54;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              height: 18;
+              text: "Display Language";
+              font: "Sans 12";
+              selectable: false;
             }
-            FormRow {
-              label: "Regional Formats";
-              ComboBox {
-                id: cmbRegionalFormats;
-                items: "United States (en_US.UTF-8), Indonesia (id_ID.UTF-8), Japan (ja_JP.UTF-8)";
-              }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
+              height: 16;
+              text: "Language used for windows and desktop elements";
+              font: "Sans 9";
+              opacity: 0.65;
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbDisplayLanguage;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 180;
+              height: 30;
+              items: "English (United States), Indonesian, Japanese, German, French";
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowDisplayLanguage.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Regional Formats
+          Container {
+            id: rowRegionalFormats;
+            anchors.top: rowDisplayLanguage.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 54;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              height: 18;
+              text: "Regional Formats";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
+              height: 16;
+              text: "Standards used for numbers, dates, and currency";
+              font: "Sans 9";
+              opacity: 0.65;
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbRegionalFormats;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 220;
+              height: 30;
+              items: "United States (en_US.UTF-8), Indonesia (id_ID.UTF-8), Japan (ja_JP.UTF-8)";
+            }
+          }
+        }
+
+        // Card 2: Regional Formats Preview
+        Container {
+          id: cardFormatsPreview;
+          styleClass: "settings-card";
+          anchors.top: cardLanguageSettings.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 162;
+          drawFrame: false;
+
+          Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Preview of Regional Formats";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+
+          // Row 1: Dates
+          Container {
+            id: rowPreviewDates;
+            anchors.top: parent.top;
+            anchors.topMargin: 36;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Dates";
+              font: "Sans 11";
+              opacity: 0.7;
+              selectable: false;
+            }
+
+            Text {
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Sunday, November 8, 2026 (2026-11-08)";
+              font: "Sans 11";
+              selectable: false;
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowPreviewDates.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Times
+          Container {
+            id: rowPreviewTimes;
+            anchors.top: rowPreviewDates.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Times";
+              font: "Sans 11";
+              opacity: 0.7;
+              selectable: false;
+            }
+
+            Text {
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "13:30:00 (1:30:00 PM)";
+              font: "Sans 11";
+              selectable: false;
+            }
+          }
+
+          Container {
+            styleClass: "card-divider";
+            anchors.top: rowPreviewTimes.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: Numbers & Currency
+          Container {
+            id: rowPreviewNumbers;
+            anchors.top: rowPreviewTimes.bottom;
+            anchors.topMargin: 1;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Numbers & Currency";
+              font: "Sans 11";
+              opacity: 0.7;
+              selectable: false;
+            }
+
+            Text {
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "1,234,567.89  •  $1,234.56";
+              font: "Sans 11";
+              selectable: false;
             }
           }
         }
@@ -832,60 +2110,92 @@ Window {
         visible: false;
         drawFrame: false;
 
+        // Card 1: Charge Status (Blue gradient banner)
         Container {
-          id: cardBattery;
-          styleClass: "settings-card";
+          id: cardBatteryBanner;
+          styleClass: "battery-banner-card";
           anchors.top: parent.top;
-          anchors.topMargin: 8;
+          anchors.topMargin: 4;
           anchors.left: parent.left;
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 280;
+          height: 140;
           drawFrame: false;
 
-          FormGrid {
-            anchors.fill: parent;
-            anchors.leftMargin: 20;
-            anchors.topMargin: 16;
-            anchors.rightMargin: 20;
-            anchors.bottomMargin: 16;
+          Text {
+            id: lblBatteryPercent;
+            anchors.top: parent.top;
+            anchors.topMargin: 24;
+            anchors.left: parent.left;
+            anchors.leftMargin: 24;
+            text: "68%";
+            font: "Sans:bold 36";
+            style: "color: #ffffff;";
+            selectable: false;
+          }
 
-            FormSection { title: "Power Management"; }
-            FormRow {
-              label: "Power Mode";
-              ComboBox {
-                id: cmbPowerMode;
-                items: "Performance, Balanced, Power Saver";
-              }
-            }
-            FormRow {
-              label: "Blank Screen After";
-              ComboBox {
-                id: cmbScreenBlank;
-                items: "1 minute, 5 minutes, 10 minutes, 15 minutes, Never";
-              }
-            }
-            FormRow {
-              label: "Automatic Suspend";
-              Row {
-                Switch { id: swAutoSuspend; width: 50; height: 28; }
-              }
-            }
+          Text {
+            id: lblBatteryRemaining;
+            anchors.top: lblBatteryPercent.bottom;
+            anchors.topMargin: 8;
+            anchors.left: parent.left;
+            anchors.leftMargin: 24;
+            text: "1 hr 25 min remaining";
+            font: "Sans 12";
+            style: "color: #e0f2fe;";
+            selectable: false;
+          }
 
-            FormSection { title: "Battery Status"; }
-            FormRow {
-              label: "Current Power";
-              Entry {
-                id: txtPowerStatus;
-                width: 260;
-                height: 30;
-                text: "AC Power Connected (100%)";
-                readOnly: true;
-              }
-            }
+          Image {
+            id: imgBatteryBolt;
+            anchors.right: parent.right;
+            anchors.rightMargin: 24;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 56;
+            height: 56;
+            icon: "battery-bolt";
           }
         }
+
+        // Card 2: Battery Health / Capacity
+        Container {
+          id: cardBatteryHealth;
+          styleClass: "settings-card";
+          anchors.top: cardBatteryBanner.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 52;
+          drawFrame: false;
+
+          Text {
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            text: "Maximum Capacity";
+            font: "Sans 12";
+            selectable: false;
+          }
+
+          Text {
+            id: lblMaxCapacity;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            text: "100%";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+        }
+
+        // Backwards-compatible hidden controls
+        ComboBox { id: cmbPowerMode; visible: false; items: "Performance, Balanced, Power Saver"; }
+        ComboBox { id: cmbScreenBlank; visible: false; items: "Never"; }
+        Switch { id: swAutoSuspend; visible: false; }
+        Entry { id: txtPowerStatus; visible: false; text: "100%"; }
       }
 
       // ── 10. About Page ──

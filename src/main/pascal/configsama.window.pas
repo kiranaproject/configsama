@@ -73,15 +73,21 @@ type
     FCmbResolution: TFtComboBox;
     FCmbRefreshRate: TFtComboBox;
     FCmbScale: TFtComboBox;
+    FSegScale: TFtSegmentedControl;
     FSwNightLight: TFtSwitch;
 
     // Desktop page controls
     FCmbDockPosition: TFtComboBox;
+    FSegDockPosition: TFtSegmentedControl;
     FCmbDockIconSize: TFtComboBox;
     FSwDockAutoHide: TFtSwitch;
     FCmbDockMargin: TFtComboBox;
     FSwShowDesktopBtn: TFtSwitch;
     FSwClock24h: TFtSwitch;
+
+    // Language page controls
+    FCmbDisplayLanguage: TFtComboBox;
+    FCmbRegionalFormats: TFtComboBox;
 
     // Sound page controls
     FCmbOutputDevice: TFtComboBox;
@@ -130,20 +136,29 @@ type
     procedure HandleCategorySelect(Sender: TFtTreeView; Node: TFtTreeNode);
     procedure HandleSearchChange(Sender: TFtWidget; const AText: string);
     procedure HandleDarkModeToggle(Sender: TFtSwitch; AToggled: Boolean);
+    procedure HandleThemeLightClick(Sender: TFtButton);
+    procedure HandleThemeDarkClick(Sender: TFtButton);
+    procedure HandleAccentButtonClick(Sender: TFtButton);
+    procedure HandleRotateButtonClick(Sender: TFtButton);
     procedure HandleAccentChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleWallpaperModeChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleChooseWallpaperClick(Sender: TFtButton);
+    procedure HandleWallpaperPresetClick(Sender: TFtButton);
     procedure HandleDisplayChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleResolutionChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleRefreshRateChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleScaleChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
+    procedure HandleSegmentScaleSelect(Sender: TFtSegmentedControl; AIndex: Integer; const AText: string);
     procedure HandleNightLightToggle(Sender: TFtSwitch; AToggled: Boolean);
     procedure HandleDockPositionChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
+    procedure HandleSegmentDockPositionSelect(Sender: TFtSegmentedControl; AIndex: Integer; const AText: string);
     procedure HandleDockIconSizeChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleDockAutoHideToggle(Sender: TFtSwitch; AToggled: Boolean);
     procedure HandleDockMarginChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleShowDesktopToggle(Sender: TFtSwitch; AToggled: Boolean);
     procedure HandleClock24hToggle(Sender: TFtSwitch; AToggled: Boolean);
+    procedure HandleDisplayLanguageChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
+    procedure HandleRegionalFormatsChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleOutputDeviceChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleVolumeChange(Sender: TFtSlider; AValue: Double);
     procedure HandleMuteToggle(Sender: TFtSwitch; AToggled: Boolean);
@@ -170,6 +185,7 @@ type
     destructor Destroy(); override;
 
     procedure SelectCategoryByName(const AName: string);
+    procedure SetDarkMode(AValue: Boolean);
 
     property Settings: TConfigSettings read FSettings;
     property AppTitle: TFtLabel read FAppTitle;
@@ -183,6 +199,7 @@ type
     property SwMute: TFtSwitch read FSwMute;
     property SwWlan: TFtSwitch read FSwWlan;
     property SwWired: TFtSwitch read FSwWired;
+    property SegScale: TFtSegmentedControl read FSegScale;
   end;
 
 implementation
@@ -340,6 +357,37 @@ begin
     FCmbAccent.OnChange := @HandleAccentChange;
   end;
 
+  w := FindWidget('btnThemeLight');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleThemeLightClick;
+  w := FindWidget('btnThemeDark');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleThemeDarkClick;
+
+  w := FindWidget('btnAccentMulti');
+  if w is TFtButton then begin w.Tag := 0; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
+  w := FindWidget('btnAccentBlue');
+  if w is TFtButton then begin w.Tag := 1; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
+  w := FindWidget('btnAccentPurple');
+  if w is TFtButton then begin w.Tag := 2; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
+  w := FindWidget('btnAccentPink');
+  if w is TFtButton then begin w.Tag := 3; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
+  w := FindWidget('btnAccentRed');
+  if w is TFtButton then begin w.Tag := 4; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
+  w := FindWidget('btnAccentOrange');
+  if w is TFtButton then begin w.Tag := 5; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
+  w := FindWidget('btnAccentYellow');
+  if w is TFtButton then begin w.Tag := 6; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
+  w := FindWidget('btnAccentGreen');
+  if w is TFtButton then begin w.Tag := 7; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
+
+  w := FindWidget('btnRotate0');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleRotateButtonClick;
+  w := FindWidget('btnRotate90');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleRotateButtonClick;
+  w := FindWidget('btnRotate180');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleRotateButtonClick;
+  w := FindWidget('btnRotate270');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleRotateButtonClick;
+
   w := FindWidget('cmbWallpaperMode');
   if w is TFtComboBox then
   begin
@@ -386,6 +434,13 @@ begin
     FCmbScale.OnChange := @HandleScaleChange;
   end;
 
+  w := FindWidget('segScale');
+  if w is TFtSegmentedControl then
+  begin
+    FSegScale := TFtSegmentedControl(w);
+    FSegScale.OnSelect := @HandleSegmentScaleSelect;
+  end;
+
   w := FindWidget('swNightLight');
   if w is TFtSwitch then
   begin
@@ -393,12 +448,29 @@ begin
     FSwNightLight.OnToggle := @HandleNightLightToggle;
   end;
 
+  // Wallpaper presets
+  w := FindWidget('btnWallSamarinda');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleWallpaperPresetClick;
+  w := FindWidget('btnWallMountains');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleWallpaperPresetClick;
+  w := FindWidget('btnWallSunset');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleWallpaperPresetClick;
+  w := FindWidget('btnWallAurora');
+  if w is TFtButton then TFtButton(w).OnClick := @HandleWallpaperPresetClick;
+
   // Desktop & Dock controls
   w := FindWidget('cmbDockPosition');
   if w is TFtComboBox then
   begin
     FCmbDockPosition := TFtComboBox(w);
     FCmbDockPosition.OnChange := @HandleDockPositionChange;
+  end;
+
+  w := FindWidget('segDockPosition');
+  if w is TFtSegmentedControl then
+  begin
+    FSegDockPosition := TFtSegmentedControl(w);
+    FSegDockPosition.OnSelect := @HandleSegmentDockPositionSelect;
   end;
 
   w := FindWidget('cmbDockIconSize');
@@ -434,6 +506,21 @@ begin
   begin
     FSwClock24h := TFtSwitch(w);
     FSwClock24h.OnToggle := @HandleClock24hToggle;
+  end;
+
+  // Language controls
+  w := FindWidget('cmbDisplayLanguage');
+  if w is TFtComboBox then
+  begin
+    FCmbDisplayLanguage := TFtComboBox(w);
+    FCmbDisplayLanguage.OnChange := @HandleDisplayLanguageChange;
+  end;
+
+  w := FindWidget('cmbRegionalFormats');
+  if w is TFtComboBox then
+  begin
+    FCmbRegionalFormats := TFtComboBox(w);
+    FCmbRegionalFormats.OnChange := @HandleRegionalFormatsChange;
   end;
 
   // Sound controls
@@ -630,12 +717,34 @@ begin
     if Assigned(FCmbResolution) then
       FCmbResolution.Text := FSettings.Resolution;
 
+    if Assigned(FSegScale) then
+    begin
+      case FSettings.Scale of
+        100: FSegScale.SelectedIndex := 0;
+        125: FSegScale.SelectedIndex := 1;
+        150: FSegScale.SelectedIndex := 2;
+        175: FSegScale.SelectedIndex := 3;
+        200: FSegScale.SelectedIndex := 4;
+        else FSegScale.SelectedIndex := 0;
+      end;
+    end;
+
     if Assigned(FSwNightLight) then
       FSwNightLight.Checked := FSettings.NightLight;
 
     // Desktop & Dock
     if Assigned(FCmbDockPosition) then
       FCmbDockPosition.Text := FSettings.DockPosition;
+
+    if Assigned(FSegDockPosition) then
+    begin
+      if SameText(FSettings.DockPosition, 'Left') then
+        FSegDockPosition.SelectedIndex := 0
+      else if SameText(FSettings.DockPosition, 'Right') then
+        FSegDockPosition.SelectedIndex := 2
+      else
+        FSegDockPosition.SelectedIndex := 1;
+    end;
 
     if Assigned(FCmbDockIconSize) then
       FCmbDockIconSize.Text := IntToStr(FSettings.DockIconSize) + ' px';
@@ -728,6 +837,20 @@ begin
   end;
 end;
 
+procedure TConfigSamaWindow.SetDarkMode(AValue: Boolean);
+begin
+  if FSettings <> nil then
+  begin
+    FSettings.DarkMode := AValue;
+    FSettings.Save();
+  end;
+  FtApp.DarkMode := AValue;
+  if FSwDarkMode <> nil then
+    FSwDarkMode.Checked := AValue;
+  UpdateThemeIcons();
+  Invalidate();
+end;
+
 procedure TConfigSamaWindow.SelectCategoryByName(const AName: string);
 var
   i, j: Integer;
@@ -815,6 +938,8 @@ begin
 end;
 
 procedure TConfigSamaWindow.UpdateThemeIcons();
+var
+  w: TFtWidget;
 begin
   if FImgWifiPurr <> nil then FImgWifiPurr.LoadSVGString(FtApp.GetIconSvg('wlan', FtApp.DarkMode));
   if FImgLockPurr <> nil then FImgLockPurr.LoadSVGString(FtApp.GetIconSvg('lock', FtApp.DarkMode));
@@ -826,7 +951,69 @@ begin
   if FImgLockVM <> nil then FImgLockVM.LoadSVGString(FtApp.GetIconSvg('lock', FtApp.DarkMode));
   if FImgWired <> nil then FImgWired.LoadSVGString(FtApp.GetIconSvg('wired', FtApp.DarkMode));
   if FBtnPurrInfo <> nil then FBtnPurrInfo.SetIconSVG(FtApp.GetIconSvg('info-accent', FtApp.DarkMode));
+
+  w := FindWidget('imgBrightnessLow');
+  if w is TFtImage then TFtImage(w).LoadSVGString(FtApp.GetIconSvg('brightness-low', FtApp.DarkMode));
+  w := FindWidget('imgBrightnessHigh');
+  if w is TFtImage then TFtImage(w).LoadSVGString(FtApp.GetIconSvg('brightness-high', FtApp.DarkMode));
+  w := FindWidget('btnRotate0');
+  if w is TFtButton then TFtButton(w).SetIconSVG(FtApp.GetIconSvg('rotate-0', FtApp.DarkMode));
+  w := FindWidget('btnRotate90');
+  if w is TFtButton then TFtButton(w).SetIconSVG(FtApp.GetIconSvg('rotate-90', FtApp.DarkMode));
+  w := FindWidget('btnRotate180');
+  if w is TFtButton then TFtButton(w).SetIconSVG(FtApp.GetIconSvg('rotate-180', FtApp.DarkMode));
+  w := FindWidget('btnRotate270');
+  if w is TFtButton then TFtButton(w).SetIconSVG(FtApp.GetIconSvg('rotate-270', FtApp.DarkMode));
+
   if FCategoryTree <> nil then FCategoryTree.Invalidate();
+end;
+
+procedure TConfigSamaWindow.HandleThemeLightClick(Sender: TFtButton);
+begin
+  if FSwDarkMode <> nil then
+  begin
+    FSwDarkMode.Checked := False;
+    HandleDarkModeToggle(FSwDarkMode, False);
+  end;
+end;
+
+procedure TConfigSamaWindow.HandleThemeDarkClick(Sender: TFtButton);
+begin
+  if FSwDarkMode <> nil then
+  begin
+    FSwDarkMode.Checked := True;
+    HandleDarkModeToggle(FSwDarkMode, True);
+  end;
+end;
+
+procedure TConfigSamaWindow.HandleAccentButtonClick(Sender: TFtButton);
+var
+  colorName: string;
+begin
+  if Sender = nil then Exit();
+  case Sender.Tag of
+    1: colorName := 'Blue';
+    2: colorName := 'Purple';
+    3: colorName := 'Pink';
+    4: colorName := 'Red';
+    5: colorName := 'Orange';
+    6: colorName := 'Yellow';
+    7: colorName := 'Green';
+    else colorName := 'Blue';
+  end;
+
+  if FSettings <> nil then
+  begin
+    FSettings.AccentColor := colorName;
+    FSettings.Save();
+  end;
+  if FCmbAccent <> nil then
+    FCmbAccent.Text := colorName;
+end;
+
+procedure TConfigSamaWindow.HandleRotateButtonClick(Sender: TFtButton);
+begin
+  // Screen rotation preset selection
 end;
 
 procedure TConfigSamaWindow.HandleDarkModeToggle(Sender: TFtSwitch; AToggled: Boolean);
@@ -868,6 +1055,19 @@ begin
       FSettings.Save();
     end;
   end;
+end;
+
+procedure TConfigSamaWindow.HandleWallpaperPresetClick(Sender: TFtButton);
+var
+  wallName, wallPath: string;
+begin
+  if FSettings = nil then Exit();
+  wallName := LowerCase(Sender.Caption);
+  wallPath := '/usr/share/backgrounds/' + wallName + '.jpg';
+  if FTxtWallpaperPath <> nil then
+    FTxtWallpaperPath.Text := wallPath;
+  FSettings.WallpaperPath := wallPath;
+  FSettings.Save();
 end;
 
 procedure TConfigSamaWindow.HandleDisplayChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
@@ -919,6 +1119,21 @@ begin
   FSettings.Save();
 end;
 
+procedure TConfigSamaWindow.HandleSegmentScaleSelect(Sender: TFtSegmentedControl; AIndex: Integer; const AText: string);
+var
+  p, scaleVal: Integer;
+  scaleStr: string;
+begin
+  if FUpdatingControls or (FSettings = nil) then Exit();
+  scaleStr := AText;
+  p := Pos('%', scaleStr);
+  if p > 0 then
+    scaleStr := Copy(scaleStr, 1, p - 1);
+  scaleVal := StrToIntDef(scaleStr, 100);
+  FSettings.Scale := scaleVal;
+  FSettings.Save();
+end;
+
 procedure TConfigSamaWindow.HandleNightLightToggle(Sender: TFtSwitch; AToggled: Boolean);
 begin
   if FSettings = nil then Exit();
@@ -930,7 +1145,39 @@ procedure TConfigSamaWindow.HandleDockPositionChange(Sender: TFtComboBox; AIndex
 begin
   if FSettings = nil then Exit();
   FSettings.DockPosition := AText;
+  if Assigned(FSegDockPosition) then
+  begin
+    if SameText(AText, 'Left') then
+      FSegDockPosition.SelectedIndex := 0
+    else if SameText(AText, 'Right') then
+      FSegDockPosition.SelectedIndex := 2
+    else
+      FSegDockPosition.SelectedIndex := 1;
+  end;
   FSettings.Save();
+end;
+
+procedure TConfigSamaWindow.HandleSegmentDockPositionSelect(Sender: TFtSegmentedControl; AIndex: Integer; const AText: string);
+begin
+  if FUpdatingControls or (FSettings = nil) then Exit();
+  case AIndex of
+    0: FSettings.DockPosition := 'Left';
+    1: FSettings.DockPosition := 'Bottom';
+    2: FSettings.DockPosition := 'Right';
+  end;
+  if Assigned(FCmbDockPosition) then
+    FCmbDockPosition.Text := FSettings.DockPosition;
+  FSettings.Save();
+end;
+
+procedure TConfigSamaWindow.HandleDisplayLanguageChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
+begin
+  if FSettings = nil then Exit();
+end;
+
+procedure TConfigSamaWindow.HandleRegionalFormatsChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
+begin
+  if FSettings = nil then Exit();
 end;
 
 procedure TConfigSamaWindow.HandleDockIconSizeChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);

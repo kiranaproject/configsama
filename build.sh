@@ -72,6 +72,8 @@ case "${TARGET}" in
     "${FTML_EMBED}" \
       --res src/main/pascal/configsama.res \
       src/main/ftml/configsama.ftml
+    touch src/main/pascal/configsama.window.pas 2>/dev/null || true
+    rm -rf target/units target/test-units 2>/dev/null || true
     ;;
   run)
     ensure_ftml

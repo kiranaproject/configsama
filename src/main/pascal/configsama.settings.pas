@@ -8,7 +8,7 @@ unit ConfigSama.Settings;
 interface
 
 uses
-  Classes, SysUtils, IniFiles;
+  Classes, SysUtils, IniFiles, Process;
 
 type
   { TConfigSettings — Samarinda desktop settings store }
@@ -75,6 +75,7 @@ type
     procedure Load();
     procedure Save();
     procedure SyncWallpaperToShell();
+    procedure SyncThemeToX11();
 
     // System Information Helpers
     function GetKernelVersion(): string;
@@ -357,6 +358,29 @@ begin
   end;
 
   SyncWallpaperToShell();
+  SyncThemeToX11();
+end;
+
+procedure TConfigSettings.SyncThemeToX11();
+var
+  p: TProcess;
+  cmd: string;
+begin
+  if GetEnvironmentVariable('DISPLAY') = '' then Exit;
+  p := TProcess.Create(nil);
+  try
+    p.Executable := '/bin/sh';
+    p.Parameters.Add('-c');
+    if FDarkMode then
+      cmd := 'xprop -root -f _SAMARINDA_THEME_DARK 32c -set _SAMARINDA_THEME_DARK 1 2>/dev/null; xprop -root -f _SAMARINDA_THEME 8s -set _SAMARINDA_THEME "dark" 2>/dev/null || true'
+    else
+      cmd := 'xprop -root -f _SAMARINDA_THEME_DARK 32c -set _SAMARINDA_THEME_DARK 0 2>/dev/null; xprop -root -f _SAMARINDA_THEME 8s -set _SAMARINDA_THEME "light" 2>/dev/null || true';
+    p.Parameters.Add(cmd);
+    p.Options := [poNoConsole];
+    p.Execute();
+  except
+  end;
+  p.Free();
 end;
 
 procedure TConfigSettings.SyncWallpaperToShell();

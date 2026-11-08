@@ -12,11 +12,23 @@ uses
 
 var
   AppWindow: TConfigSamaWindow;
+  i: Integer;
+  arg: string;
 
 begin
   ApplyConfigSamaStyles();
   AppWindow := TConfigSamaWindow.Create();
   try
+    for i := 1 to ParamCount() do
+    begin
+      arg := ParamStr(i);
+      if (arg = '--dark') or (arg = '-d') then
+        AppWindow.SetDarkMode(True)
+      else if (arg = '--light') or (arg = '-l') then
+        AppWindow.SetDarkMode(False)
+      else
+        AppWindow.SelectCategoryByName(arg);
+    end;
     AppWindow.Show();
     FtApp().Run();
   finally
