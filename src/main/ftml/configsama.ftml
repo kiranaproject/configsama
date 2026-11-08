@@ -20,7 +20,7 @@ Window {
     width: 240;
     padding: 0;
     drawFrame: false;
-    style: "background-color: #ebedf2; border-right: 1px solid rgba(0, 0, 0, 0.08);";
+    style: "background-color: #ececf4; border-right: 1px solid rgba(0, 0, 0, 0.08); box-shadow: none;";
 
     Text {
       id: appTitle;
@@ -68,7 +68,7 @@ Window {
       itemHeight: 38;
       indentWidth: 10;
       drawFrame: false;
-      style: "background-color: transparent; border: none;";
+      style: "background-color: #ececf4; border: none; box-shadow: none;";
 
       TreeNode {
         text: "Network and connection";
@@ -151,7 +151,7 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 256;
+          height: 252;
           drawFrame: false;
           style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
 
@@ -162,6 +162,7 @@ Window {
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 52;
+            padding: 0;
             drawFrame: false;
 
             Text {
@@ -184,23 +185,14 @@ Window {
             }
           }
 
-          Container {
-            anchors.top: rowWlanStatus.bottom;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            height: 1;
-            drawFrame: false;
-            style: "background-color: rgba(0, 0, 0, 0.06);";
-          }
-
           // Row 1: "Purr" network (connected)
           Container {
             id: rowWifiPurr;
             anchors.top: rowWlanStatus.bottom;
-            anchors.topMargin: 1;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 50;
+            padding: 0;
             drawFrame: false;
 
             Image {
@@ -253,23 +245,14 @@ Window {
             }
           }
 
-          Container {
-            anchors.top: rowWifiPurr.bottom;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            height: 1;
-            drawFrame: false;
-            style: "background-color: rgba(0, 0, 0, 0.06);";
-          }
-
           // Row 2: "Meow" network
           Container {
             id: rowWifiMeow;
             anchors.top: rowWifiPurr.bottom;
-            anchors.topMargin: 1;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 50;
+            padding: 0;
             drawFrame: false;
 
             Image {
@@ -300,23 +283,14 @@ Window {
             }
           }
 
-          Container {
-            anchors.top: rowWifiMeow.bottom;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            height: 1;
-            drawFrame: false;
-            style: "background-color: rgba(0, 0, 0, 0.06);";
-          }
-
           // Row 3: "Virgin Media" network
           Container {
             id: rowWifiVirgin;
             anchors.top: rowWifiMeow.bottom;
-            anchors.topMargin: 1;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 50;
+            padding: 0;
             drawFrame: false;
 
             Image {
@@ -347,23 +321,14 @@ Window {
             }
           }
 
-          Container {
-            anchors.top: rowWifiVirgin.bottom;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            height: 1;
-            drawFrame: false;
-            style: "background-color: rgba(0, 0, 0, 0.06);";
-          }
-
           // Row 4: "VM6974871" network
           Container {
             id: rowWifiVM;
             anchors.top: rowWifiVirgin.bottom;
-            anchors.topMargin: 1;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 50;
+            padding: 0;
             drawFrame: false;
 
             Image {
@@ -404,21 +369,24 @@ Window {
         drawFrame: false;
 
         Container {
+          id: cardWired;
           anchors.top: parent.top;
           anchors.topMargin: 8;
           anchors.left: parent.left;
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 160;
+          height: 156;
           drawFrame: false;
           style: "background-color: #ffffff; border-radius: 12px; border: 1px solid rgba(0, 0, 0, 0.08);";
 
           Container {
+            id: rowWiredStatus;
             anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 52;
+            padding: 0;
             drawFrame: false;
 
             Text {
@@ -442,21 +410,12 @@ Window {
           }
 
           Container {
-            anchors.top: parent.top;
-            anchors.topMargin: 52;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            height: 1;
-            drawFrame: false;
-            style: "background-color: rgba(0, 0, 0, 0.06);";
-          }
-
-          Container {
-            anchors.top: parent.top;
-            anchors.topMargin: 53;
+            id: rowWiredSpeed;
+            anchors.top: rowWiredStatus.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 52;
+            padding: 0;
             drawFrame: false;
 
             Image {
@@ -479,21 +438,12 @@ Window {
           }
 
           Container {
-            anchors.top: parent.top;
-            anchors.topMargin: 105;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            height: 1;
-            drawFrame: false;
-            style: "background-color: rgba(0, 0, 0, 0.06);";
-          }
-
-          Container {
-            anchors.top: parent.top;
-            anchors.topMargin: 106;
+            id: rowWiredHw;
+            anchors.top: rowWiredSpeed.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 52;
+            padding: 0;
             drawFrame: false;
 
             Text {
