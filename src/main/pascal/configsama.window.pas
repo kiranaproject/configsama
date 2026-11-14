@@ -11,7 +11,9 @@ uses
   Classes, SysUtils,
   ftpas, ftpas.types, ftpas.api, ftpas.app, ftpas.canvas, ftpas.widget, ftpas.controls,
   ftpas.layouts, ftpas.views, ftpas.dialogs, ftpas.ftml,
-  ConfigSama.Wlan, ConfigSama.Wired, ConfigSama.Display, ConfigSama.Settings, ConfigSama.Styles;
+  ConfigSama.Wlan, ConfigSama.Wired, ConfigSama.Display,
+  ConfigSama.Bluetooth, ConfigSama.Sound, ConfigSama.Power,
+  ConfigSama.Settings, ConfigSama.Styles;
 
 type
   { TConfigSamaWindow — GNOME Settings styled application with FTML and ECA }
@@ -32,6 +34,7 @@ type
     // Content Pages
     FPageWlan: TFtWidget;
     FPageWired: TFtWidget;
+    FPageBluetooth: TFtWidget;
     FPageDisplays: TFtWidget;
     FPageAppearance: TFtWidget;
     FPageBackground: TFtWidget;
@@ -100,6 +103,31 @@ type
     FLblWiredDns: TFtLabel;
     FLblWiredMac: TFtLabel;
 
+    // Bluetooth page controls
+    FCardBluetoothToggle: TFtContainer;
+    FLblBluetoothTitle: TFtLabel;
+    FLblBluetoothStatus: TFtLabel;
+    FBtnBluetoothScan: TFtButton;
+    FSwBluetooth: TFtSwitch;
+    FContainerBluetoothDisabled: TFtContainer;
+    FLblBluetoothDisabled: TFtLabel;
+    FCardBluetoothDevices: TFtContainer;
+    FRowBtDev0: TFtContainer;
+    FRowBtDev1: TFtContainer;
+    FRowBtDev2: TFtContainer;
+    FLblBtName0: TFtLabel;
+    FLblBtName1: TFtLabel;
+    FLblBtName2: TFtLabel;
+    FLblBtStatus0: TFtLabel;
+    FLblBtStatus1: TFtLabel;
+    FLblBtStatus2: TFtLabel;
+    FBtnBtConnect0: TFtButton;
+    FBtnBtConnect1: TFtButton;
+    FBtnBtConnect2: TFtButton;
+    FImgBtDev0: TFtImage;
+    FImgBtDev1: TFtImage;
+    FImgBtDev2: TFtImage;
+
     // Backward-compatibility aliases
     FImgWifiPurr: TFtImage;
     FImgLockPurr: TFtImage;
@@ -113,6 +141,10 @@ type
     FImgLockVM: TFtImage;
 
     // Appearance page controls
+    FBtnThemeLight: TFtButton;
+    FBtnThemeDark: TFtButton;
+    FBtnStandardFont: TFtButton;
+    FBtnMonospaceFont: TFtButton;
     FSwDarkMode: TFtSwitch;
     FCmbAccent: TFtComboBox;
     FCmbWallpaperMode: TFtComboBox;
@@ -152,13 +184,24 @@ type
     // Sound page controls
     FCmbOutputDevice: TFtComboBox;
     FSlVolume: TFtSlider;
+    FLblVolumePercent: TFtLabel;
     FSwMute: TFtSwitch;
+    FBtnTestSound: TFtButton;
+    FCmbInputDevice: TFtComboBox;
+    FSlInputVolume: TFtSlider;
+    FLblInputVolumePercent: TFtLabel;
+    FSwInputMute: TFtSwitch;
     FSwSoundEffects: TFtSwitch;
 
     // Power page controls
+    FLblBatteryPercent: TFtLabel;
+    FLblBatteryRemaining: TFtLabel;
+    FImgBatteryBolt: TFtImage;
+    FSegPowerMode: TFtSegmentedControl;
     FCmbPowerMode: TFtComboBox;
     FCmbScreenBlank: TFtComboBox;
     FSwAutoSuspend: TFtSwitch;
+    FLblMaxCapacity: TFtLabel;
     FTxtPowerStatus: TFtEntry;
 
     // Mouse page controls
@@ -209,6 +252,28 @@ type
     procedure HandleWiredRefresh(Sender: TFtButton);
     procedure HandleWiredConnectClick(Sender: TFtButton);
     procedure RefreshWiredUI();
+
+    // Bluetooth Event Handlers
+    procedure HandleBluetoothToggle(Sender: TFtSwitch; AToggled: Boolean);
+    procedure HandleBluetoothScanClick(Sender: TFtButton);
+    procedure HandleBluetoothConnectClick(Sender: TFtButton);
+    procedure RefreshBluetoothUI();
+
+    // Sound Event Handlers
+    procedure HandleTestSoundClick(Sender: TFtButton);
+    procedure HandleInputDeviceChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
+    procedure HandleInputVolumeChange(Sender: TFtSlider; AValue: Double);
+    procedure HandleInputMuteToggle(Sender: TFtSwitch; AToggled: Boolean);
+    procedure RefreshSoundUI();
+
+    // Power Event Handlers
+    procedure HandleSegmentPowerModeSelect(Sender: TFtSegmentedControl; AIndex: Integer; const AText: string);
+    procedure RefreshPowerUI();
+
+    // Appearance Event Handlers
+    procedure HandleStandardFontClick(Sender: TFtButton);
+    procedure HandleMonospaceFontClick(Sender: TFtButton);
+    procedure RefreshAppearanceUI();
 
     // Displays Event Handlers
     procedure HandleBrightnessChange(Sender: TFtSlider; AValue: Double);
@@ -271,6 +336,8 @@ type
 
     procedure SelectCategoryByName(const AName: string);
     procedure SetDarkMode(AValue: Boolean);
+    procedure CycleStandardFont();
+    procedure CycleMonospaceFont();
 
     property Settings: TConfigSettings read FSettings;
     property AppTitle: TFtLabel read FAppTitle;
@@ -293,6 +360,45 @@ type
     property BtnDisplayApply: TFtButton read FBtnDisplayApply;
     property LblWiredStatus: TFtLabel read FLblWiredStatus;
     property LblDisplayInfo: TFtLabel read FLblDisplayInfo;
+
+    // Bluetooth
+    property PageBluetooth: TFtWidget read FPageBluetooth;
+    property SwBluetooth: TFtSwitch read FSwBluetooth;
+    property LblBluetoothStatus: TFtLabel read FLblBluetoothStatus;
+    property BtnBluetoothScan: TFtButton read FBtnBluetoothScan;
+    property CardBluetoothDevices: TFtContainer read FCardBluetoothDevices;
+    property BtnBtConnect0: TFtButton read FBtnBtConnect0;
+    property BtnBtConnect1: TFtButton read FBtnBtConnect1;
+    property BtnBtConnect2: TFtButton read FBtnBtConnect2;
+
+    // Sound
+    property PageSound: TFtWidget read FPageSound;
+    property CmbOutputDevice: TFtComboBox read FCmbOutputDevice;
+    property LblVolumePercent: TFtLabel read FLblVolumePercent;
+    property BtnTestSound: TFtButton read FBtnTestSound;
+    property CmbInputDevice: TFtComboBox read FCmbInputDevice;
+    property SlInputVolume: TFtSlider read FSlInputVolume;
+    property LblInputVolumePercent: TFtLabel read FLblInputVolumePercent;
+    property SwInputMute: TFtSwitch read FSwInputMute;
+    property SwSoundEffects: TFtSwitch read FSwSoundEffects;
+
+    // Power
+    property PagePower: TFtWidget read FPagePower;
+    property PageBattery: TFtWidget read FPageBattery;
+    property LblBatteryPercent: TFtLabel read FLblBatteryPercent;
+    property LblBatteryRemaining: TFtLabel read FLblBatteryRemaining;
+    property SegPowerMode: TFtSegmentedControl read FSegPowerMode;
+    property CmbPowerMode: TFtComboBox read FCmbPowerMode;
+    property CmbScreenBlank: TFtComboBox read FCmbScreenBlank;
+    property SwAutoSuspend: TFtSwitch read FSwAutoSuspend;
+    property LblMaxCapacity: TFtLabel read FLblMaxCapacity;
+
+    // Appearance
+    property PageAppearance: TFtWidget read FPageAppearance;
+    property BtnThemeLight: TFtButton read FBtnThemeLight;
+    property BtnThemeDark: TFtButton read FBtnThemeDark;
+    property BtnStandardFont: TFtButton read FBtnStandardFont;
+    property BtnMonospaceFont: TFtButton read FBtnMonospaceFont;
   end;
 
 implementation
@@ -378,6 +484,7 @@ begin
   // Content Pages
   FPageWlan := FindWidget('pageWlan');
   FPageWired := FindWidget('pageWired');
+  FPageBluetooth := FindWidget('pageBluetooth');
   FPageDisplays := FindWidget('pageDisplays');
   FPageAppearance := FindWidget('pageAppearance');
   FPageBackground := FindWidget('pageBackground');
@@ -559,6 +666,87 @@ begin
     FLblWiredMac.Alignment := ftaRight;
   end;
 
+  // Bluetooth controls
+  w := FindWidget('cardBluetoothToggle');
+  if w is TFtContainer then FCardBluetoothToggle := TFtContainer(w);
+
+  w := FindWidget('lblBluetoothTitle');
+  if w is TFtLabel then FLblBluetoothTitle := TFtLabel(w);
+
+  w := FindWidget('lblBluetoothStatus');
+  if w is TFtLabel then FLblBluetoothStatus := TFtLabel(w);
+
+  w := FindWidget('btnBluetoothScan');
+  if w is TFtButton then
+  begin
+    FBtnBluetoothScan := TFtButton(w);
+    FBtnBluetoothScan.OnClick := @HandleBluetoothScanClick;
+  end;
+
+  w := FindWidget('swBluetooth');
+  if w is TFtSwitch then
+  begin
+    FSwBluetooth := TFtSwitch(w);
+    FSwBluetooth.OnToggle := @HandleBluetoothToggle;
+  end;
+
+  w := FindWidget('containerBluetoothDisabled');
+  if w is TFtContainer then FContainerBluetoothDisabled := TFtContainer(w);
+
+  w := FindWidget('lblBluetoothDisabled');
+  if w is TFtLabel then FLblBluetoothDisabled := TFtLabel(w);
+
+  w := FindWidget('cardBluetoothDevices');
+  if w is TFtContainer then FCardBluetoothDevices := TFtContainer(w);
+
+  w := FindWidget('rowBtDev0');
+  if w is TFtContainer then FRowBtDev0 := TFtContainer(w);
+  w := FindWidget('imgBtDev0');
+  if w is TFtImage then FImgBtDev0 := TFtImage(w);
+  w := FindWidget('lblBtName0');
+  if w is TFtLabel then FLblBtName0 := TFtLabel(w);
+  w := FindWidget('lblBtStatus0');
+  if w is TFtLabel then FLblBtStatus0 := TFtLabel(w);
+  w := FindWidget('btnBtConnect0');
+  if w is TFtButton then
+  begin
+    FBtnBtConnect0 := TFtButton(w);
+    FBtnBtConnect0.Tag := 0;
+    FBtnBtConnect0.OnClick := @HandleBluetoothConnectClick;
+  end;
+
+  w := FindWidget('rowBtDev1');
+  if w is TFtContainer then FRowBtDev1 := TFtContainer(w);
+  w := FindWidget('imgBtDev1');
+  if w is TFtImage then FImgBtDev1 := TFtImage(w);
+  w := FindWidget('lblBtName1');
+  if w is TFtLabel then FLblBtName1 := TFtLabel(w);
+  w := FindWidget('lblBtStatus1');
+  if w is TFtLabel then FLblBtStatus1 := TFtLabel(w);
+  w := FindWidget('btnBtConnect1');
+  if w is TFtButton then
+  begin
+    FBtnBtConnect1 := TFtButton(w);
+    FBtnBtConnect1.Tag := 1;
+    FBtnBtConnect1.OnClick := @HandleBluetoothConnectClick;
+  end;
+
+  w := FindWidget('rowBtDev2');
+  if w is TFtContainer then FRowBtDev2 := TFtContainer(w);
+  w := FindWidget('imgBtDev2');
+  if w is TFtImage then FImgBtDev2 := TFtImage(w);
+  w := FindWidget('lblBtName2');
+  if w is TFtLabel then FLblBtName2 := TFtLabel(w);
+  w := FindWidget('lblBtStatus2');
+  if w is TFtLabel then FLblBtStatus2 := TFtLabel(w);
+  w := FindWidget('btnBtConnect2');
+  if w is TFtButton then
+  begin
+    FBtnBtConnect2 := TFtButton(w);
+    FBtnBtConnect2.Tag := 2;
+    FBtnBtConnect2.OnClick := @HandleBluetoothConnectClick;
+  end;
+
   // Appearance controls
   w := FindWidget('swDarkMode');
   if w is TFtSwitch then
@@ -575,9 +763,17 @@ begin
   end;
 
   w := FindWidget('btnThemeLight');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleThemeLightClick;
+  if w is TFtButton then
+  begin
+    FBtnThemeLight := TFtButton(w);
+    FBtnThemeLight.OnClick := @HandleThemeLightClick;
+  end;
   w := FindWidget('btnThemeDark');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleThemeDarkClick;
+  if w is TFtButton then
+  begin
+    FBtnThemeDark := TFtButton(w);
+    FBtnThemeDark.OnClick := @HandleThemeDarkClick;
+  end;
 
   w := FindWidget('btnAccentMulti');
   if w is TFtButton then begin w.Tag := 0; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
@@ -611,6 +807,20 @@ begin
   begin
     FBtnChooseWallpaper := TFtButton(w);
     FBtnChooseWallpaper.OnClick := @HandleChooseWallpaperClick;
+  end;
+
+  w := FindWidget('btnStandardFont');
+  if w is TFtButton then
+  begin
+    FBtnStandardFont := TFtButton(w);
+    FBtnStandardFont.OnClick := @HandleStandardFontClick;
+  end;
+
+  w := FindWidget('btnMonospaceFont');
+  if w is TFtButton then
+  begin
+    FBtnMonospaceFont := TFtButton(w);
+    FBtnMonospaceFont.OnClick := @HandleMonospaceFontClick;
   end;
 
   // Displays controls
@@ -802,11 +1012,46 @@ begin
     FSlVolume.OnChange := @HandleVolumeChange;
   end;
 
+  w := FindWidget('lblVolumePercent');
+  if w is TFtLabel then FLblVolumePercent := TFtLabel(w);
+
   w := FindWidget('swMute');
   if w is TFtSwitch then
   begin
     FSwMute := TFtSwitch(w);
     FSwMute.OnToggle := @HandleMuteToggle;
+  end;
+
+  w := FindWidget('btnTestSound');
+  if w is TFtButton then
+  begin
+    FBtnTestSound := TFtButton(w);
+    FBtnTestSound.OnClick := @HandleTestSoundClick;
+  end;
+
+  w := FindWidget('cmbInputDevice');
+  if w is TFtComboBox then
+  begin
+    FCmbInputDevice := TFtComboBox(w);
+    FCmbInputDevice.OnChange := @HandleInputDeviceChange;
+  end;
+
+  w := FindWidget('slInputVolume');
+  if w is TFtSlider then
+  begin
+    FSlInputVolume := TFtSlider(w);
+    FSlInputVolume.SetRange(0.0, 100.0);
+    FSlInputVolume.OnChange := @HandleInputVolumeChange;
+  end;
+
+  w := FindWidget('lblInputVolumePercent');
+  if w is TFtLabel then FLblInputVolumePercent := TFtLabel(w);
+
+  w := FindWidget('swInputMute');
+  if w is TFtSwitch then
+  begin
+    FSwInputMute := TFtSwitch(w);
+    FSwInputMute.OnToggle := @HandleInputMuteToggle;
   end;
 
   w := FindWidget('swSoundEffects');
@@ -817,6 +1062,22 @@ begin
   end;
 
   // Power controls
+  w := FindWidget('lblBatteryPercent');
+  if w is TFtLabel then FLblBatteryPercent := TFtLabel(w);
+
+  w := FindWidget('lblBatteryRemaining');
+  if w is TFtLabel then FLblBatteryRemaining := TFtLabel(w);
+
+  w := FindWidget('imgBatteryBolt');
+  if w is TFtImage then FImgBatteryBolt := TFtImage(w);
+
+  w := FindWidget('segPowerMode');
+  if w is TFtSegmentedControl then
+  begin
+    FSegPowerMode := TFtSegmentedControl(w);
+    FSegPowerMode.OnSelect := @HandleSegmentPowerModeSelect;
+  end;
+
   w := FindWidget('cmbPowerMode');
   if w is TFtComboBox then
   begin
@@ -837,6 +1098,9 @@ begin
     FSwAutoSuspend := TFtSwitch(w);
     FSwAutoSuspend.OnToggle := @HandleAutoSuspendToggle;
   end;
+
+  w := FindWidget('lblMaxCapacity');
+  if w is TFtLabel then FLblMaxCapacity := TFtLabel(w);
 
   w := FindWidget('txtPowerStatus');
   if w is TFtEntry then FTxtPowerStatus := TFtEntry(w);
@@ -971,12 +1235,20 @@ begin
     // Wired
     RefreshWiredUI();
 
+    // Bluetooth
+    RefreshBluetoothUI();
+
     // Displays
     RefreshDisplayUI();
 
     // Appearance
-    if Assigned(FSwDarkMode) then
-      FSwDarkMode.Checked := FSettings.DarkMode;
+    RefreshAppearanceUI();
+
+    // Sound
+    RefreshSoundUI();
+
+    // Power
+    RefreshPowerUI();
 
     if Assigned(FCmbAccent) then
       FCmbAccent.Text := FSettings.AccentColor;
@@ -1145,20 +1417,46 @@ begin
       if FPageWired.Visible then
         RefreshWiredUI();
     end;
+    if FPageBluetooth <> nil then
+    begin
+      FPageBluetooth.Visible := SameText(AName, 'Bluetooth');
+      if FPageBluetooth.Visible then
+        RefreshBluetoothUI();
+    end;
     if FPageDisplays <> nil then
     begin
       FPageDisplays.Visible := SameText(AName, 'Display') or SameText(AName, 'Displays');
       if FPageDisplays.Visible then
         RefreshDisplayUI();
     end;
-    if FPageAppearance <> nil then FPageAppearance.Visible := SameText(AName, 'Appearance');
+    if FPageAppearance <> nil then
+    begin
+      FPageAppearance.Visible := SameText(AName, 'Appearance');
+      if FPageAppearance.Visible then
+        RefreshAppearanceUI();
+    end;
     if FPageBackground <> nil then FPageBackground.Visible := SameText(AName, 'Background');
     if FPageDesktop <> nil then FPageDesktop.Visible := SameText(AName, 'Dock') or SameText(AName, 'Desktop & Dock');
     if FPageUser <> nil then FPageUser.Visible := SameText(AName, 'User') or SameText(AName, 'Users');
     if FPageLanguage <> nil then FPageLanguage.Visible := SameText(AName, 'Language');
-    if FPageBattery <> nil then FPageBattery.Visible := SameText(AName, 'Battery') or SameText(AName, 'Power');
-    if FPageSound <> nil then FPageSound.Visible := SameText(AName, 'Sound');
-    if FPagePower <> nil then FPagePower.Visible := SameText(AName, 'Power') or SameText(AName, 'Battery');
+    if FPageBattery <> nil then
+    begin
+      FPageBattery.Visible := SameText(AName, 'Battery') or SameText(AName, 'Power');
+      if FPageBattery.Visible then
+        RefreshPowerUI();
+    end;
+    if FPageSound <> nil then
+    begin
+      FPageSound.Visible := SameText(AName, 'Sound') or SameText(AName, 'Audio');
+      if FPageSound.Visible then
+        RefreshSoundUI();
+    end;
+    if FPagePower <> nil then
+    begin
+      FPagePower.Visible := SameText(AName, 'Power') or SameText(AName, 'Battery');
+      if FPagePower.Visible then
+        RefreshPowerUI();
+    end;
     if FPageMouse <> nil then FPageMouse.Visible := SameText(AName, 'Mouse & Touchpad');
     if FPageKeyboard <> nil then
       FPageKeyboard.Visible := SameText(AName, 'Keyboard & Shortcuts') or SameText(AName, 'Keyboard');
@@ -1181,6 +1479,7 @@ begin
           if SameText(cNode.Text, AName) or
              (SameText(AName, 'Displays') and SameText(cNode.Text, 'Display')) or
              (SameText(AName, 'Desktop & Dock') and SameText(cNode.Text, 'Dock')) or
+             (SameText(AName, 'Battery') and SameText(cNode.Text, 'Power')) or
              (SameText(AName, 'Power') and SameText(cNode.Text, 'Battery')) then
           begin
             if FCategoryTree.SelectedNode <> cNode then
@@ -1212,14 +1511,15 @@ begin
 
   if (Pos('wifi', q) > 0) or (Pos('wlan', q) > 0) or (Pos('wirel', q) > 0) then SelectCategoryByName('WLAN')
   else if (Pos('ether', q) > 0) or (Pos('wired', q) > 0) or (Pos('lan', q) > 0) then SelectCategoryByName('Wired')
-  else if (Pos('appear', q) > 0) or (Pos('theme', q) > 0) then SelectCategoryByName('Appearance')
+  else if (Pos('blue', q) > 0) or (Pos('bt', q) > 0) then SelectCategoryByName('Bluetooth')
+  else if (Pos('appear', q) > 0) or (Pos('theme', q) > 0) or (Pos('font', q) > 0) or (Pos('dark', q) > 0) then SelectCategoryByName('Appearance')
   else if (Pos('disp', q) > 0) or (Pos('screen', q) > 0) or (Pos('resolut', q) > 0) then SelectCategoryByName('Displays')
   else if (Pos('wall', q) > 0) or (Pos('backg', q) > 0) then SelectCategoryByName('Background')
   else if (Pos('dock', q) > 0) or (Pos('panel', q) > 0) or (Pos('desk', q) > 0) then SelectCategoryByName('Desktop & Dock')
   else if (Pos('user', q) > 0) or (Pos('acc', q) > 0) then SelectCategoryByName('User')
   else if (Pos('lang', q) > 0) or (Pos('loc', q) > 0) then SelectCategoryByName('Language')
-  else if (Pos('sound', q) > 0) or (Pos('vol', q) > 0) or (Pos('audio', q) > 0) then SelectCategoryByName('Sound')
-  else if (Pos('power', q) > 0) or (Pos('batt', q) > 0) or (Pos('sleep', q) > 0) then SelectCategoryByName('Power')
+  else if (Pos('sound', q) > 0) or (Pos('vol', q) > 0) or (Pos('audio', q) > 0) or (Pos('speaker', q) > 0) then SelectCategoryByName('Sound')
+  else if (Pos('power', q) > 0) or (Pos('batt', q) > 0) or (Pos('sleep', q) > 0) or (Pos('suspend', q) > 0) then SelectCategoryByName('Power')
   else if (Pos('mouse', q) > 0) or (Pos('touch', q) > 0) or (Pos('cursor', q) > 0) then SelectCategoryByName('Mouse & Touchpad')
   else if (Pos('key', q) > 0) or (Pos('short', q) > 0) then SelectCategoryByName('Keyboard & Shortcuts')
   else if (Pos('app', q) > 0) or (Pos('browser', q) > 0) or (Pos('term', q) > 0) then SelectCategoryByName('Default Applications')
@@ -2015,60 +2315,497 @@ begin
 end;
 
 procedure TConfigSamaWindow.HandleOutputDeviceChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
+var
+  outputs: TSoundDeviceArray;
 begin
-  if FSettings = nil then Exit();
-  FSettings.OutputDevice := AText;
-  FSettings.Save();
+  if FUpdatingControls or (Sender = nil) then Exit();
+  outputs := SoundService().GetOutputDevices();
+  if (AIndex >= 0) and (AIndex < Length(outputs)) then
+  begin
+    SoundService().SetDefaultOutputDevice(outputs[AIndex].ID);
+    if FSettings <> nil then
+    begin
+      FSettings.OutputDevice := outputs[AIndex].Name;
+      FSettings.Save();
+    end;
+  end;
 end;
 
 procedure TConfigSamaWindow.HandleVolumeChange(Sender: TFtSlider; AValue: Double);
+var
+  vol: Integer;
 begin
-  if FSettings = nil then Exit();
-  FSettings.OutputVolume := Round(AValue);
-  FSettings.Save();
+  if FUpdatingControls then Exit();
+  vol := Round(AValue);
+  SoundService().SetOutputVolume(vol);
+  if Assigned(FLblVolumePercent) then
+    FLblVolumePercent.Text := IntToStr(vol) + '%';
+  if FSettings <> nil then
+  begin
+    FSettings.OutputVolume := vol;
+    FSettings.Save();
+  end;
 end;
 
 procedure TConfigSamaWindow.HandleMuteToggle(Sender: TFtSwitch; AToggled: Boolean);
 begin
-  if FSettings = nil then Exit();
-  FSettings.Muted := AToggled;
-  FSettings.Save();
+  if FUpdatingControls then Exit();
+  SoundService().SetOutputMuted(AToggled);
+  if FSettings <> nil then
+  begin
+    FSettings.Muted := AToggled;
+    FSettings.Save();
+  end;
+end;
+
+procedure TConfigSamaWindow.HandleTestSoundClick(Sender: TFtButton);
+begin
+  SoundService().PlayTestSound();
+end;
+
+procedure TConfigSamaWindow.HandleInputDeviceChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
+var
+  inputs: TSoundDeviceArray;
+begin
+  if FUpdatingControls or (Sender = nil) then Exit();
+  inputs := SoundService().GetInputDevices();
+  if (AIndex >= 0) and (AIndex < Length(inputs)) then
+  begin
+    SoundService().SetDefaultInputDevice(inputs[AIndex].ID);
+    if FSettings <> nil then
+    begin
+      FSettings.InputDevice := inputs[AIndex].Name;
+      FSettings.Save();
+    end;
+  end;
+end;
+
+procedure TConfigSamaWindow.HandleInputVolumeChange(Sender: TFtSlider; AValue: Double);
+var
+  vol: Integer;
+begin
+  if FUpdatingControls then Exit();
+  vol := Round(AValue);
+  SoundService().SetInputVolume(vol);
+  if Assigned(FLblInputVolumePercent) then
+    FLblInputVolumePercent.Text := IntToStr(vol) + '%';
+  if FSettings <> nil then
+  begin
+    FSettings.InputVolume := vol;
+    FSettings.Save();
+  end;
+end;
+
+procedure TConfigSamaWindow.HandleInputMuteToggle(Sender: TFtSwitch; AToggled: Boolean);
+begin
+  if FUpdatingControls then Exit();
+  SoundService().SetInputMuted(AToggled);
+  if FSettings <> nil then
+  begin
+    FSettings.InputMuted := AToggled;
+    FSettings.Save();
+  end;
 end;
 
 procedure TConfigSamaWindow.HandleSoundEffectsToggle(Sender: TFtSwitch; AToggled: Boolean);
 begin
-  if FSettings = nil then Exit();
-  FSettings.SoundEffects := AToggled;
-  FSettings.Save();
+  if FUpdatingControls then Exit();
+  SoundService().SetSoundEffectsEnabled(AToggled);
+  if FSettings <> nil then
+  begin
+    FSettings.SoundEffects := AToggled;
+    FSettings.Save();
+  end;
+end;
+
+procedure TConfigSamaWindow.RefreshSoundUI();
+var
+  outputs, inputs: TSoundDeviceArray;
+  i, defOutIdx, defInIdx, outVol, inVol: Integer;
+begin
+  FUpdatingControls := True;
+  try
+    // Outputs
+    outputs := SoundService().GetOutputDevices();
+    if Assigned(FCmbOutputDevice) then
+    begin
+      FCmbOutputDevice.Clear();
+      defOutIdx := 0;
+      for i := 0 to High(outputs) do
+      begin
+        FCmbOutputDevice.AddItem(outputs[i].Name);
+        if outputs[i].IsDefault then
+          defOutIdx := i;
+      end;
+      if FCmbOutputDevice.ItemCount > 0 then
+        FCmbOutputDevice.SelectedIndex := defOutIdx;
+    end;
+
+    outVol := SoundService().GetOutputVolume();
+    if Assigned(FSlVolume) then
+      FSlVolume.Value := outVol;
+    if Assigned(FLblVolumePercent) then
+      FLblVolumePercent.Text := IntToStr(outVol) + '%';
+    if Assigned(FSwMute) then
+      FSwMute.Checked := SoundService().IsOutputMuted();
+
+    // Inputs
+    inputs := SoundService().GetInputDevices();
+    if Assigned(FCmbInputDevice) then
+    begin
+      FCmbInputDevice.Clear();
+      defInIdx := 0;
+      for i := 0 to High(inputs) do
+      begin
+        FCmbInputDevice.AddItem(inputs[i].Name);
+        if inputs[i].IsDefault then
+          defInIdx := i;
+      end;
+      if FCmbInputDevice.ItemCount > 0 then
+        FCmbInputDevice.SelectedIndex := defInIdx;
+    end;
+
+    inVol := SoundService().GetInputVolume();
+    if Assigned(FSlInputVolume) then
+      FSlInputVolume.Value := inVol;
+    if Assigned(FLblInputVolumePercent) then
+      FLblInputVolumePercent.Text := IntToStr(inVol) + '%';
+    if Assigned(FSwInputMute) then
+      FSwInputMute.Checked := SoundService().IsInputMuted();
+
+    // Sound Effects
+    if Assigned(FSwSoundEffects) then
+      FSwSoundEffects.Checked := SoundService().AreSoundEffectsEnabled();
+  finally
+    FUpdatingControls := False;
+  end;
+  Invalidate();
 end;
 
 procedure TConfigSamaWindow.HandlePowerModeChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
 begin
-  if FSettings = nil then Exit();
+  if FUpdatingControls or (FSettings = nil) then Exit();
+  PowerService().SetPowerMode(AText);
   FSettings.PowerMode := AText;
   FSettings.Save();
+  if Assigned(FSegPowerMode) then
+  begin
+    if SameText(AText, 'Power Saver') then
+      FSegPowerMode.SelectedIndex := 0
+    else if SameText(AText, 'Performance') then
+      FSegPowerMode.SelectedIndex := 2
+    else
+      FSegPowerMode.SelectedIndex := 1;
+  end;
+end;
+
+procedure TConfigSamaWindow.HandleSegmentPowerModeSelect(Sender: TFtSegmentedControl; AIndex: Integer; const AText: string);
+begin
+  if FUpdatingControls or (FSettings = nil) then Exit();
+  PowerService().SetPowerMode(AText);
+  FSettings.PowerMode := AText;
+  FSettings.Save();
+  if Assigned(FCmbPowerMode) then
+    FCmbPowerMode.Text := AText;
 end;
 
 procedure TConfigSamaWindow.HandleScreenBlankChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
 var
   delayVal: Integer;
 begin
-  if FSettings = nil then Exit();
-  if Pos('1 ', AText) = 1 then delayVal := 1
-  else if Pos('5 ', AText) = 1 then delayVal := 5
-  else if Pos('10 ', AText) = 1 then delayVal := 10
-  else if Pos('15 ', AText) = 1 then delayVal := 15
-  else delayVal := 0;
+  if FUpdatingControls or (FSettings = nil) then Exit();
+  if Pos('Never', AText) > 0 then delayVal := 0
+  else if Pos('5 ', AText) > 0 then delayVal := 5
+  else if Pos('10 ', AText) > 0 then delayVal := 10
+  else if Pos('15 ', AText) > 0 then delayVal := 15
+  else if Pos('30 ', AText) > 0 then delayVal := 30
+  else if Pos('1 hour', AText) > 0 then delayVal := 60
+  else delayVal := 10;
 
+  PowerService().SetScreenBlankDelay(delayVal);
   FSettings.ScreenBlankDelay := delayVal;
   FSettings.Save();
 end;
 
 procedure TConfigSamaWindow.HandleAutoSuspendToggle(Sender: TFtSwitch; AToggled: Boolean);
 begin
-  if FSettings = nil then Exit();
+  if FUpdatingControls or (FSettings = nil) then Exit();
+  PowerService().SetAutoSuspendEnabled(AToggled);
   FSettings.AutoSuspend := AToggled;
   FSettings.Save();
+end;
+
+procedure TConfigSamaWindow.RefreshPowerUI();
+var
+  pct: Integer;
+  st, pmode: string;
+  delayMins, selIdx: Integer;
+begin
+  FUpdatingControls := True;
+  try
+    pct := PowerService().GetBatteryPercentage();
+    if Assigned(FLblBatteryPercent) then
+      FLblBatteryPercent.Text := IntToStr(pct) + '%';
+
+    st := PowerService().GetBatteryStatus() + ' • ' + PowerService().GetTimeRemaining();
+    if Assigned(FLblBatteryRemaining) then
+      FLblBatteryRemaining.Text := st;
+
+    pmode := PowerService().GetPowerMode();
+    if Assigned(FSegPowerMode) then
+    begin
+      if SameText(pmode, 'Power Saver') then
+        FSegPowerMode.SelectedIndex := 0
+      else if SameText(pmode, 'Performance') then
+        FSegPowerMode.SelectedIndex := 2
+      else
+        FSegPowerMode.SelectedIndex := 1;
+    end;
+    if Assigned(FCmbPowerMode) then
+      FCmbPowerMode.Text := pmode;
+
+    delayMins := PowerService().GetScreenBlankDelay();
+    if Assigned(FCmbScreenBlank) then
+    begin
+      case delayMins of
+        0: selIdx := 0;
+        5: selIdx := 1;
+        10: selIdx := 2;
+        15: selIdx := 3;
+        30: selIdx := 4;
+        60: selIdx := 5;
+        else selIdx := 2;
+      end;
+      if (selIdx >= 0) and (selIdx < FCmbScreenBlank.ItemCount) then
+        FCmbScreenBlank.SelectedIndex := selIdx;
+    end;
+
+    if Assigned(FSwAutoSuspend) then
+      FSwAutoSuspend.Checked := PowerService().IsAutoSuspendEnabled();
+
+    if Assigned(FLblMaxCapacity) then
+      FLblMaxCapacity.Text := '100%';
+  finally
+    FUpdatingControls := False;
+  end;
+  Invalidate();
+end;
+
+procedure TConfigSamaWindow.HandleBluetoothToggle(Sender: TFtSwitch; AToggled: Boolean);
+begin
+  if FUpdatingControls then Exit();
+  BluetoothService().SetBluetoothEnabled(AToggled);
+  if FSettings <> nil then
+  begin
+    FSettings.BluetoothEnabled := AToggled;
+    FSettings.Save();
+  end;
+  RefreshBluetoothUI();
+end;
+
+procedure TConfigSamaWindow.HandleBluetoothScanClick(Sender: TFtButton);
+begin
+  BluetoothService().StartScan();
+  RefreshBluetoothUI();
+end;
+
+procedure TConfigSamaWindow.HandleBluetoothConnectClick(Sender: TFtButton);
+var
+  devs: TBluetoothDeviceArray;
+  idx: Integer;
+begin
+  if Sender = nil then Exit();
+  idx := Sender.Tag;
+  devs := BluetoothService().GetDevices();
+  if (idx >= 0) and (idx < Length(devs)) then
+  begin
+    if devs[idx].Connected then
+      BluetoothService().Disconnect(devs[idx].Address)
+    else
+      BluetoothService().Connect(devs[idx].Address);
+  end;
+  RefreshBluetoothUI();
+end;
+
+procedure TConfigSamaWindow.RefreshBluetoothUI();
+var
+  btEnabled: Boolean;
+  devs: TBluetoothDeviceArray;
+  statusStr: string;
+begin
+  btEnabled := BluetoothService().IsBluetoothEnabled();
+
+  if Assigned(FSwBluetooth) then
+    FSwBluetooth.Checked := btEnabled;
+
+  if not btEnabled then
+  begin
+    if Assigned(FLblBluetoothStatus) then
+      FLblBluetoothStatus.Text := 'Bluetooth is turned off';
+    if Assigned(FCardBluetoothDevices) then
+      FCardBluetoothDevices.Visible := False;
+    if Assigned(FContainerBluetoothDisabled) then
+      FContainerBluetoothDisabled.Visible := True;
+    Invalidate();
+    Exit();
+  end;
+
+  if Assigned(FLblBluetoothStatus) then
+    FLblBluetoothStatus.Text := 'Visible and available for pairing';
+  if Assigned(FContainerBluetoothDisabled) then
+    FContainerBluetoothDisabled.Visible := False;
+  if Assigned(FCardBluetoothDevices) then
+    FCardBluetoothDevices.Visible := True;
+
+  devs := BluetoothService().GetDevices();
+
+  // Row 0
+  if Length(devs) > 0 then
+  begin
+    if Assigned(FLblBtName0) then FLblBtName0.Text := devs[0].Name;
+    if devs[0].Connected then
+    begin
+      statusStr := 'Connected';
+      if devs[0].Battery >= 0 then
+        statusStr := statusStr + ' • ' + IntToStr(devs[0].Battery) + '% Battery';
+      if Assigned(FBtnBtConnect0) then FBtnBtConnect0.Caption := 'Disconnect';
+    end
+    else if devs[0].Paired then
+    begin
+      statusStr := 'Paired';
+      if devs[0].Battery >= 0 then
+        statusStr := statusStr + ' • ' + IntToStr(devs[0].Battery) + '% Battery';
+      if Assigned(FBtnBtConnect0) then FBtnBtConnect0.Caption := 'Connect';
+    end
+    else
+    begin
+      statusStr := 'Ready to pair';
+      if Assigned(FBtnBtConnect0) then FBtnBtConnect0.Caption := 'Pair';
+    end;
+    if Assigned(FLblBtStatus0) then FLblBtStatus0.Text := statusStr;
+    if Assigned(FRowBtDev0) then FRowBtDev0.Visible := True;
+  end;
+
+  // Row 1
+  if Length(devs) > 1 then
+  begin
+    if Assigned(FLblBtName1) then FLblBtName1.Text := devs[1].Name;
+    if devs[1].Connected then
+    begin
+      statusStr := 'Connected';
+      if devs[1].Battery >= 0 then
+        statusStr := statusStr + ' • ' + IntToStr(devs[1].Battery) + '% Battery';
+      if Assigned(FBtnBtConnect1) then FBtnBtConnect1.Caption := 'Disconnect';
+    end
+    else if devs[1].Paired then
+    begin
+      statusStr := 'Paired';
+      if devs[1].Battery >= 0 then
+        statusStr := statusStr + ' • ' + IntToStr(devs[1].Battery) + '% Battery';
+      if Assigned(FBtnBtConnect1) then FBtnBtConnect1.Caption := 'Connect';
+    end
+    else
+    begin
+      statusStr := 'Ready to pair';
+      if Assigned(FBtnBtConnect1) then FBtnBtConnect1.Caption := 'Pair';
+    end;
+    if Assigned(FLblBtStatus1) then FLblBtStatus1.Text := statusStr;
+    if Assigned(FRowBtDev1) then FRowBtDev1.Visible := True;
+  end;
+
+  // Row 2
+  if Length(devs) > 2 then
+  begin
+    if Assigned(FLblBtName2) then FLblBtName2.Text := devs[2].Name;
+    if devs[2].Connected then
+    begin
+      statusStr := 'Connected';
+      if devs[2].Battery >= 0 then
+        statusStr := statusStr + ' • ' + IntToStr(devs[2].Battery) + '% Battery';
+      if Assigned(FBtnBtConnect2) then FBtnBtConnect2.Caption := 'Disconnect';
+    end
+    else if devs[2].Paired then
+    begin
+      statusStr := 'Paired';
+      if devs[2].Battery >= 0 then
+        statusStr := statusStr + ' • ' + IntToStr(devs[2].Battery) + '% Battery';
+      if Assigned(FBtnBtConnect2) then FBtnBtConnect2.Caption := 'Connect';
+    end
+    else
+    begin
+      statusStr := 'Ready to pair';
+      if Assigned(FBtnBtConnect2) then FBtnBtConnect2.Caption := 'Pair';
+    end;
+    if Assigned(FLblBtStatus2) then FLblBtStatus2.Text := statusStr;
+    if Assigned(FRowBtDev2) then FRowBtDev2.Visible := True;
+  end;
+
+  Invalidate();
+end;
+
+procedure TConfigSamaWindow.RefreshAppearanceUI();
+begin
+  FUpdatingControls := True;
+  try
+    if Assigned(FSwDarkMode) then
+      FSwDarkMode.Checked := FSettings.DarkMode;
+    if Assigned(FCmbAccent) then
+      FCmbAccent.Text := FSettings.AccentColor;
+    if Assigned(FBtnStandardFont) then
+      FBtnStandardFont.Caption := FSettings.StandardFont;
+    if Assigned(FBtnMonospaceFont) then
+      FBtnMonospaceFont.Caption := FSettings.MonospaceFont;
+  finally
+    FUpdatingControls := False;
+  end;
+  Invalidate();
+end;
+
+procedure TConfigSamaWindow.HandleStandardFontClick(Sender: TFtButton);
+var
+  cur: string;
+begin
+  if FSettings = nil then Exit();
+  cur := FSettings.StandardFont;
+  if SameText(cur, 'Inter 11') then cur := 'Cantarell 11'
+  else if SameText(cur, 'Cantarell 11') then cur := 'Noto Sans 11'
+  else if SameText(cur, 'Noto Sans 11') then cur := 'Roboto 11'
+  else if SameText(cur, 'Roboto 11') then cur := 'Sans 11'
+  else cur := 'Inter 11';
+
+  FSettings.StandardFont := cur;
+  FSettings.Save();
+  if Assigned(FBtnStandardFont) then
+    FBtnStandardFont.Caption := cur;
+  Invalidate();
+end;
+
+procedure TConfigSamaWindow.HandleMonospaceFontClick(Sender: TFtButton);
+var
+  cur: string;
+begin
+  if FSettings = nil then Exit();
+  cur := FSettings.MonospaceFont;
+  if SameText(cur, 'JetBrains Mono 10') then cur := 'Fira Code 10'
+  else if SameText(cur, 'Fira Code 10') then cur := 'Source Code Pro 10'
+  else if SameText(cur, 'Source Code Pro 10') then cur := 'Monospace 10'
+  else cur := 'JetBrains Mono 10';
+
+  FSettings.MonospaceFont := cur;
+  FSettings.Save();
+  if Assigned(FBtnMonospaceFont) then
+    FBtnMonospaceFont.Caption := cur;
+  Invalidate();
+end;
+
+procedure TConfigSamaWindow.CycleStandardFont();
+begin
+  HandleStandardFontClick(FBtnStandardFont);
+end;
+
+procedure TConfigSamaWindow.CycleMonospaceFont();
+begin
+  HandleMonospaceFontClick(FBtnMonospaceFont);
 end;
 
 procedure TConfigSamaWindow.HandlePrimaryBtnChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);

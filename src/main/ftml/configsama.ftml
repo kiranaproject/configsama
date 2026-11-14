@@ -72,6 +72,7 @@ Window {
         expanded: true;
         TreeNode { text: "WLAN"; icon: "wlan"; iconSelected: "wlan-white"; }
         TreeNode { text: "Wired"; icon: "wired"; iconSelected: "wired-white"; }
+        TreeNode { text: "Bluetooth"; icon: "bluetooth"; iconSelected: "bluetooth-white"; }
       }
       TreeNode {
         text: "Display and appearance";
@@ -86,9 +87,10 @@ Window {
         text: "System";
         isHeader: true;
         expanded: true;
+        TreeNode { text: "Sound"; icon: "sound"; iconSelected: "sound-white"; }
+        TreeNode { text: "Power"; icon: "power"; iconSelected: "power-white"; }
         TreeNode { text: "User"; icon: "user"; iconSelected: "user-white"; }
         TreeNode { text: "Language"; icon: "language"; iconSelected: "language-white"; }
-        TreeNode { text: "Battery"; icon: "battery"; iconSelected: "battery-white"; }
         TreeNode { text: "About"; icon: "about"; iconSelected: "about-white"; }
       }
     }
@@ -1081,6 +1083,289 @@ Window {
               text: "00:00:00:00:00:00";
               font: "Sans 11";
               selectable: false;
+            }
+          }
+        }
+      }
+
+      // ── Bluetooth Page ──
+      Container {
+        id: pageBluetooth;
+        anchors.fill: parent;
+        visible: false;
+        drawFrame: false;
+
+        // Card 1: Master Toggle & Status
+        Container {
+          id: cardBluetoothToggle;
+          styleClass: "settings-card";
+          anchors.top: parent.top;
+          anchors.topMargin: 4;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 64;
+          drawFrame: false;
+
+          Text {
+            id: lblBluetoothTitle;
+            anchors.top: parent.top;
+            anchors.topMargin: 14;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Bluetooth";
+            font: "Sans:bold 13";
+            selectable: false;
+          }
+
+          Text {
+            id: lblBluetoothStatus;
+            anchors.top: lblBluetoothTitle.bottom;
+            anchors.topMargin: 2;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Visible and available for pairing";
+            font: "Sans 11";
+            selectable: false;
+          }
+
+          Button {
+            id: btnBluetoothScan;
+            text: "Scan";
+            width: 76;
+            height: 26;
+            anchors.right: swBluetooth.left;
+            anchors.rightMargin: 12;
+            anchors.verticalCenter: parent.verticalCenter;
+          }
+
+          Switch {
+            id: swBluetooth;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 48;
+            height: 26;
+            checked: true;
+          }
+        }
+
+        // Card 2: Disabled message
+        Container {
+          id: containerBluetoothDisabled;
+          anchors.top: cardBluetoothToggle.bottom;
+          anchors.topMargin: 36;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 80;
+          visible: false;
+          drawFrame: false;
+
+          Text {
+            id: lblBluetoothDisabled;
+            anchors.centerIn: parent;
+            text: "Bluetooth is turned off";
+            font: "Sans 13";
+            selectable: false;
+          }
+        }
+
+        // Card 3: Paired & Available Devices
+        Container {
+          id: cardBluetoothDevices;
+          styleClass: "settings-card";
+          anchors.top: cardBluetoothToggle.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 194;
+          drawFrame: false;
+
+          // Device 0
+          Container {
+            id: rowBtDev0;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Image {
+              id: imgBtDev0;
+              icon: "sound";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Text {
+              id: lblBtName0;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              text: "AZ09 Wireless Earphones";
+              font: "Sans:bold 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblBtStatus0;
+              anchors.top: lblBtName0.bottom;
+              anchors.topMargin: 2;
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              text: "Connected • 85% Battery";
+              font: "Sans 11";
+              selectable: false;
+            }
+
+            Button {
+              id: btnBtConnect0;
+              text: "Disconnect";
+              width: 96;
+              height: 26;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+          }
+
+          Container {
+            id: divBt0;
+            styleClass: "card-divider";
+            anchors.top: rowBtDev0.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Device 1
+          Container {
+            id: rowBtDev1;
+            anchors.top: divBt0.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Image {
+              id: imgBtDev1;
+              icon: "display";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Text {
+              id: lblBtName1;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              text: "Logitech MX Master 3S";
+              font: "Sans:bold 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblBtStatus1;
+              anchors.top: lblBtName1.bottom;
+              anchors.topMargin: 2;
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              text: "Paired • 90% Battery";
+              font: "Sans 11";
+              selectable: false;
+            }
+
+            Button {
+              id: btnBtConnect1;
+              text: "Connect";
+              width: 96;
+              height: 26;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+          }
+
+          Container {
+            id: divBt1;
+            styleClass: "card-divider";
+            anchors.top: rowBtDev1.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Device 2
+          Container {
+            id: rowBtDev2;
+            anchors.top: divBt1.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Image {
+              id: imgBtDev2;
+              icon: "wlan";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Text {
+              id: lblBtName2;
+              anchors.top: parent.top;
+              anchors.topMargin: 8;
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              text: "Keychron K2 Pro";
+              font: "Sans:bold 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblBtStatus2;
+              anchors.top: lblBtName2.bottom;
+              anchors.topMargin: 2;
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              text: "Ready to pair";
+              font: "Sans 11";
+              selectable: false;
+            }
+
+            Button {
+              id: btnBtConnect2;
+              text: "Pair";
+              width: 96;
+              height: 26;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
             }
           }
         }
@@ -2801,7 +3086,7 @@ Window {
         }
       }
 
-      // ── 9. Battery Page ──
+      // ── 9. Battery & Power Page ──
       Container {
         id: pageBattery;
         anchors.fill: parent;
@@ -2818,16 +3103,16 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 140;
+          height: 120;
           drawFrame: false;
 
           Text {
             id: lblBatteryPercent;
             anchors.top: parent.top;
-            anchors.topMargin: 24;
+            anchors.topMargin: 18;
             anchors.left: parent.left;
             anchors.leftMargin: 24;
-            text: "68%";
+            text: "92%";
             font: "Sans:bold 36";
             style: "color: #ffffff;";
             selectable: false;
@@ -2836,10 +3121,10 @@ Window {
           Text {
             id: lblBatteryRemaining;
             anchors.top: lblBatteryPercent.bottom;
-            anchors.topMargin: 8;
+            anchors.topMargin: 4;
             anchors.left: parent.left;
             anchors.leftMargin: 24;
-            text: "1 hr 25 min remaining";
+            text: "Charging • 45 min until full";
             font: "Sans 12";
             style: "color: #e0f2fe;";
             selectable: false;
@@ -2850,15 +3135,15 @@ Window {
             anchors.right: parent.right;
             anchors.rightMargin: 24;
             anchors.verticalCenter: parent.verticalCenter;
-            width: 56;
-            height: 56;
+            width: 48;
+            height: 48;
             icon: "battery-bolt";
           }
         }
 
-        // Card 2: Battery Health / Capacity
+        // Card 2: Power Mode
         Container {
-          id: cardBatteryHealth;
+          id: cardPowerMode;
           styleClass: "settings-card";
           anchors.top: cardBatteryBanner.bottom;
           anchors.topMargin: 14;
@@ -2866,33 +3151,173 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 52;
+          height: 96;
           drawFrame: false;
 
           Text {
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
             anchors.left: parent.left;
             anchors.leftMargin: 18;
-            anchors.verticalCenter: parent.verticalCenter;
-            text: "Maximum Capacity";
-            font: "Sans 12";
+            text: "Power Mode";
+            font: "Sans:bold 12";
             selectable: false;
           }
 
           Text {
-            id: lblMaxCapacity;
+            anchors.top: parent.top;
+            anchors.topMargin: 30;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Balance system performance and battery efficiency";
+            font: "Sans 11";
+            selectable: false;
+          }
+
+          SegmentedControl {
+            id: segPowerMode;
+            anchors.bottom: parent.bottom;
+            anchors.bottomMargin: 14;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
             anchors.right: parent.right;
             anchors.rightMargin: 18;
-            anchors.verticalCenter: parent.verticalCenter;
-            text: "100%";
-            font: "Sans:bold 12";
-            selectable: false;
+            height: 32;
+            items: "Power Saver, Balanced, Performance";
+            selectedIndex: 1;
+          }
+
+          ComboBox { id: cmbPowerMode; visible: false; items: "Performance, Balanced, Power Saver"; }
+        }
+
+        // Card 3: Display & Sleep
+        Container {
+          id: cardPowerSleep;
+          styleClass: "settings-card";
+          anchors.top: cardPowerMode.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 144;
+          drawFrame: false;
+
+          // Row 1: Screen Blank
+          Container {
+            id: rowScreenBlank;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Turn off screen when inactive";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbScreenBlank;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 160;
+              height: 28;
+              items: "Never, 5 minutes, 10 minutes, 15 minutes, 30 minutes, 1 hour";
+            }
+          }
+
+          Container {
+            id: divPower0;
+            styleClass: "card-divider";
+            anchors.top: rowScreenBlank.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Auto Suspend
+          Container {
+            id: rowAutoSuspend;
+            anchors.top: divPower0.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Automatic suspend when idle";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Switch {
+              id: swAutoSuspend;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
+              checked: true;
+            }
+          }
+
+          Container {
+            id: divPower1;
+            styleClass: "card-divider";
+            anchors.top: rowAutoSuspend.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: Battery Health
+          Container {
+            id: rowBatteryHealth;
+            anchors.top: divPower1.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 46;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Maximum Battery Capacity";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblMaxCapacity;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "100%";
+              font: "Sans:bold 12";
+              selectable: false;
+            }
           }
         }
 
-        // Backwards-compatible hidden controls
-        ComboBox { id: cmbPowerMode; visible: false; items: "Performance, Balanced, Power Saver"; }
-        ComboBox { id: cmbScreenBlank; visible: false; items: "Never"; }
-        Switch { id: swAutoSuspend; visible: false; }
         Entry { id: txtPowerStatus; visible: false; text: "100%"; }
       }
 
@@ -2999,49 +3424,389 @@ Window {
         }
       }
 
-      // ── Backward-Compatibility Pages (Hidden by default) ──
+      // ── Sound Page ──
       Container {
         id: pageSound;
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
 
-        FormGrid {
-          anchors.fill: parent;
-          anchors.leftMargin: 24;
-          anchors.topMargin: 16;
-          anchors.rightMargin: 24;
-          anchors.bottomMargin: 16;
+        // Card 1: Output
+        Container {
+          id: cardSoundOutput;
+          styleClass: "settings-card";
+          anchors.top: parent.top;
+          anchors.topMargin: 4;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 232;
+          drawFrame: false;
 
-          FormSection { title: "Sound Output"; }
-          FormRow {
-            label: "Output Device";
+          // Row 1: Output Device
+          Container {
+            id: rowOutputDevice;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Output Device";
+              font: "Sans 12";
+              selectable: false;
+            }
+
             ComboBox {
               id: cmbOutputDevice;
-              items: "Default Audio Sink, Analog Stereo, HDMI / DisplayPort Audio";
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 240;
+              height: 28;
+              items: "Default Audio Sink, Built-in Audio Analog Stereo, HDMI / DisplayPort Audio";
             }
           }
-          FormRow {
-            label: "Output Volume";
-            Row {
-              Slider {
-                id: slVolume;
-                width: 220;
-                height: 24;
-              }
+
+          Container {
+            id: divSound0;
+            styleClass: "card-divider";
+            anchors.top: rowOutputDevice.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Volume Slider
+          Container {
+            id: rowOutputVolume;
+            anchors.top: divSound0.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 52;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Output Volume";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblVolumePercent;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 44;
+              height: 20;
+              text: "80%";
+              font: "Sans:bold 11";
+              selectable: false;
+            }
+
+            Image {
+              id: imgVolumeHigh;
+              icon: "sound";
+              width: 18;
+              height: 18;
+              anchors.right: lblVolumePercent.left;
+              anchors.rightMargin: 8;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Slider {
+              id: slVolume;
+              anchors.right: imgVolumeHigh.left;
+              anchors.rightMargin: 10;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 190;
+              height: 24;
+              min: 0.0;
+              max: 100.0;
+              value: 80.0;
+            }
+
+            Image {
+              id: imgVolumeLow;
+              icon: "sound";
+              width: 16;
+              height: 16;
+              anchors.right: slVolume.left;
+              anchors.rightMargin: 10;
+              anchors.verticalCenter: parent.verticalCenter;
             }
           }
-          FormRow {
-            label: "Mute Output";
-            Row {
-              Switch { id: swMute; width: 50; height: 28; }
+
+          Container {
+            id: divSound1;
+            styleClass: "card-divider";
+            anchors.top: rowOutputVolume.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: Mute Output
+          Container {
+            id: rowOutputMute;
+            anchors.top: divSound1.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Mute Output";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Switch {
+              id: swMute;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
+              checked: false;
             }
           }
-          FormRow {
-            label: "System Alert Sounds";
-            Row {
-              Switch { id: swSoundEffects; width: 50; height: 28; }
+
+          Container {
+            id: divSound2;
+            styleClass: "card-divider";
+            anchors.top: rowOutputMute.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 4: Test Audio
+          Container {
+            id: rowOutputTest;
+            anchors.top: divSound2.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Test Audio Output";
+              font: "Sans 12";
+              selectable: false;
             }
+
+            Button {
+              id: btnTestSound;
+              text: "Test Sound";
+              width: 100;
+              height: 26;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+          }
+        }
+
+        // Card 2: Input
+        Container {
+          id: cardSoundInput;
+          styleClass: "settings-card";
+          anchors.top: cardSoundOutput.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 156;
+          drawFrame: false;
+
+          // Row 1: Input Device
+          Container {
+            id: rowInputDevice;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Input Device";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbInputDevice;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 240;
+              height: 28;
+              items: "Default Audio Source, Built-in Audio Analog Stereo, Headset Microphone";
+            }
+          }
+
+          Container {
+            id: divSound3;
+            styleClass: "card-divider";
+            anchors.top: rowInputDevice.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Input Volume
+          Container {
+            id: rowInputVolume;
+            anchors.top: divSound3.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 52;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Input Volume";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblInputVolumePercent;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 44;
+              height: 20;
+              text: "50%";
+              font: "Sans:bold 11";
+              selectable: false;
+            }
+
+            Slider {
+              id: slInputVolume;
+              anchors.right: lblInputVolumePercent.left;
+              anchors.rightMargin: 12;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 236;
+              height: 24;
+              min: 0.0;
+              max: 100.0;
+              value: 50.0;
+            }
+          }
+
+          Container {
+            id: divSound4;
+            styleClass: "card-divider";
+            anchors.top: rowInputVolume.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: Input Mute
+          Container {
+            id: rowInputMute;
+            anchors.top: divSound4.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Mute Input";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Switch {
+              id: swInputMute;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 48;
+              height: 26;
+              checked: false;
+            }
+          }
+        }
+
+        // Card 3: Alert Sounds
+        Container {
+          id: cardSoundEffects;
+          styleClass: "settings-card";
+          anchors.top: cardSoundInput.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 52;
+          drawFrame: false;
+
+          Text {
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            text: "System Alert Sounds";
+            font: "Sans 12";
+            selectable: false;
+          }
+
+          Switch {
+            id: swSoundEffects;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 48;
+            height: 26;
+            checked: true;
           }
         }
       }

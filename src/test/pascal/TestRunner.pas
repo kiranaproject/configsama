@@ -11,6 +11,9 @@ uses
   ConfigSama.Wlan.Test,
   ConfigSama.Wired.Test,
   ConfigSama.Display.Test,
+  ConfigSama.Bluetooth.Test,
+  ConfigSama.Sound.Test,
+  ConfigSama.Power.Test,
   ConfigSama.Window.Test;
 
 var

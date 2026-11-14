@@ -21,6 +21,11 @@ type
     FAccentColor: string;
     FWallpaperPath: string;
     FWallpaperMode: string;
+    FStandardFont: string;
+    FMonospaceFont: string;
+
+    // Bluetooth
+    FBluetoothEnabled: Boolean;
 
     // Displays
     FResolution: string;
@@ -41,6 +46,9 @@ type
     FMuted: Boolean;
     FSoundEffects: Boolean;
     FOutputDevice: string;
+    FInputVolume: Integer;
+    FInputMuted: Boolean;
+    FInputDevice: string;
 
     // Power
     FPowerMode: string;
@@ -92,6 +100,11 @@ type
     property AccentColor: string read FAccentColor write FAccentColor;
     property WallpaperPath: string read FWallpaperPath write FWallpaperPath;
     property WallpaperMode: string read FWallpaperMode write FWallpaperMode;
+    property StandardFont: string read FStandardFont write FStandardFont;
+    property MonospaceFont: string read FMonospaceFont write FMonospaceFont;
+
+    // Bluetooth
+    property BluetoothEnabled: Boolean read FBluetoothEnabled write FBluetoothEnabled;
 
     // Displays
     property Resolution: string read FResolution write FResolution;
@@ -112,6 +125,9 @@ type
     property Muted: Boolean read FMuted write FMuted;
     property SoundEffects: Boolean read FSoundEffects write FSoundEffects;
     property OutputDevice: string read FOutputDevice write FOutputDevice;
+    property InputVolume: Integer read FInputVolume write FInputVolume;
+    property InputMuted: Boolean read FInputMuted write FInputMuted;
+    property InputDevice: string read FInputDevice write FInputDevice;
 
     // Power
     property PowerMode: string read FPowerMode write FPowerMode;
@@ -186,6 +202,11 @@ begin
   FAccentColor := 'Blue';
   FWallpaperPath := '/usr/share/backgrounds/samarinda.jpg';
   FWallpaperMode := 'fill';
+  FStandardFont := 'Inter 11';
+  FMonospaceFont := 'JetBrains Mono 10';
+
+  // Bluetooth defaults
+  FBluetoothEnabled := True;
 
   // Displays defaults
   FResolution := '1920x1080';
@@ -249,6 +270,11 @@ begin
     FAccentColor := ini.ReadString('Appearance', 'AccentColor', FAccentColor);
     FWallpaperPath := ini.ReadString('Appearance', 'Wallpaper', FWallpaperPath);
     FWallpaperMode := ini.ReadString('Appearance', 'WallpaperMode', FWallpaperMode);
+    FStandardFont := ini.ReadString('Appearance', 'StandardFont', FStandardFont);
+    FMonospaceFont := ini.ReadString('Appearance', 'MonospaceFont', FMonospaceFont);
+
+    // Bluetooth
+    FBluetoothEnabled := ini.ReadBool('Bluetooth', 'Enabled', FBluetoothEnabled);
 
     // Displays
     FResolution := ini.ReadString('Displays', 'Resolution', FResolution);
@@ -269,6 +295,9 @@ begin
     FMuted := ini.ReadBool('Sound', 'Muted', FMuted);
     FSoundEffects := ini.ReadBool('Sound', 'SoundEffects', FSoundEffects);
     FOutputDevice := ini.ReadString('Sound', 'OutputDevice', FOutputDevice);
+    FInputVolume := ini.ReadInteger('Sound', 'InputVolume', FInputVolume);
+    FInputMuted := ini.ReadBool('Sound', 'InputMuted', FInputMuted);
+    FInputDevice := ini.ReadString('Sound', 'InputDevice', FInputDevice);
 
     // Power
     FPowerMode := ini.ReadString('Power', 'PowerMode', FPowerMode);
@@ -310,6 +339,11 @@ begin
       ini.WriteString('Appearance', 'AccentColor', FAccentColor);
       ini.WriteString('Appearance', 'Wallpaper', FWallpaperPath);
       ini.WriteString('Appearance', 'WallpaperMode', FWallpaperMode);
+      ini.WriteString('Appearance', 'StandardFont', FStandardFont);
+      ini.WriteString('Appearance', 'MonospaceFont', FMonospaceFont);
+
+      // Bluetooth
+      ini.WriteBool('Bluetooth', 'Enabled', FBluetoothEnabled);
 
       // Displays
       ini.WriteString('Displays', 'Resolution', FResolution);
@@ -330,6 +364,9 @@ begin
       ini.WriteBool('Sound', 'Muted', FMuted);
       ini.WriteBool('Sound', 'SoundEffects', FSoundEffects);
       ini.WriteString('Sound', 'OutputDevice', FOutputDevice);
+      ini.WriteInteger('Sound', 'InputVolume', FInputVolume);
+      ini.WriteBool('Sound', 'InputMuted', FInputMuted);
+      ini.WriteString('Sound', 'InputDevice', FInputDevice);
 
       // Power
       ini.WriteString('Power', 'PowerMode', FPowerMode);
