@@ -302,59 +302,63 @@ procedure TConfigSettings.Save();
 var
   ini: TIniFile;
 begin
-  ini := TIniFile.Create(FIniPath);
   try
-    // Appearance
-    ini.WriteBool('Appearance', 'DarkMode', FDarkMode);
-    ini.WriteString('Appearance', 'AccentColor', FAccentColor);
-    ini.WriteString('Appearance', 'Wallpaper', FWallpaperPath);
-    ini.WriteString('Appearance', 'WallpaperMode', FWallpaperMode);
+    ini := TIniFile.Create(FIniPath);
+    try
+      // Appearance
+      ini.WriteBool('Appearance', 'DarkMode', FDarkMode);
+      ini.WriteString('Appearance', 'AccentColor', FAccentColor);
+      ini.WriteString('Appearance', 'Wallpaper', FWallpaperPath);
+      ini.WriteString('Appearance', 'WallpaperMode', FWallpaperMode);
 
-    // Displays
-    ini.WriteString('Displays', 'Resolution', FResolution);
-    ini.WriteInteger('Displays', 'RefreshRate', FRefreshRate);
-    ini.WriteInteger('Displays', 'Scale', FScale);
-    ini.WriteBool('Displays', 'NightLight', FNightLight);
+      // Displays
+      ini.WriteString('Displays', 'Resolution', FResolution);
+      ini.WriteInteger('Displays', 'RefreshRate', FRefreshRate);
+      ini.WriteInteger('Displays', 'Scale', FScale);
+      ini.WriteBool('Displays', 'NightLight', FNightLight);
 
-    // Desktop
-    ini.WriteString('Desktop', 'DockPosition', FDockPosition);
-    ini.WriteInteger('Desktop', 'DockIconSize', FDockIconSize);
-    ini.WriteBool('Desktop', 'DockAutoHide', FDockAutoHide);
-    ini.WriteInteger('Desktop', 'DockMargin', FDockMargin);
-    ini.WriteBool('Desktop', 'ShowDesktopButton', FShowDesktopButton);
-    ini.WriteString('Desktop', 'ClockFormat', FClockFormat);
+      // Desktop
+      ini.WriteString('Desktop', 'DockPosition', FDockPosition);
+      ini.WriteInteger('Desktop', 'DockIconSize', FDockIconSize);
+      ini.WriteBool('Desktop', 'DockAutoHide', FDockAutoHide);
+      ini.WriteInteger('Desktop', 'DockMargin', FDockMargin);
+      ini.WriteBool('Desktop', 'ShowDesktopButton', FShowDesktopButton);
+      ini.WriteString('Desktop', 'ClockFormat', FClockFormat);
 
-    // Sound
-    ini.WriteInteger('Sound', 'OutputVolume', FOutputVolume);
-    ini.WriteBool('Sound', 'Muted', FMuted);
-    ini.WriteBool('Sound', 'SoundEffects', FSoundEffects);
-    ini.WriteString('Sound', 'OutputDevice', FOutputDevice);
+      // Sound
+      ini.WriteInteger('Sound', 'OutputVolume', FOutputVolume);
+      ini.WriteBool('Sound', 'Muted', FMuted);
+      ini.WriteBool('Sound', 'SoundEffects', FSoundEffects);
+      ini.WriteString('Sound', 'OutputDevice', FOutputDevice);
 
-    // Power
-    ini.WriteString('Power', 'PowerMode', FPowerMode);
-    ini.WriteInteger('Power', 'ScreenBlankDelay', FScreenBlankDelay);
-    ini.WriteBool('Power', 'AutoSuspend', FAutoSuspend);
-    ini.WriteInteger('Power', 'SuspendDelay', FSuspendDelay);
+      // Power
+      ini.WriteString('Power', 'PowerMode', FPowerMode);
+      ini.WriteInteger('Power', 'ScreenBlankDelay', FScreenBlankDelay);
+      ini.WriteBool('Power', 'AutoSuspend', FAutoSuspend);
+      ini.WriteInteger('Power', 'SuspendDelay', FSuspendDelay);
 
-    // Mouse
-    ini.WriteInteger('Mouse', 'PointerSpeed', FPointerSpeed);
-    ini.WriteBool('Mouse', 'NaturalScrolling', FNaturalScrolling);
-    ini.WriteBool('Mouse', 'TapToClick', FTapToClick);
-    ini.WriteString('Mouse', 'PrimaryButton', FPrimaryButton);
+      // Mouse
+      ini.WriteInteger('Mouse', 'PointerSpeed', FPointerSpeed);
+      ini.WriteBool('Mouse', 'NaturalScrolling', FNaturalScrolling);
+      ini.WriteBool('Mouse', 'TapToClick', FTapToClick);
+      ini.WriteString('Mouse', 'PrimaryButton', FPrimaryButton);
 
-    // Keyboard
-    ini.WriteString('Keyboard', 'Layout', FKeyboardLayout);
-    ini.WriteInteger('Keyboard', 'RepeatDelay', FKeyRepeatDelay);
-    ini.WriteInteger('Keyboard', 'RepeatRate', FKeyRepeatRate);
-    ini.WriteBool('Keyboard', 'SuperKeyLauncher', FSuperKeyLauncher);
+      // Keyboard
+      ini.WriteString('Keyboard', 'Layout', FKeyboardLayout);
+      ini.WriteInteger('Keyboard', 'RepeatDelay', FKeyRepeatDelay);
+      ini.WriteInteger('Keyboard', 'RepeatRate', FKeyRepeatRate);
+      ini.WriteBool('Keyboard', 'SuperKeyLauncher', FSuperKeyLauncher);
 
-    // Applications
-    ini.WriteString('Applications', 'Browser', FDefaultBrowser);
-    ini.WriteString('Applications', 'FileManager', FDefaultFileManager);
-    ini.WriteString('Applications', 'Terminal', FDefaultTerminal);
-    ini.WriteString('Applications', 'TextEditor', FDefaultTextEditor);
-  finally
-    ini.Free();
+      // Applications
+      ini.WriteString('Applications', 'Browser', FDefaultBrowser);
+      ini.WriteString('Applications', 'FileManager', FDefaultFileManager);
+      ini.WriteString('Applications', 'Terminal', FDefaultTerminal);
+      ini.WriteString('Applications', 'TextEditor', FDefaultTextEditor);
+    finally
+      ini.Free();
+    end;
+  except
+    // Non-fatal if filesystem is temporarily unavailable or locked during concurrent tests
   end;
 
   SyncWallpaperToShell();

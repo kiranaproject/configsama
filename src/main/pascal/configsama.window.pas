@@ -11,7 +11,7 @@ uses
   Classes, SysUtils,
   ftpas, ftpas.types, ftpas.api, ftpas.app, ftpas.canvas, ftpas.widget, ftpas.controls,
   ftpas.layouts, ftpas.views, ftpas.dialogs, ftpas.ftml,
-  ConfigSama.Settings, ConfigSama.Styles;
+  ConfigSama.Wlan, ConfigSama.Settings, ConfigSama.Styles;
 
 type
   { TConfigSamaWindow — GNOME Settings styled application with FTML and ECA }
@@ -46,9 +46,48 @@ type
     FPageApps: TFtWidget;
     FPageAbout: TFtWidget;
 
-    // WLAN & Wired page controls
+    // WLAN page controls
+    FCardWlanToggle: TFtContainer;
+    FLblWlanTitle: TFtLabel;
+    FLblWlanStatus: TFtLabel;
+    FBtnWlanRescan: TFtButton;
     FSwWlan: TFtSwitch;
+
+    FContainerWlanDisabled: TFtContainer;
+    FLblWlanDisabled: TFtLabel;
+
+    FCardWlanConnected: TFtContainer;
+    FImgConnWifi: TFtImage;
+    FLblConnSsid: TFtLabel;
+    FLblConnDetails: TFtLabel;
+    FImgConnCheck: TFtImage;
+    FBtnConnDetails: TFtButton;
+    FBtnConnDisconnect: TFtButton;
+
+    FCardWlanAvailable: TFtContainer;
+    FLblScanStatus: TFtLabel;
+
+    FWlanRows: array[0..5] of record
+      Row: TFtContainer;
+      ImgIcon: TFtImage;
+      LblSsid: TFtLabel;
+      LblSignal: TFtLabel;
+      ImgLock: TFtImage;
+      BtnConnect: TFtButton;
+      Divider: TFtWidget;
+      Network: TWlanNetwork;
+    end;
+
+    // Password Prompt Dialog controls
+    FPwdDialog: TFtWindow;
+    FPwdEntry: TFtEntry;
+    FPwdSubmitted: Boolean;
+
+    // Wired page controls
     FSwWired: TFtSwitch;
+    FImgWired: TFtImage;
+
+    // Backward-compatibility aliases
     FImgWifiPurr: TFtImage;
     FImgLockPurr: TFtImage;
     FImgCheckPurr: TFtImage;
@@ -59,7 +98,6 @@ type
     FImgLockVirgin: TFtImage;
     FImgWifiVM: TFtImage;
     FImgLockVM: TFtImage;
-    FImgWired: TFtImage;
 
     // Appearance page controls
     FSwDarkMode: TFtSwitch;
@@ -132,6 +170,18 @@ type
     procedure PopulateControls();
     procedure UpdateThemeIcons();
 
+    // WLAN Event Handlers
+    procedure HandleWlanToggle(Sender: TFtSwitch; AToggled: Boolean);
+    procedure HandleWlanRescan(Sender: TFtButton);
+    procedure HandleConnectedDetails(Sender: TFtButton);
+    procedure HandleConnectedDisconnect(Sender: TFtButton);
+    procedure HandleRowConnectClick(Sender: TFtButton);
+    procedure RefreshWlanUI(AFreshScan: Boolean = False);
+    procedure PromptPasswordAndConnect(const ASsid: string);
+    procedure ShowNetworkDetailsDialog(const ASsid: string);
+    procedure HandlePasswordPromptConnect(Sender: TFtButton);
+    procedure HandlePasswordPromptCancel(Sender: TFtButton);
+
     // Event Handlers
     procedure HandleCategorySelect(Sender: TFtTreeView; Node: TFtTreeNode);
     procedure HandleSearchChange(Sender: TFtWidget; const AText: string);
@@ -181,7 +231,7 @@ type
   protected
     procedure DoMouseDown(AX, AY, AButton: Integer); override;
   public
-    constructor Create(); reintroduce;
+    constructor Create(const ACustomIniPath: string = ''); reintroduce;
     destructor Destroy(); override;
 
     procedure SelectCategoryByName(const AName: string);
@@ -208,12 +258,12 @@ implementation
 
 { TConfigSamaWindow }
 
-constructor TConfigSamaWindow.Create();
+constructor TConfigSamaWindow.Create(const ACustomIniPath: string = '');
 begin
   ApplyConfigSamaStyles();
   inherited Create(960, 640, 'Settings', 'TConfigSamaWindow');
 
-  FSettings := TConfigSettings.Create();
+  FSettings := TConfigSettings.Create(ACustomIniPath);
   SetupUI();
   PopulateControls();
 end;
@@ -245,6 +295,7 @@ end;
 procedure TConfigSamaWindow.SetupUI();
 var
   w: TFtWidget;
+  i: Integer;
 begin
   // Header
   w := FindWidget('appTitle');
@@ -298,46 +349,101 @@ begin
   FPageApps := FindWidget('pageApps');
   FPageAbout := FindWidget('pageAbout');
 
-  // WLAN & Wired controls
+  // WLAN controls
+  w := FindWidget('cardWlanToggle');
+  if w is TFtContainer then FCardWlanToggle := TFtContainer(w);
+
+  w := FindWidget('lblWlanTitle');
+  if w is TFtLabel then FLblWlanTitle := TFtLabel(w);
+
+  w := FindWidget('lblWlanStatus');
+  if w is TFtLabel then FLblWlanStatus := TFtLabel(w);
+
+  w := FindWidget('btnWlanRescan');
+  if w is TFtButton then
+  begin
+    FBtnWlanRescan := TFtButton(w);
+    FBtnWlanRescan.OnClick := @HandleWlanRescan;
+  end;
+
   w := FindWidget('swWlan');
-  if w is TFtSwitch then FSwWlan := TFtSwitch(w);
+  if w is TFtSwitch then
+  begin
+    FSwWlan := TFtSwitch(w);
+    FSwWlan.OnToggle := @HandleWlanToggle;
+  end;
+
+  w := FindWidget('containerWlanDisabled');
+  if w is TFtContainer then FContainerWlanDisabled := TFtContainer(w);
+
+  w := FindWidget('lblWlanDisabled');
+  if w is TFtLabel then FLblWlanDisabled := TFtLabel(w);
+
+  w := FindWidget('cardWlanConnected');
+  if w is TFtContainer then FCardWlanConnected := TFtContainer(w);
+
+  w := FindWidget('imgConnWifi');
+  if w is TFtImage then FImgConnWifi := TFtImage(w);
+
+  w := FindWidget('lblConnSsid');
+  if w is TFtLabel then FLblConnSsid := TFtLabel(w);
+
+  w := FindWidget('lblConnDetails');
+  if w is TFtLabel then FLblConnDetails := TFtLabel(w);
+
+  w := FindWidget('imgConnCheck');
+  if w is TFtImage then FImgConnCheck := TFtImage(w);
+
+  w := FindWidget('btnConnDetails');
+  if w is TFtButton then
+  begin
+    FBtnConnDetails := TFtButton(w);
+    FBtnConnDetails.OnClick := @HandleConnectedDetails;
+  end;
+
+  w := FindWidget('btnConnDisconnect');
+  if w is TFtButton then
+  begin
+    FBtnConnDisconnect := TFtButton(w);
+    FBtnConnDisconnect.OnClick := @HandleConnectedDisconnect;
+  end;
+
+  w := FindWidget('cardWlanAvailable');
+  if w is TFtContainer then FCardWlanAvailable := TFtContainer(w);
+
+  w := FindWidget('lblScanStatus');
+  if w is TFtLabel then FLblScanStatus := TFtLabel(w);
+
+  for i := 0 to 5 do
+  begin
+    w := FindWidget('rowNet' + IntToStr(i));
+    if w is TFtContainer then FWlanRows[i].Row := TFtContainer(w);
+
+    w := FindWidget('imgNetIcon' + IntToStr(i));
+    if w is TFtImage then FWlanRows[i].ImgIcon := TFtImage(w);
+
+    w := FindWidget('lblNetSsid' + IntToStr(i));
+    if w is TFtLabel then FWlanRows[i].LblSsid := TFtLabel(w);
+
+    w := FindWidget('lblNetSignal' + IntToStr(i));
+    if w is TFtLabel then FWlanRows[i].LblSignal := TFtLabel(w);
+
+    w := FindWidget('imgNetLock' + IntToStr(i));
+    if w is TFtImage then FWlanRows[i].ImgLock := TFtImage(w);
+
+    w := FindWidget('btnNetConnect' + IntToStr(i));
+    if w is TFtButton then
+    begin
+      FWlanRows[i].BtnConnect := TFtButton(w);
+      FWlanRows[i].BtnConnect.Tag := i;
+      FWlanRows[i].BtnConnect.OnClick := @HandleRowConnectClick;
+    end;
+
+    FWlanRows[i].Divider := FindWidget('divNet' + IntToStr(i));
+  end;
 
   w := FindWidget('swWired');
   if w is TFtSwitch then FSwWired := TFtSwitch(w);
-
-  w := FindWidget('imgWifiPurr');
-  if w is TFtImage then FImgWifiPurr := TFtImage(w);
-
-  w := FindWidget('imgLockPurr');
-  if w is TFtImage then FImgLockPurr := TFtImage(w);
-
-  w := FindWidget('imgCheckPurr');
-  if w is TFtImage then FImgCheckPurr := TFtImage(w);
-
-  w := FindWidget('btnPurrInfo');
-  if w is TFtButton then
-  begin
-    FBtnPurrInfo := TFtButton(w);
-    FBtnPurrInfo.Flat := True;
-  end;
-
-  w := FindWidget('imgWifiMeow');
-  if w is TFtImage then FImgWifiMeow := TFtImage(w);
-
-  w := FindWidget('imgLockMeow');
-  if w is TFtImage then FImgLockMeow := TFtImage(w);
-
-  w := FindWidget('imgWifiVirgin');
-  if w is TFtImage then FImgWifiVirgin := TFtImage(w);
-
-  w := FindWidget('imgLockVirgin');
-  if w is TFtImage then FImgLockVirgin := TFtImage(w);
-
-  w := FindWidget('imgWifiVM');
-  if w is TFtImage then FImgWifiVM := TFtImage(w);
-
-  w := FindWidget('imgLockVM');
-  if w is TFtImage then FImgLockVM := TFtImage(w);
 
   w := FindWidget('imgWired');
   if w is TFtImage then FImgWired := TFtImage(w);
@@ -700,6 +806,11 @@ begin
     FtApp.DarkMode := FSettings.DarkMode;
     UpdateThemeIcons();
 
+    // WLAN
+    if Assigned(FSwWlan) then
+      FSwWlan.Checked := WlanService().IsWifiEnabled();
+    RefreshWlanUI(False);
+
     // Appearance
     if Assigned(FSwDarkMode) then
       FSwDarkMode.Checked := FSettings.DarkMode;
@@ -859,7 +970,12 @@ begin
   if FSelectingCategory then Exit;
   FSelectingCategory := True;
   try
-    if FPageWlan <> nil then FPageWlan.Visible := SameText(AName, 'WLAN') or SameText(AName, 'Wi-Fi');
+    if FPageWlan <> nil then
+    begin
+      FPageWlan.Visible := SameText(AName, 'WLAN') or SameText(AName, 'Wi-Fi');
+      if FPageWlan.Visible then
+        RefreshWlanUI(False);
+    end;
     if FPageWired <> nil then FPageWired.Visible := SameText(AName, 'Wired');
     if FPageDisplays <> nil then FPageDisplays.Visible := SameText(AName, 'Display') or SameText(AName, 'Displays');
     if FPageAppearance <> nil then FPageAppearance.Visible := SameText(AName, 'Appearance');
@@ -1373,6 +1489,271 @@ begin
   if FSettings = nil then Exit();
   FSettings.DefaultTextEditor := AText;
   FSettings.Save();
+end;
+
+// ── WLAN Service & Dialog Handlers ──
+
+procedure TConfigSamaWindow.HandlePasswordPromptConnect(Sender: TFtButton);
+begin
+  FPwdSubmitted := True;
+  if Assigned(FPwdDialog) then
+  begin
+    FPwdDialog.ModalResult := Integer(ftmrOk);
+    FPwdDialog.Hide();
+  end;
+end;
+
+procedure TConfigSamaWindow.HandlePasswordPromptCancel(Sender: TFtButton);
+begin
+  FPwdSubmitted := False;
+  if Assigned(FPwdDialog) then
+  begin
+    FPwdDialog.ModalResult := Integer(ftmrCancel);
+    FPwdDialog.Hide();
+  end;
+end;
+
+procedure TConfigSamaWindow.HandleWlanToggle(Sender: TFtSwitch; AToggled: Boolean);
+begin
+  WlanService().SetWifiEnabled(AToggled);
+  RefreshWlanUI(False);
+end;
+
+procedure TConfigSamaWindow.HandleWlanRescan(Sender: TFtButton);
+begin
+  RefreshWlanUI(True);
+end;
+
+procedure TConfigSamaWindow.HandleConnectedDetails(Sender: TFtButton);
+var
+  det: TWlanConnectionDetails;
+begin
+  det := WlanService().GetConnectionDetails();
+  if det.Ssid <> '' then
+    ShowNetworkDetailsDialog(det.Ssid);
+end;
+
+procedure TConfigSamaWindow.HandleConnectedDisconnect(Sender: TFtButton);
+begin
+  WlanService().Disconnect();
+  RefreshWlanUI(False);
+end;
+
+procedure TConfigSamaWindow.HandleRowConnectClick(Sender: TFtButton);
+var
+  idx: Integer;
+  net: TWlanNetwork;
+begin
+  if Sender = nil then Exit();
+  idx := Sender.Tag;
+  if (idx < 0) or (idx > 5) then Exit();
+
+  net := FWlanRows[idx].Network;
+  if net.Ssid = '' then Exit();
+
+  if net.IsConnected then
+  begin
+    ShowNetworkDetailsDialog(net.Ssid);
+    Exit();
+  end;
+
+  if net.IsSaved or (net.Security = '') then
+  begin
+    WlanService().Connect(net.Ssid);
+    RefreshWlanUI(False);
+  end
+  else
+  begin
+    PromptPasswordAndConnect(net.Ssid);
+  end;
+end;
+
+procedure TConfigSamaWindow.RefreshWlanUI(AFreshScan: Boolean = False);
+var
+  wifiOn: Boolean;
+  nets: TWlanNetworkArray;
+  details: TWlanConnectionDetails;
+  i, count: Integer;
+begin
+  wifiOn := WlanService().IsWifiEnabled();
+  if Assigned(FSwWlan) then
+    FSwWlan.Checked := wifiOn;
+
+  if not wifiOn then
+  begin
+    if Assigned(FLblWlanStatus) then
+      FLblWlanStatus.Text := 'Wi-Fi is turned off';
+    if Assigned(FContainerWlanDisabled) then
+      FContainerWlanDisabled.Visible := True;
+    if Assigned(FCardWlanConnected) then
+      FCardWlanConnected.Visible := False;
+    if Assigned(FCardWlanAvailable) then
+      FCardWlanAvailable.Visible := False;
+    Invalidate();
+    Exit();
+  end;
+
+  if Assigned(FContainerWlanDisabled) then
+    FContainerWlanDisabled.Visible := False;
+
+  nets := WlanService().ScanNetworks(AFreshScan);
+  details := WlanService().GetConnectionDetails();
+
+  if details.Ssid <> '' then
+  begin
+    if Assigned(FLblWlanStatus) then
+      FLblWlanStatus.Text := 'Connected to ' + details.Ssid;
+
+    if Assigned(FCardWlanConnected) then
+    begin
+      FCardWlanConnected.Visible := True;
+      if Assigned(FLblConnSsid) then
+        FLblConnSsid.Text := details.Ssid;
+      if Assigned(FLblConnDetails) then
+      begin
+        if details.IpAddress <> '' then
+          FLblConnDetails.Text := 'Connected • IPv4: ' + details.IpAddress
+        else
+          FLblConnDetails.Text := 'Connected';
+      end;
+      if Assigned(FImgConnCheck) then
+        FImgConnCheck.Visible := True;
+      if Assigned(FBtnConnDetails) then
+        FBtnConnDetails.Visible := True;
+      if Assigned(FBtnConnDisconnect) then
+        FBtnConnDisconnect.Visible := True;
+    end;
+  end
+  else
+  begin
+    if Assigned(FLblWlanStatus) then
+      FLblWlanStatus.Text := 'Disconnected';
+
+    if Assigned(FCardWlanConnected) then
+    begin
+      FCardWlanConnected.Visible := True;
+      if Assigned(FLblConnSsid) then
+        FLblConnSsid.Text := 'Not Connected';
+      if Assigned(FLblConnDetails) then
+        FLblConnDetails.Text := 'Select a wireless network below to connect';
+      if Assigned(FImgConnCheck) then
+        FImgConnCheck.Visible := False;
+      if Assigned(FBtnConnDetails) then
+        FBtnConnDetails.Visible := False;
+      if Assigned(FBtnConnDisconnect) then
+        FBtnConnDisconnect.Visible := False;
+    end;
+  end;
+
+  if Assigned(FCardWlanAvailable) then
+    FCardWlanAvailable.Visible := True;
+
+  if Assigned(FLblScanStatus) then
+    FLblScanStatus.Text := IntToStr(Length(nets)) + ' networks visible';
+
+  count := Length(nets);
+  for i := 0 to 5 do
+  begin
+    if i < count then
+    begin
+      FWlanRows[i].Network := nets[i];
+      if Assigned(FWlanRows[i].Row) then
+        FWlanRows[i].Row.Visible := True;
+      if Assigned(FWlanRows[i].LblSsid) then
+        FWlanRows[i].LblSsid.Text := nets[i].Ssid;
+      if Assigned(FWlanRows[i].LblSignal) then
+        FWlanRows[i].LblSignal.Text := IntToStr(nets[i].Signal) + '%';
+      if Assigned(FWlanRows[i].ImgLock) then
+        FWlanRows[i].ImgLock.Visible := (nets[i].Security <> '');
+      if Assigned(FWlanRows[i].BtnConnect) then
+      begin
+        if nets[i].IsConnected then
+          FWlanRows[i].BtnConnect.Caption := 'Connected'
+        else if nets[i].IsSaved then
+          FWlanRows[i].BtnConnect.Caption := 'Connect'
+        else
+          FWlanRows[i].BtnConnect.Caption := 'Connect';
+      end;
+      if Assigned(FWlanRows[i].Divider) then
+        FWlanRows[i].Divider.Visible := (i < 5);
+    end
+    else
+    begin
+      if Assigned(FWlanRows[i].Row) then
+        FWlanRows[i].Row.Visible := False;
+      if Assigned(FWlanRows[i].Divider) then
+        FWlanRows[i].Divider.Visible := False;
+    end;
+  end;
+
+  Invalidate();
+end;
+
+procedure TConfigSamaWindow.PromptPasswordAndConnect(const ASsid: string);
+var
+  lblTitle, lblInstr: TFtLabel;
+  btnCancel, btnConnect: TFtButton;
+  pw: string;
+begin
+  FPwdSubmitted := False;
+  FPwdDialog := TFtWindow.Create(380, 190, 'Authentication Required');
+  try
+    FPwdDialog.ExtendedClientArea := False;
+
+    lblTitle := TFtLabel.Create(FPwdDialog, 20, 16, 340, 24, 'Authentication Required');
+    lblTitle.Selectable := False;
+
+    lblInstr := TFtLabel.Create(FPwdDialog, 20, 42, 340, 22, 'Enter the password for "' + ASsid + '"');
+    lblInstr.Selectable := False;
+
+    FPwdEntry := TFtEntry.Create(FPwdDialog, 20, 74, 340, 32);
+    FPwdEntry.Placeholder := 'Password';
+
+    btnCancel := TFtButton.Create(FPwdDialog, 180, 130, 80, 32, 'Cancel');
+    btnCancel.OnClick := @HandlePasswordPromptCancel;
+
+    btnConnect := TFtButton.Create(FPwdDialog, 270, 130, 90, 32, 'Connect');
+    btnConnect.OnClick := @HandlePasswordPromptConnect;
+
+    FPwdDialog.ShowModal();
+
+    if FPwdSubmitted and (FPwdEntry.Text <> '') then
+    begin
+      pw := FPwdEntry.Text;
+      if WlanService().Connect(ASsid, pw) then
+        RefreshWlanUI(False)
+      else
+        TFtMessageDialog.ShowError('Connection Failed', 'Could not connect to ' + ASsid,
+                                   'Please verify the password and try again.');
+    end;
+  finally
+    FPwdDialog.Free();
+    FPwdDialog := nil;
+    FPwdEntry := nil;
+  end;
+end;
+
+procedure TConfigSamaWindow.ShowNetworkDetailsDialog(const ASsid: string);
+var
+  det: TWlanConnectionDetails;
+  msg: string;
+begin
+  det := WlanService().GetConnectionDetails();
+  msg := 'SSID: ' + ASsid + LineEnding;
+  if det.IpAddress <> '' then
+    msg := msg + 'IPv4 Address: ' + det.IpAddress + LineEnding;
+  if det.Gateway <> '' then
+    msg := msg + 'Gateway: ' + det.Gateway + LineEnding;
+  if det.Dns <> '' then
+    msg := msg + 'DNS: ' + det.Dns + LineEnding;
+  if det.HwAddr <> '' then
+    msg := msg + 'Hardware MAC: ' + det.HwAddr + LineEnding;
+  if det.Security <> '' then
+    msg := msg + 'Security: ' + det.Security + LineEnding;
+  if det.Signal > 0 then
+    msg := msg + 'Signal Strength: ' + IntToStr(det.Signal) + '%' + LineEnding;
+
+  TFtMessageDialog.ShowInfo('Network Details', ASsid, msg);
 end;
 
 end.

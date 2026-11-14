@@ -18,6 +18,7 @@ type
   TConfigWindowTest = class(TTestCase)
   private
     FWindow: TConfigSamaWindow;
+    FTestIniPath: string;
   protected
     procedure SetUp(); override;
     procedure TearDown(); override;
@@ -46,7 +47,8 @@ begin
       Fail('FtApp.Initialize failed: ' + E.Message);
   end;
 
-  FWindow := TConfigSamaWindow.Create();
+  FTestIniPath := Format('/tmp/configsama_win_test_%d_%d.ini', [GetProcessID(), Random(100000)]);
+  FWindow := TConfigSamaWindow.Create(FTestIniPath);
 end;
 
 procedure TConfigWindowTest.TearDown();
@@ -56,6 +58,8 @@ begin
     FWindow.Free();
     FWindow := nil;
   end;
+  if (FTestIniPath <> '') and FileExists(FTestIniPath) then
+    DeleteFile(FTestIniPath);
 end;
 
 procedure TConfigWindowTest.TestWindowCreationAndFTMLResolution();

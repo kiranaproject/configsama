@@ -138,8 +138,9 @@ Window {
         visible: true;
         drawFrame: false;
 
+        // Card 1: WLAN Master Toggle Card
         Container {
-          id: cardWlan;
+          id: cardWlanToggle;
           styleClass: "settings-card";
           anchors.top: parent.top;
           anchors.topMargin: 4;
@@ -147,16 +148,176 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 252;
+          height: 60;
+          padding: 0;
           drawFrame: false;
 
-          // Row 0: WLAN toggle
+          Text {
+            id: lblWlanTitle;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.top: parent.top;
+            anchors.topMargin: 12;
+            text: "WLAN";
+            font: "Sans:bold 13";
+            selectable: false;
+          }
+
+          Text {
+            id: lblWlanStatus;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.top: lblWlanTitle.bottom;
+            anchors.topMargin: 2;
+            text: "Enabled";
+            font: "Sans 11";
+            selectable: false;
+          }
+
+          Button {
+            id: btnWlanRescan;
+            anchors.right: swWlan.left;
+            anchors.rightMargin: 14;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 76;
+            height: 28;
+            text: "Rescan";
+            flat: true;
+          }
+
+          Switch {
+            id: swWlan;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 48;
+            height: 26;
+            checked: true;
+          }
+        }
+
+        // Message container when Wi-Fi is disabled
+        Container {
+          id: containerWlanDisabled;
+          anchors.top: cardWlanToggle.bottom;
+          anchors.topMargin: 20;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 80;
+          visible: false;
+          drawFrame: false;
+
+          Text {
+            id: lblWlanDisabled;
+            anchors.horizontalCenter: parent.horizontalCenter;
+            anchors.verticalCenter: parent.verticalCenter;
+            text: "Wi-Fi is turned off. Turn on the switch above to search for available wireless networks.";
+            font: "Sans 12";
+            selectable: false;
+          }
+        }
+
+        // Card 2: Connected Network Card
+        Container {
+          id: cardWlanConnected;
+          styleClass: "settings-card";
+          anchors.top: cardWlanToggle.bottom;
+          anchors.topMargin: 12;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 62;
+          padding: 0;
+          drawFrame: false;
+
+          Image {
+            id: imgConnWifi;
+            icon: "wlan";
+            width: 20;
+            height: 20;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+          }
+
+          Text {
+            id: lblConnSsid;
+            anchors.left: parent.left;
+            anchors.leftMargin: 48;
+            anchors.top: parent.top;
+            anchors.topMargin: 13;
+            text: "Connected Network";
+            font: "Sans:bold 12";
+            selectable: false;
+          }
+
+          Text {
+            id: lblConnDetails;
+            anchors.left: parent.left;
+            anchors.leftMargin: 48;
+            anchors.top: lblConnSsid.bottom;
+            anchors.topMargin: 2;
+            text: "Connected";
+            font: "Sans 11";
+            selectable: false;
+          }
+
+          Image {
+            id: imgConnCheck;
+            icon: "dialog-success";
+            width: 16;
+            height: 16;
+            anchors.right: btnConnDetails.left;
+            anchors.rightMargin: 12;
+            anchors.verticalCenter: parent.verticalCenter;
+          }
+
+          Button {
+            id: btnConnDetails;
+            icon: "info-accent";
+            width: 26;
+            height: 26;
+            flat: true;
+            anchors.right: btnConnDisconnect.left;
+            anchors.rightMargin: 10;
+            anchors.verticalCenter: parent.verticalCenter;
+          }
+
+          Button {
+            id: btnConnDisconnect;
+            text: "Disconnect";
+            width: 96;
+            height: 28;
+            anchors.right: parent.right;
+            anchors.rightMargin: 16;
+            anchors.verticalCenter: parent.verticalCenter;
+          }
+        }
+
+        // Card 3: Visible / Available Networks Card
+        Container {
+          id: cardWlanAvailable;
+          styleClass: "settings-card";
+          anchors.top: cardWlanConnected.bottom;
+          anchors.topMargin: 12;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 340;
+          padding: 0;
+          drawFrame: false;
+
+          // Header row
           Container {
-            id: rowWlanStatus;
+            id: rowAvailableHeader;
             anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 52;
+            height: 38;
             padding: 0;
             drawFrame: false;
 
@@ -164,34 +325,43 @@ Window {
               anchors.left: parent.left;
               anchors.leftMargin: 18;
               anchors.verticalCenter: parent.verticalCenter;
-              text: "WLAN";
+              text: "Available Networks";
               font: "Sans:bold 12";
               selectable: false;
             }
 
-            Switch {
-              id: swWlan;
+            Text {
+              id: lblScanStatus;
               anchors.right: parent.right;
               anchors.rightMargin: 18;
               anchors.verticalCenter: parent.verticalCenter;
-              width: 48;
-              height: 26;
-              checked: true;
+              text: "";
+              font: "Sans 11";
+              selectable: false;
             }
           }
 
-          // Row 1: "Purr" network (connected)
           Container {
-            id: rowWifiPurr;
-            anchors.top: rowWlanStatus.bottom;
+            id: divAvailHeader;
+            styleClass: "card-divider";
+            anchors.top: rowAvailableHeader.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 50;
+            height: 1;
+          }
+
+          // Row 0
+          Container {
+            id: rowNet0;
+            anchors.top: divAvailHeader.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
             padding: 0;
             drawFrame: false;
 
             Image {
-              id: imgWifiPurr;
+              id: imgNetIcon0;
               icon: "wlan";
               width: 18;
               height: 18;
@@ -201,60 +371,68 @@ Window {
             }
 
             Text {
+              id: lblNetSsid0;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
               anchors.verticalCenter: parent.verticalCenter;
-              text: "Purr";
+              text: "";
               font: "Sans 12";
               selectable: false;
             }
 
-            Image {
-              id: imgLockPurr;
-              icon: "lock";
-              width: 14;
-              height: 14;
-              anchors.right: imgCheckPurr.left;
-              anchors.rightMargin: 14;
+            Text {
+              id: lblNetSignal0;
+              anchors.right: imgNetLock0.left;
+              anchors.rightMargin: 10;
               anchors.verticalCenter: parent.verticalCenter;
+              width: 36;
+              text: "";
+              font: "Sans 11";
+              selectable: false;
             }
 
             Image {
-              id: imgCheckPurr;
-              icon: "dialog-success";
-              width: 16;
-              height: 16;
-              anchors.right: btnPurrInfo.left;
+              id: imgNetLock0;
+              icon: "lock";
+              width: 14;
+              height: 14;
+              anchors.right: btnNetConnect0.left;
               anchors.rightMargin: 12;
               anchors.verticalCenter: parent.verticalCenter;
             }
 
             Button {
-              id: btnPurrInfo;
-              icon: "info-accent";
-              width: 24;
-              height: 24;
-              flat: true;
-              drawFrame: false;
-              style: "background-color: transparent; border: none; box-shadow: none;";
+              id: btnNetConnect0;
+              text: "Connect";
+              width: 96;
+              height: 26;
               anchors.right: parent.right;
               anchors.rightMargin: 16;
               anchors.verticalCenter: parent.verticalCenter;
             }
           }
 
-          // Row 2: "Meow" network
           Container {
-            id: rowWifiMeow;
-            anchors.top: rowWifiPurr.bottom;
+            id: divNet0;
+            styleClass: "card-divider";
+            anchors.top: rowNet0.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 50;
+            height: 1;
+          }
+
+          // Row 1
+          Container {
+            id: rowNet1;
+            anchors.top: divNet0.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
             padding: 0;
             drawFrame: false;
 
             Image {
-              id: imgWifiMeow;
+              id: imgNetIcon1;
               icon: "wlan";
               width: 18;
               height: 18;
@@ -264,37 +442,68 @@ Window {
             }
 
             Text {
+              id: lblNetSsid1;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
               anchors.verticalCenter: parent.verticalCenter;
-              text: "Meow";
+              text: "";
               font: "Sans 12";
               selectable: false;
             }
 
+            Text {
+              id: lblNetSignal1;
+              anchors.right: imgNetLock1.left;
+              anchors.rightMargin: 10;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 36;
+              text: "";
+              font: "Sans 11";
+              selectable: false;
+            }
+
             Image {
-              id: imgLockMeow;
+              id: imgNetLock1;
               icon: "lock";
               width: 14;
               height: 14;
+              anchors.right: btnNetConnect1.left;
+              anchors.rightMargin: 12;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Button {
+              id: btnNetConnect1;
+              text: "Connect";
+              width: 96;
+              height: 26;
               anchors.right: parent.right;
-              anchors.rightMargin: 18;
+              anchors.rightMargin: 16;
               anchors.verticalCenter: parent.verticalCenter;
             }
           }
 
-          // Row 3: "Virgin Media" network
           Container {
-            id: rowWifiVirgin;
-            anchors.top: rowWifiMeow.bottom;
+            id: divNet1;
+            styleClass: "card-divider";
+            anchors.top: rowNet1.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 50;
+            height: 1;
+          }
+
+          // Row 2
+          Container {
+            id: rowNet2;
+            anchors.top: divNet1.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
             padding: 0;
             drawFrame: false;
 
             Image {
-              id: imgWifiVirgin;
+              id: imgNetIcon2;
               icon: "wlan";
               width: 18;
               height: 18;
@@ -304,37 +513,68 @@ Window {
             }
 
             Text {
+              id: lblNetSsid2;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
               anchors.verticalCenter: parent.verticalCenter;
-              text: "Virgin Media";
+              text: "";
               font: "Sans 12";
               selectable: false;
             }
 
+            Text {
+              id: lblNetSignal2;
+              anchors.right: imgNetLock2.left;
+              anchors.rightMargin: 10;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 36;
+              text: "";
+              font: "Sans 11";
+              selectable: false;
+            }
+
             Image {
-              id: imgLockVirgin;
+              id: imgNetLock2;
               icon: "lock";
               width: 14;
               height: 14;
+              anchors.right: btnNetConnect2.left;
+              anchors.rightMargin: 12;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Button {
+              id: btnNetConnect2;
+              text: "Connect";
+              width: 96;
+              height: 26;
               anchors.right: parent.right;
-              anchors.rightMargin: 18;
+              anchors.rightMargin: 16;
               anchors.verticalCenter: parent.verticalCenter;
             }
           }
 
-          // Row 4: "VM6974871" network
           Container {
-            id: rowWifiVM;
-            anchors.top: rowWifiVirgin.bottom;
+            id: divNet2;
+            styleClass: "card-divider";
+            anchors.top: rowNet2.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 50;
+            height: 1;
+          }
+
+          // Row 3
+          Container {
+            id: rowNet3;
+            anchors.top: divNet2.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
             padding: 0;
             drawFrame: false;
 
             Image {
-              id: imgWifiVM;
+              id: imgNetIcon3;
               icon: "wlan";
               width: 18;
               height: 18;
@@ -344,21 +584,185 @@ Window {
             }
 
             Text {
+              id: lblNetSsid3;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
               anchors.verticalCenter: parent.verticalCenter;
-              text: "VM6974871";
+              text: "";
               font: "Sans 12";
               selectable: false;
             }
 
+            Text {
+              id: lblNetSignal3;
+              anchors.right: imgNetLock3.left;
+              anchors.rightMargin: 10;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 36;
+              text: "";
+              font: "Sans 11";
+              selectable: false;
+            }
+
             Image {
-              id: imgLockVM;
+              id: imgNetLock3;
               icon: "lock";
               width: 14;
               height: 14;
+              anchors.right: btnNetConnect3.left;
+              anchors.rightMargin: 12;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Button {
+              id: btnNetConnect3;
+              text: "Connect";
+              width: 96;
+              height: 26;
               anchors.right: parent.right;
-              anchors.rightMargin: 18;
+              anchors.rightMargin: 16;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+          }
+
+          Container {
+            id: divNet3;
+            styleClass: "card-divider";
+            anchors.top: rowNet3.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 1;
+          }
+
+          // Row 4
+          Container {
+            id: rowNet4;
+            anchors.top: divNet3.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Image {
+              id: imgNetIcon4;
+              icon: "wlan";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Text {
+              id: lblNetSsid4;
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblNetSignal4;
+              anchors.right: imgNetLock4.left;
+              anchors.rightMargin: 10;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 36;
+              text: "";
+              font: "Sans 11";
+              selectable: false;
+            }
+
+            Image {
+              id: imgNetLock4;
+              icon: "lock";
+              width: 14;
+              height: 14;
+              anchors.right: btnNetConnect4.left;
+              anchors.rightMargin: 12;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Button {
+              id: btnNetConnect4;
+              text: "Connect";
+              width: 96;
+              height: 26;
+              anchors.right: parent.right;
+              anchors.rightMargin: 16;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+          }
+
+          Container {
+            id: divNet4;
+            styleClass: "card-divider";
+            anchors.top: rowNet4.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 1;
+          }
+
+          // Row 5
+          Container {
+            id: rowNet5;
+            anchors.top: divNet4.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Image {
+              id: imgNetIcon5;
+              icon: "wlan";
+              width: 18;
+              height: 18;
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Text {
+              id: lblNetSsid5;
+              anchors.left: parent.left;
+              anchors.leftMargin: 48;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblNetSignal5;
+              anchors.right: imgNetLock5.left;
+              anchors.rightMargin: 10;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 36;
+              text: "";
+              font: "Sans 11";
+              selectable: false;
+            }
+
+            Image {
+              id: imgNetLock5;
+              icon: "lock";
+              width: 14;
+              height: 14;
+              anchors.right: btnNetConnect5.left;
+              anchors.rightMargin: 12;
+              anchors.verticalCenter: parent.verticalCenter;
+            }
+
+            Button {
+              id: btnNetConnect5;
+              text: "Connect";
+              width: 96;
+              height: 26;
+              anchors.right: parent.right;
+              anchors.rightMargin: 16;
               anchors.verticalCenter: parent.verticalCenter;
             }
           }

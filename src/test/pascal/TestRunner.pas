@@ -8,6 +8,7 @@ program TestRunner;
 uses
   Classes, SysUtils, fpcunit, testregistry, consoletestrunner,
   ConfigSama.Settings.Test,
+  ConfigSama.Wlan.Test,
   ConfigSama.Window.Test;
 
 var
