@@ -119,14 +119,15 @@ const
     '    border: 2px solid rgba(0, 0, 0, 0.12);' + LineEnding +
     '    box-shadow: none;' + LineEnding +
     '}' + LineEnding +
-    'button.theme-preview-btn:hover, .theme-preview-btn:hover {' + LineEnding +
-    '    border-color: #3b82f6;' + LineEnding +
-    '}' + LineEnding +
     'button.theme-preview-btn.dark, .theme-preview-btn.dark, window.dark .theme-preview-btn {' + LineEnding +
     '    border: 2px solid rgba(255, 255, 255, 0.14);' + LineEnding +
     '}' + LineEnding +
-    'button.theme-preview-btn.active, .theme-preview-btn.active {' + LineEnding +
-    '    border-color: #3b82f6;' + LineEnding +
+    'button.theme-preview-btn:hover, .theme-preview-btn:hover {' + LineEnding +
+    '    border-color: #3286ff;' + LineEnding +
+    '}' + LineEnding +
+    'button.theme-preview-btn.active, .theme-preview-btn.active,' + LineEnding +
+    'window.dark button.theme-preview-btn.active, window.dark .theme-preview-btn.active {' + LineEnding +
+    '    border: 2px solid #3286ff;' + LineEnding +
     '}' + LineEnding +
     'button.swatch-btn, .swatch-btn {' + LineEnding +
     '    border-radius: 14px;' + LineEnding +

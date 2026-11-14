@@ -766,12 +766,14 @@ begin
   if w is TFtButton then
   begin
     FBtnThemeLight := TFtButton(w);
+    FBtnThemeLight.SetIconSize(104, 76);
     FBtnThemeLight.OnClick := @HandleThemeLightClick;
   end;
   w := FindWidget('btnThemeDark');
   if w is TFtButton then
   begin
     FBtnThemeDark := TFtButton(w);
+    FBtnThemeDark.SetIconSize(104, 76);
     FBtnThemeDark.OnClick := @HandleThemeDarkClick;
   end;
 
@@ -1607,6 +1609,7 @@ begin
   FSettings.Save();
   FtApp.DarkMode := AToggled;
   UpdateThemeIcons();
+  RefreshAppearanceUI();
   Invalidate();
 end;
 
@@ -2755,6 +2758,24 @@ begin
       FBtnStandardFont.Caption := FSettings.StandardFont;
     if Assigned(FBtnMonospaceFont) then
       FBtnMonospaceFont.Caption := FSettings.MonospaceFont;
+
+    if Assigned(FBtnThemeLight) and Assigned(FBtnThemeDark) then
+    begin
+      if FSettings.DarkMode then
+      begin
+        FBtnThemeDark.StyleClass := 'theme-preview-btn active';
+        FBtnThemeLight.StyleClass := 'theme-preview-btn';
+        FBtnThemeDark.Style := 'border: 2px solid #3286ff; border-radius: 8px;';
+        FBtnThemeLight.Style := 'border: 2px solid rgba(255, 255, 255, 0.14); border-radius: 8px;';
+      end
+      else
+      begin
+        FBtnThemeLight.StyleClass := 'theme-preview-btn active';
+        FBtnThemeDark.StyleClass := 'theme-preview-btn';
+        FBtnThemeLight.Style := 'border: 2px solid #3286ff; border-radius: 8px;';
+        FBtnThemeDark.Style := 'border: 2px solid rgba(0, 0, 0, 0.12); border-radius: 8px;';
+      end;
+    end;
   finally
     FUpdatingControls := False;
   end;
