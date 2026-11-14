@@ -150,7 +150,7 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 60;
+          height: 64;
           padding: 0;
           drawFrame: false;
 
@@ -160,6 +160,7 @@ Window {
             anchors.leftMargin: 18;
             anchors.top: parent.top;
             anchors.topMargin: 12;
+            height: 18;
             text: "WLAN";
             font: "Sans:bold 13";
             selectable: false;
@@ -169,10 +170,12 @@ Window {
             id: lblWlanStatus;
             anchors.left: parent.left;
             anchors.leftMargin: 18;
-            anchors.top: lblWlanTitle.bottom;
-            anchors.topMargin: 2;
+            anchors.top: parent.top;
+            anchors.topMargin: 33;
+            height: 16;
             text: "Enabled";
-            font: "Sans 11";
+            font: "Sans 9";
+            opacity: 0.65;
             selectable: false;
           }
 
@@ -217,6 +220,7 @@ Window {
             anchors.verticalCenter: parent.verticalCenter;
             text: "Wi-Fi is turned off. Turn on the switch above to search for available wireless networks.";
             font: "Sans 12";
+            opacity: 0.65;
             selectable: false;
           }
         }
@@ -231,7 +235,7 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 62;
+          height: 64;
           padding: 0;
           drawFrame: false;
 
@@ -250,7 +254,8 @@ Window {
             anchors.left: parent.left;
             anchors.leftMargin: 48;
             anchors.top: parent.top;
-            anchors.topMargin: 13;
+            anchors.topMargin: 12;
+            height: 18;
             text: "Connected Network";
             font: "Sans:bold 12";
             selectable: false;
@@ -260,10 +265,12 @@ Window {
             id: lblConnDetails;
             anchors.left: parent.left;
             anchors.leftMargin: 48;
-            anchors.top: lblConnSsid.bottom;
-            anchors.topMargin: 2;
+            anchors.top: parent.top;
+            anchors.topMargin: 33;
+            height: 16;
             text: "Connected";
-            font: "Sans 11";
+            font: "Sans 9";
+            opacity: 0.65;
             selectable: false;
           }
 
@@ -338,7 +345,8 @@ Window {
               anchors.rightMargin: 18;
               anchors.verticalCenter: parent.verticalCenter;
               text: "";
-              font: "Sans 11";
+              font: "Sans 9";
+              opacity: 0.65;
               selectable: false;
             }
           }
@@ -389,7 +397,8 @@ Window {
               anchors.verticalCenter: parent.verticalCenter;
               width: 36;
               text: "";
-              font: "Sans 11";
+              font: "Sans 10";
+              opacity: 0.65;
               selectable: false;
             }
 
@@ -460,7 +469,8 @@ Window {
               anchors.verticalCenter: parent.verticalCenter;
               width: 36;
               text: "";
-              font: "Sans 11";
+              font: "Sans 10";
+              opacity: 0.65;
               selectable: false;
             }
 
@@ -531,7 +541,8 @@ Window {
               anchors.verticalCenter: parent.verticalCenter;
               width: 36;
               text: "";
-              font: "Sans 11";
+              font: "Sans 10";
+              opacity: 0.65;
               selectable: false;
             }
 
@@ -602,7 +613,8 @@ Window {
               anchors.verticalCenter: parent.verticalCenter;
               width: 36;
               text: "";
-              font: "Sans 11";
+              font: "Sans 10";
+              opacity: 0.65;
               selectable: false;
             }
 
@@ -673,7 +685,8 @@ Window {
               anchors.verticalCenter: parent.verticalCenter;
               width: 36;
               text: "";
-              font: "Sans 11";
+              font: "Sans 10";
+              opacity: 0.65;
               selectable: false;
             }
 
@@ -744,7 +757,8 @@ Window {
               anchors.verticalCenter: parent.verticalCenter;
               width: 36;
               text: "";
-              font: "Sans 11";
+              font: "Sans 10";
+              opacity: 0.65;
               selectable: false;
             }
 
@@ -794,9 +808,10 @@ Window {
           Text {
             id: lblWiredTitle;
             anchors.top: parent.top;
-            anchors.topMargin: 14;
+            anchors.topMargin: 12;
             anchors.left: parent.left;
             anchors.leftMargin: 18;
+            height: 18;
             text: "Wired";
             font: "Sans:bold 13";
             selectable: false;
@@ -804,12 +819,14 @@ Window {
 
           Text {
             id: lblWiredStatus;
-            anchors.top: lblWiredTitle.bottom;
-            anchors.topMargin: 2;
+            anchors.top: parent.top;
+            anchors.topMargin: 33;
             anchors.left: parent.left;
             anchors.leftMargin: 18;
+            height: 16;
             text: "Connected";
-            font: "Sans 11";
+            font: "Sans 9";
+            opacity: 0.65;
             selectable: false;
           }
 
@@ -852,6 +869,7 @@ Window {
             anchors.centerIn: parent;
             text: "Wired connection is turned off";
             font: "Sans 13";
+            opacity: 0.65;
             selectable: false;
           }
         }
@@ -1111,9 +1129,10 @@ Window {
           Text {
             id: lblBluetoothTitle;
             anchors.top: parent.top;
-            anchors.topMargin: 14;
+            anchors.topMargin: 12;
             anchors.left: parent.left;
             anchors.leftMargin: 18;
+            height: 18;
             text: "Bluetooth";
             font: "Sans:bold 13";
             selectable: false;
@@ -1121,12 +1140,14 @@ Window {
 
           Text {
             id: lblBluetoothStatus;
-            anchors.top: lblBluetoothTitle.bottom;
-            anchors.topMargin: 2;
+            anchors.top: parent.top;
+            anchors.topMargin: 33;
             anchors.left: parent.left;
             anchors.leftMargin: 18;
+            height: 16;
             text: "Visible and available for pairing";
-            font: "Sans 11";
+            font: "Sans 9";
+            opacity: 0.65;
             selectable: false;
           }
 
@@ -1169,6 +1190,7 @@ Window {
             anchors.centerIn: parent;
             text: "Bluetooth is turned off";
             font: "Sans 13";
+            opacity: 0.65;
             selectable: false;
           }
         }
@@ -1183,7 +1205,7 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 194;
+          height: 164;
           drawFrame: false;
 
           // Device 0
@@ -1192,7 +1214,7 @@ Window {
             anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 48;
+            height: 54;
             padding: 0;
             drawFrame: false;
 
@@ -1212,6 +1234,7 @@ Window {
               anchors.topMargin: 8;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
+              height: 18;
               text: "AZ09 Wireless Earphones";
               font: "Sans:bold 12";
               selectable: false;
@@ -1219,12 +1242,14 @@ Window {
 
             Text {
               id: lblBtStatus0;
-              anchors.top: lblBtName0.bottom;
-              anchors.topMargin: 2;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
+              height: 16;
               text: "Connected • 85% Battery";
-              font: "Sans 11";
+              font: "Sans 9";
+              opacity: 0.65;
               selectable: false;
             }
 
@@ -1257,7 +1282,7 @@ Window {
             anchors.top: divBt0.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 48;
+            height: 54;
             padding: 0;
             drawFrame: false;
 
@@ -1277,6 +1302,7 @@ Window {
               anchors.topMargin: 8;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
+              height: 18;
               text: "Logitech MX Master 3S";
               font: "Sans:bold 12";
               selectable: false;
@@ -1284,12 +1310,14 @@ Window {
 
             Text {
               id: lblBtStatus1;
-              anchors.top: lblBtName1.bottom;
-              anchors.topMargin: 2;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
+              height: 16;
               text: "Paired • 90% Battery";
-              font: "Sans 11";
+              font: "Sans 9";
+              opacity: 0.65;
               selectable: false;
             }
 
@@ -1322,7 +1350,7 @@ Window {
             anchors.top: divBt1.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 48;
+            height: 54;
             padding: 0;
             drawFrame: false;
 
@@ -1342,6 +1370,7 @@ Window {
               anchors.topMargin: 8;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
+              height: 18;
               text: "Keychron K2 Pro";
               font: "Sans:bold 12";
               selectable: false;
@@ -1349,12 +1378,14 @@ Window {
 
             Text {
               id: lblBtStatus2;
-              anchors.top: lblBtName2.bottom;
-              anchors.topMargin: 2;
+              anchors.top: parent.top;
+              anchors.topMargin: 29;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
+              height: 16;
               text: "Ready to pair";
-              font: "Sans 11";
+              font: "Sans 9";
+              opacity: 0.65;
               selectable: false;
             }
 
