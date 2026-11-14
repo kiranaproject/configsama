@@ -9,6 +9,8 @@ uses
   Classes, SysUtils, fpcunit, testregistry, consoletestrunner,
   ConfigSama.Settings.Test,
   ConfigSama.Wlan.Test,
+  ConfigSama.Wired.Test,
+  ConfigSama.Display.Test,
   ConfigSama.Window.Test;
 
 var

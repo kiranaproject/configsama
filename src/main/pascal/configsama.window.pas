@@ -11,7 +11,7 @@ uses
   Classes, SysUtils,
   ftpas, ftpas.types, ftpas.api, ftpas.app, ftpas.canvas, ftpas.widget, ftpas.controls,
   ftpas.layouts, ftpas.views, ftpas.dialogs, ftpas.ftml,
-  ConfigSama.Wlan, ConfigSama.Settings, ConfigSama.Styles;
+  ConfigSama.Wlan, ConfigSama.Wired, ConfigSama.Display, ConfigSama.Settings, ConfigSama.Styles;
 
 type
   { TConfigSamaWindow — GNOME Settings styled application with FTML and ECA }
@@ -84,8 +84,21 @@ type
     FPwdSubmitted: Boolean;
 
     // Wired page controls
+    FCardWiredToggle: TFtContainer;
+    FLblWiredTitle: TFtLabel;
+    FLblWiredStatus: TFtLabel;
+    FBtnWiredRefresh: TFtButton;
     FSwWired: TFtSwitch;
+    FContainerWiredDisabled: TFtContainer;
+    FLblWiredDisabled: TFtLabel;
+    FCardWired: TFtContainer;
     FImgWired: TFtImage;
+    FLblWiredDevice: TFtLabel;
+    FBtnWiredConnect: TFtButton;
+    FLblWiredSpeed: TFtLabel;
+    FLblWiredIp: TFtLabel;
+    FLblWiredDns: TFtLabel;
+    FLblWiredMac: TFtLabel;
 
     // Backward-compatibility aliases
     FImgWifiPurr: TFtImage;
@@ -107,11 +120,20 @@ type
     FBtnChooseWallpaper: TFtButton;
 
     // Displays page controls
+    FSldBrightness: TFtSlider;
+    FImgBrightnessLow: TFtImage;
+    FImgBrightnessHigh: TFtImage;
     FCmbDisplay: TFtComboBox;
     FCmbResolution: TFtComboBox;
     FCmbRefreshRate: TFtComboBox;
     FCmbScale: TFtComboBox;
     FSegScale: TFtSegmentedControl;
+    FBtnRotate0: TFtButton;
+    FBtnRotate90: TFtButton;
+    FBtnRotate180: TFtButton;
+    FBtnRotate270: TFtButton;
+    FLblDisplayInfo: TFtLabel;
+    FBtnDisplayApply: TFtButton;
     FSwNightLight: TFtSwitch;
 
     // Desktop page controls
@@ -182,6 +204,19 @@ type
     procedure HandlePasswordPromptConnect(Sender: TFtButton);
     procedure HandlePasswordPromptCancel(Sender: TFtButton);
 
+    // Wired Event Handlers
+    procedure HandleWiredToggle(Sender: TFtSwitch; AToggled: Boolean);
+    procedure HandleWiredRefresh(Sender: TFtButton);
+    procedure HandleWiredConnectClick(Sender: TFtButton);
+    procedure RefreshWiredUI();
+
+    // Displays Event Handlers
+    procedure HandleBrightnessChange(Sender: TFtSlider; AValue: Double);
+    procedure HandleDisplayApplyClick(Sender: TFtButton);
+    procedure RefreshDisplayUI();
+    procedure UpdateRotationButtonStates(const ARotation: string);
+    function GetSelectedDisplayName(): string;
+
     // Event Handlers
     procedure HandleCategorySelect(Sender: TFtTreeView; Node: TFtTreeNode);
     procedure HandleSearchChange(Sender: TFtWidget; const AText: string);
@@ -250,6 +285,14 @@ type
     property SwWlan: TFtSwitch read FSwWlan;
     property SwWired: TFtSwitch read FSwWired;
     property SegScale: TFtSegmentedControl read FSegScale;
+    property CmbDisplay: TFtComboBox read FCmbDisplay;
+    property CmbResolution: TFtComboBox read FCmbResolution;
+    property CmbRefreshRate: TFtComboBox read FCmbRefreshRate;
+    property SldBrightness: TFtSlider read FSldBrightness;
+    property BtnWiredConnect: TFtButton read FBtnWiredConnect;
+    property BtnDisplayApply: TFtButton read FBtnDisplayApply;
+    property LblWiredStatus: TFtLabel read FLblWiredStatus;
+    property LblDisplayInfo: TFtLabel read FLblDisplayInfo;
   end;
 
 implementation
@@ -442,11 +485,79 @@ begin
     FWlanRows[i].Divider := FindWidget('divNet' + IntToStr(i));
   end;
 
+  // Wired controls
+  w := FindWidget('cardWiredToggle');
+  if w is TFtContainer then FCardWiredToggle := TFtContainer(w);
+
+  w := FindWidget('lblWiredTitle');
+  if w is TFtLabel then FLblWiredTitle := TFtLabel(w);
+
+  w := FindWidget('lblWiredStatus');
+  if w is TFtLabel then FLblWiredStatus := TFtLabel(w);
+
+  w := FindWidget('btnWiredRefresh');
+  if w is TFtButton then
+  begin
+    FBtnWiredRefresh := TFtButton(w);
+    FBtnWiredRefresh.OnClick := @HandleWiredRefresh;
+  end;
+
   w := FindWidget('swWired');
-  if w is TFtSwitch then FSwWired := TFtSwitch(w);
+  if w is TFtSwitch then
+  begin
+    FSwWired := TFtSwitch(w);
+    FSwWired.OnToggle := @HandleWiredToggle;
+  end;
+
+  w := FindWidget('containerWiredDisabled');
+  if w is TFtContainer then FContainerWiredDisabled := TFtContainer(w);
+
+  w := FindWidget('lblWiredDisabled');
+  if w is TFtLabel then FLblWiredDisabled := TFtLabel(w);
+
+  w := FindWidget('cardWired');
+  if w is TFtContainer then FCardWired := TFtContainer(w);
 
   w := FindWidget('imgWired');
   if w is TFtImage then FImgWired := TFtImage(w);
+
+  w := FindWidget('lblWiredDevice');
+  if w is TFtLabel then FLblWiredDevice := TFtLabel(w);
+
+  w := FindWidget('btnWiredConnect');
+  if w is TFtButton then
+  begin
+    FBtnWiredConnect := TFtButton(w);
+    FBtnWiredConnect.OnClick := @HandleWiredConnectClick;
+  end;
+
+  w := FindWidget('lblWiredSpeed');
+  if w is TFtLabel then
+  begin
+    FLblWiredSpeed := TFtLabel(w);
+    FLblWiredSpeed.Alignment := ftaRight;
+  end;
+
+  w := FindWidget('lblWiredIp');
+  if w is TFtLabel then
+  begin
+    FLblWiredIp := TFtLabel(w);
+    FLblWiredIp.Alignment := ftaRight;
+  end;
+
+  w := FindWidget('lblWiredDns');
+  if w is TFtLabel then
+  begin
+    FLblWiredDns := TFtLabel(w);
+    FLblWiredDns.Alignment := ftaRight;
+  end;
+
+  w := FindWidget('lblWiredMac');
+  if w is TFtLabel then
+  begin
+    FLblWiredMac := TFtLabel(w);
+    FLblWiredMac.Alignment := ftaRight;
+  end;
 
   // Appearance controls
   w := FindWidget('swDarkMode');
@@ -485,15 +596,6 @@ begin
   w := FindWidget('btnAccentGreen');
   if w is TFtButton then begin w.Tag := 7; TFtButton(w).OnClick := @HandleAccentButtonClick; end;
 
-  w := FindWidget('btnRotate0');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleRotateButtonClick;
-  w := FindWidget('btnRotate90');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleRotateButtonClick;
-  w := FindWidget('btnRotate180');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleRotateButtonClick;
-  w := FindWidget('btnRotate270');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleRotateButtonClick;
-
   w := FindWidget('cmbWallpaperMode');
   if w is TFtComboBox then
   begin
@@ -512,6 +614,19 @@ begin
   end;
 
   // Displays controls
+  w := FindWidget('imgBrightnessLow');
+  if w is TFtImage then FImgBrightnessLow := TFtImage(w);
+
+  w := FindWidget('imgBrightnessHigh');
+  if w is TFtImage then FImgBrightnessHigh := TFtImage(w);
+
+  w := FindWidget('sldBrightness');
+  if w is TFtSlider then
+  begin
+    FSldBrightness := TFtSlider(w);
+    FSldBrightness.OnChange := @HandleBrightnessChange;
+  end;
+
   w := FindWidget('cmbDisplay');
   if w is TFtComboBox then
   begin
@@ -545,6 +660,48 @@ begin
   begin
     FSegScale := TFtSegmentedControl(w);
     FSegScale.OnSelect := @HandleSegmentScaleSelect;
+  end;
+
+  w := FindWidget('btnRotate0');
+  if w is TFtButton then
+  begin
+    FBtnRotate0 := TFtButton(w);
+    FBtnRotate0.Tag := 0;
+    FBtnRotate0.OnClick := @HandleRotateButtonClick;
+  end;
+
+  w := FindWidget('btnRotate90');
+  if w is TFtButton then
+  begin
+    FBtnRotate90 := TFtButton(w);
+    FBtnRotate90.Tag := 1;
+    FBtnRotate90.OnClick := @HandleRotateButtonClick;
+  end;
+
+  w := FindWidget('btnRotate180');
+  if w is TFtButton then
+  begin
+    FBtnRotate180 := TFtButton(w);
+    FBtnRotate180.Tag := 2;
+    FBtnRotate180.OnClick := @HandleRotateButtonClick;
+  end;
+
+  w := FindWidget('btnRotate270');
+  if w is TFtButton then
+  begin
+    FBtnRotate270 := TFtButton(w);
+    FBtnRotate270.Tag := 3;
+    FBtnRotate270.OnClick := @HandleRotateButtonClick;
+  end;
+
+  w := FindWidget('lblDisplayInfo');
+  if w is TFtLabel then FLblDisplayInfo := TFtLabel(w);
+
+  w := FindWidget('btnDisplayApply');
+  if w is TFtButton then
+  begin
+    FBtnDisplayApply := TFtButton(w);
+    FBtnDisplayApply.OnClick := @HandleDisplayApplyClick;
   end;
 
   w := FindWidget('swNightLight');
@@ -811,6 +968,12 @@ begin
       FSwWlan.Checked := WlanService().IsWifiEnabled();
     RefreshWlanUI(False);
 
+    // Wired
+    RefreshWiredUI();
+
+    // Displays
+    RefreshDisplayUI();
+
     // Appearance
     if Assigned(FSwDarkMode) then
       FSwDarkMode.Checked := FSettings.DarkMode;
@@ -976,8 +1139,18 @@ begin
       if FPageWlan.Visible then
         RefreshWlanUI(False);
     end;
-    if FPageWired <> nil then FPageWired.Visible := SameText(AName, 'Wired');
-    if FPageDisplays <> nil then FPageDisplays.Visible := SameText(AName, 'Display') or SameText(AName, 'Displays');
+    if FPageWired <> nil then
+    begin
+      FPageWired.Visible := SameText(AName, 'Wired');
+      if FPageWired.Visible then
+        RefreshWiredUI();
+    end;
+    if FPageDisplays <> nil then
+    begin
+      FPageDisplays.Visible := SameText(AName, 'Display') or SameText(AName, 'Displays');
+      if FPageDisplays.Visible then
+        RefreshDisplayUI();
+    end;
     if FPageAppearance <> nil then FPageAppearance.Visible := SameText(AName, 'Appearance');
     if FPageBackground <> nil then FPageBackground.Visible := SameText(AName, 'Background');
     if FPageDesktop <> nil then FPageDesktop.Visible := SameText(AName, 'Dock') or SameText(AName, 'Desktop & Dock');
@@ -1127,11 +1300,6 @@ begin
     FCmbAccent.Text := colorName;
 end;
 
-procedure TConfigSamaWindow.HandleRotateButtonClick(Sender: TFtButton);
-begin
-  // Screen rotation preset selection
-end;
-
 procedure TConfigSamaWindow.HandleDarkModeToggle(Sender: TFtSwitch; AToggled: Boolean);
 begin
   if FUpdatingControls or (FSettings = nil) then Exit();
@@ -1186,23 +1354,138 @@ begin
   FSettings.Save();
 end;
 
+function TConfigSamaWindow.GetSelectedDisplayName(): string;
+var
+  s: string;
+  p: Integer;
+  primary: TDisplayOutput;
+begin
+  if Assigned(FCmbDisplay) and (FCmbDisplay.Text <> '') then
+  begin
+    s := FCmbDisplay.Text;
+    p := Pos(' ', s);
+    if p > 0 then
+      Result := Copy(s, 1, p - 1)
+    else
+      Result := s;
+  end
+  else
+  begin
+    primary := DisplayService().GetPrimaryOutput();
+    Result := primary.Name;
+  end;
+end;
+
+procedure TConfigSamaWindow.UpdateRotationButtonStates(const ARotation: string);
+var
+  r: string;
+begin
+  r := LowerCase(ARotation);
+  if Assigned(FBtnRotate0) then
+    FBtnRotate0.Flat := (r <> 'normal');
+  if Assigned(FBtnRotate90) then
+    FBtnRotate90.Flat := (r <> 'left');
+  if Assigned(FBtnRotate180) then
+    FBtnRotate180.Flat := (r <> 'inverted');
+  if Assigned(FBtnRotate270) then
+    FBtnRotate270.Flat := (r <> 'right');
+end;
+
+procedure TConfigSamaWindow.HandleRotateButtonClick(Sender: TFtButton);
+var
+  dev, rot: string;
+begin
+  if Sender = nil then Exit();
+  dev := GetSelectedDisplayName();
+  case Sender.Tag of
+    0: rot := 'normal';
+    1: rot := 'left';
+    2: rot := 'inverted';
+    3: rot := 'right';
+    else rot := 'normal';
+  end;
+  DisplayService().SetRotation(dev, rot);
+  RefreshDisplayUI();
+end;
+
+procedure TConfigSamaWindow.HandleBrightnessChange(Sender: TFtSlider; AValue: Double);
+var
+  dev: string;
+  pct: Integer;
+begin
+  if FUpdatingControls then Exit();
+  pct := Round(AValue);
+  dev := GetSelectedDisplayName();
+  DisplayService().SetBrightness(dev, pct);
+end;
+
 procedure TConfigSamaWindow.HandleDisplayChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
 begin
-  // Display output selection
+  if FUpdatingControls then Exit();
+  RefreshDisplayUI();
 end;
 
 procedure TConfigSamaWindow.HandleResolutionChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
 var
-  p: Integer;
-  res: string;
+  dev, resText, sW, sH: string;
+  p, pX, w, h: Integer;
+  outItem: TDisplayOutput;
+  rateItems: TStringList;
+  i, j, k: Integer;
 begin
-  if FSettings = nil then Exit();
-  res := AText;
-  p := Pos(' ', res);
+  if FUpdatingControls then Exit();
+  resText := AText;
+  p := Pos('(', resText);
   if p > 0 then
-    res := Copy(res, 1, p - 1);
-  FSettings.Resolution := res;
-  FSettings.Save();
+    resText := Trim(Copy(resText, 1, p - 1));
+
+  pX := Pos('×', resText);
+  if pX = 0 then pX := Pos('x', resText);
+  if pX > 0 then
+  begin
+    sW := Trim(Copy(resText, 1, pX - 1));
+    sH := Trim(Copy(resText, pX + 1, Length(resText)));
+    w := StrToIntDef(sW, 1920);
+    h := StrToIntDef(sH, 1080);
+  end
+  else
+  begin
+    w := 1920;
+    h := 1080;
+  end;
+
+  if FSettings <> nil then
+  begin
+    FSettings.Resolution := IntToStr(w) + 'x' + IntToStr(h);
+    FSettings.Save();
+  end;
+
+  dev := GetSelectedDisplayName();
+  outItem := DisplayService().GetOutput(dev);
+  if Assigned(FCmbRefreshRate) and (Length(outItem.Modes) > 0) then
+  begin
+    rateItems := TStringList.Create();
+    try
+      for i := 0 to High(outItem.Modes) do
+      begin
+        if (outItem.Modes[i].Width = w) and (outItem.Modes[i].Height = h) then
+        begin
+          for j := 0 to High(outItem.Modes[i].Rates) do
+            rateItems.Add(Format('%.2f Hz', [outItem.Modes[i].Rates[j]]));
+          Break;
+        end;
+      end;
+      if rateItems.Count > 0 then
+      begin
+        FCmbRefreshRate.Clear();
+        for k := 0 to rateItems.Count - 1 do
+          FCmbRefreshRate.AddItem(rateItems[k]);
+        FCmbRefreshRate.SelectedIndex := 0;
+      end;
+    finally
+      rateItems.Free();
+    end;
+  end;
 end;
 
 procedure TConfigSamaWindow.HandleRefreshRateChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
@@ -1210,7 +1493,7 @@ var
   p, rate: Integer;
   rateStr: string;
 begin
-  if FSettings = nil then Exit();
+  if FUpdatingControls or (FSettings = nil) then Exit();
   rateStr := AText;
   p := Pos(' ', rateStr);
   if p > 0 then
@@ -1218,6 +1501,387 @@ begin
   rate := StrToIntDef(rateStr, 60);
   FSettings.RefreshRate := rate;
   FSettings.Save();
+end;
+
+procedure TConfigSamaWindow.HandleDisplayApplyClick(Sender: TFtButton);
+var
+  dev, resText, sW, sH, rateStr: string;
+  p, pX, w, h: Integer;
+  rateVal: Double;
+  fs: TFormatSettings;
+begin
+  dev := GetSelectedDisplayName();
+  if dev = '' then Exit();
+
+  w := 1920;
+  h := 1080;
+  if Assigned(FCmbResolution) then
+  begin
+    resText := FCmbResolution.Text;
+    p := Pos('(', resText);
+    if p > 0 then resText := Trim(Copy(resText, 1, p - 1));
+    pX := Pos('×', resText);
+    if pX = 0 then pX := Pos('x', resText);
+    if pX > 0 then
+    begin
+      sW := Trim(Copy(resText, 1, pX - 1));
+      sH := Trim(Copy(resText, pX + 1, Length(resText)));
+      w := StrToIntDef(sW, 1920);
+      h := StrToIntDef(sH, 1080);
+    end;
+  end;
+
+  rateVal := 60.0;
+  if Assigned(FCmbRefreshRate) and (FCmbRefreshRate.Text <> '') then
+  begin
+    rateStr := FCmbRefreshRate.Text;
+    p := Pos(' ', rateStr);
+    if p > 0 then rateStr := Copy(rateStr, 1, p - 1);
+    fs.DecimalSeparator := '.';
+    if not TryStrToFloat(rateStr, rateVal, fs) then
+    begin
+      fs.DecimalSeparator := ',';
+      TryStrToFloat(rateStr, rateVal, fs);
+    end;
+  end;
+
+  if DisplayService().SetMode(dev, w, h, rateVal) then
+  begin
+    if FSettings <> nil then
+    begin
+      FSettings.Resolution := IntToStr(w) + 'x' + IntToStr(h);
+      FSettings.RefreshRate := Round(rateVal);
+      FSettings.Save();
+    end;
+  end;
+
+  RefreshDisplayUI();
+end;
+
+procedure TConfigSamaWindow.RefreshDisplayUI();
+var
+  outputs: TDisplayOutputArray;
+  primary: TDisplayOutput;
+  outNames, resItems, rateItems: TStringList;
+  i, j, k, selOutIdx, curResIdx, curRateIdx: Integer;
+  resLabel, rateLabel, infoStr, selDevName: string;
+  foundRes: Boolean;
+begin
+  outputs := DisplayService().QueryOutputs();
+  if Length(outputs) = 0 then Exit();
+
+  selDevName := GetSelectedDisplayName();
+  primary := DisplayService().GetOutput(selDevName);
+  if primary.Name = '' then
+    primary := DisplayService().GetPrimaryOutput();
+
+  FUpdatingControls := True;
+  try
+    // 1. Populate Display combobox
+    if Assigned(FCmbDisplay) then
+    begin
+      outNames := TStringList.Create();
+      try
+        selOutIdx := 0;
+        for i := 0 to High(outputs) do
+        begin
+          if outputs[i].IsConnected then
+          begin
+            if outputs[i].IsPrimary then
+              outNames.Add(outputs[i].Name + ' (Primary)')
+            else
+              outNames.Add(outputs[i].Name);
+            if SameText(outputs[i].Name, primary.Name) then
+              selOutIdx := outNames.Count - 1;
+          end;
+        end;
+        if outNames.Count = 0 then
+          outNames.Add('Default Screen');
+
+        FCmbDisplay.Clear();
+        for k := 0 to outNames.Count - 1 do
+          FCmbDisplay.AddItem(outNames[k]);
+        if (selOutIdx >= 0) and (selOutIdx < FCmbDisplay.ItemCount) then
+          FCmbDisplay.SelectedIndex := selOutIdx;
+      finally
+        outNames.Free();
+      end;
+    end;
+
+    // 2. Brightness Slider
+    if Assigned(FSldBrightness) and (primary.BrightnessPercent > 0) then
+      FSldBrightness.Value := primary.BrightnessPercent;
+
+    // 3. Populate Resolutions combobox
+    if Assigned(FCmbResolution) then
+    begin
+      resItems := TStringList.Create();
+      try
+        curResIdx := -1;
+        for i := 0 to High(primary.Modes) do
+        begin
+          resLabel := IntToStr(primary.Modes[i].Width) + ' × ' + IntToStr(primary.Modes[i].Height);
+          if primary.Modes[i].IsPreferred then
+            resLabel := resLabel + ' (Preferred)'
+          else if (primary.Modes[i].Width = primary.CurrentWidth) and (primary.Modes[i].Height = primary.CurrentHeight) then
+            resLabel := resLabel + ' (Current)';
+
+          resItems.Add(resLabel);
+          if (primary.Modes[i].Width = primary.CurrentWidth) and (primary.Modes[i].Height = primary.CurrentHeight) and (curResIdx < 0) then
+            curResIdx := resItems.Count - 1;
+        end;
+
+        if resItems.Count > 0 then
+        begin
+          FCmbResolution.Clear();
+          for k := 0 to resItems.Count - 1 do
+            FCmbResolution.AddItem(resItems[k]);
+          if (curResIdx >= 0) and (curResIdx < FCmbResolution.ItemCount) then
+            FCmbResolution.SelectedIndex := curResIdx
+          else
+            FCmbResolution.SelectedIndex := 0;
+        end;
+      finally
+        resItems.Free();
+      end;
+    end;
+
+    // 4. Populate Refresh Rate combobox
+    if Assigned(FCmbRefreshRate) then
+    begin
+      rateItems := TStringList.Create();
+      try
+        curRateIdx := -1;
+        foundRes := False;
+        for i := 0 to High(primary.Modes) do
+        begin
+          if (primary.Modes[i].Width = primary.CurrentWidth) and (primary.Modes[i].Height = primary.CurrentHeight) then
+          begin
+            foundRes := True;
+            for j := 0 to High(primary.Modes[i].Rates) do
+            begin
+              rateLabel := Format('%.2f Hz', [primary.Modes[i].Rates[j]]);
+              rateItems.Add(rateLabel);
+              if Abs(primary.Modes[i].Rates[j] - primary.CurrentRate) < 0.05 then
+                curRateIdx := rateItems.Count - 1;
+            end;
+            Break;
+          end;
+        end;
+
+        if not foundRes or (rateItems.Count = 0) then
+        begin
+          rateItems.Add('60.00 Hz');
+          rateItems.Add('75.00 Hz');
+          rateItems.Add('120.00 Hz');
+          curRateIdx := 0;
+        end;
+
+        FCmbRefreshRate.Clear();
+        for k := 0 to rateItems.Count - 1 do
+          FCmbRefreshRate.AddItem(rateItems[k]);
+        if (curRateIdx >= 0) and (curRateIdx < FCmbRefreshRate.ItemCount) then
+          FCmbRefreshRate.SelectedIndex := curRateIdx
+        else
+          FCmbRefreshRate.SelectedIndex := 0;
+      finally
+        rateItems.Free();
+      end;
+    end;
+
+    // 5. Update rotation buttons
+    UpdateRotationButtonStates(primary.CurrentRotation);
+
+    // 6. Scale control
+    if Assigned(FSegScale) and (FSettings <> nil) then
+    begin
+      case FSettings.Scale of
+        100: FSegScale.SelectedIndex := 0;
+        125: FSegScale.SelectedIndex := 1;
+        150: FSegScale.SelectedIndex := 2;
+        175: FSegScale.SelectedIndex := 3;
+        200: FSegScale.SelectedIndex := 4;
+        else FSegScale.SelectedIndex := 0;
+      end;
+    end;
+
+    // 7. Status info label
+    if Assigned(FLblDisplayInfo) then
+    begin
+      infoStr := primary.Name;
+      if primary.CurrentWidth > 0 then
+        infoStr := infoStr + ' • ' + IntToStr(primary.CurrentWidth) + ' × ' + IntToStr(primary.CurrentHeight);
+      if primary.CurrentRate > 0 then
+        infoStr := infoStr + Format(' @ %.2f Hz', [primary.CurrentRate]);
+      if primary.CurrentRotation <> '' then
+        infoStr := infoStr + ' (' + UpCase(primary.CurrentRotation[1]) + Copy(primary.CurrentRotation, 2, Length(primary.CurrentRotation)) + ')';
+      FLblDisplayInfo.Text := infoStr;
+    end;
+  finally
+    FUpdatingControls := False;
+  end;
+
+  Invalidate();
+end;
+
+procedure TConfigSamaWindow.HandleWiredToggle(Sender: TFtSwitch; AToggled: Boolean);
+begin
+  if FUpdatingControls then Exit();
+  WiredService().SetWiredEnabled(AToggled);
+  RefreshWiredUI();
+end;
+
+procedure TConfigSamaWindow.HandleWiredRefresh(Sender: TFtButton);
+begin
+  RefreshWiredUI();
+end;
+
+procedure TConfigSamaWindow.HandleWiredConnectClick(Sender: TFtButton);
+var
+  primary: TWiredInterface;
+begin
+  primary := WiredService().GetPrimaryInterface();
+  if primary.IsConnected then
+    WiredService().Disconnect(primary.Device)
+  else
+    WiredService().Connect(primary.Device);
+  RefreshWiredUI();
+end;
+
+procedure TConfigSamaWindow.RefreshWiredUI();
+var
+  isWiredOn: Boolean;
+  primary: TWiredInterface;
+  speedStr, ipStr, devTitle: string;
+begin
+  isWiredOn := WiredService().IsWiredEnabled();
+  if Assigned(FSwWired) then
+    FSwWired.Checked := isWiredOn;
+
+  if not isWiredOn then
+  begin
+    if Assigned(FLblWiredStatus) then
+      FLblWiredStatus.Text := 'Wired is turned off';
+    if Assigned(FContainerWiredDisabled) then
+      FContainerWiredDisabled.Visible := True;
+    if Assigned(FCardWired) then
+      FCardWired.Visible := False;
+    Invalidate();
+    Exit();
+  end;
+
+  if Assigned(FContainerWiredDisabled) then
+    FContainerWiredDisabled.Visible := False;
+  if Assigned(FCardWired) then
+    FCardWired.Visible := True;
+
+  primary := WiredService().GetPrimaryInterface();
+
+  if primary.Device <> '' then
+  begin
+    devTitle := 'Ethernet (' + primary.Device + ')';
+    if primary.ConnectionName <> '' then
+      devTitle := primary.ConnectionName + ' (' + primary.Device + ')';
+
+    if Assigned(FLblWiredDevice) then
+      FLblWiredDevice.Text := devTitle;
+
+    if primary.IsConnected then
+    begin
+      if Assigned(FLblWiredStatus) then
+        FLblWiredStatus.Text := 'Connected';
+      if Assigned(FBtnWiredConnect) then
+      begin
+        FBtnWiredConnect.Caption := 'Disconnect';
+        FBtnWiredConnect.Visible := True;
+      end;
+    end
+    else
+    begin
+      if primary.Carrier then
+      begin
+        if Assigned(FLblWiredStatus) then
+          FLblWiredStatus.Text := 'Cable plugged in • Disconnected';
+        if Assigned(FBtnWiredConnect) then
+        begin
+          FBtnWiredConnect.Caption := 'Connect';
+          FBtnWiredConnect.Visible := True;
+        end;
+      end
+      else
+      begin
+        if Assigned(FLblWiredStatus) then
+          FLblWiredStatus.Text := 'Cable unplugged';
+        if Assigned(FBtnWiredConnect) then
+          FBtnWiredConnect.Visible := False;
+      end;
+    end;
+
+    // Speed & Duplex
+    if primary.Speed > 0 then
+    begin
+      speedStr := IntToStr(primary.Speed) + ' Mb/s';
+      if primary.Duplex <> '' then
+        speedStr := speedStr + ' (' + UpCase(primary.Duplex[1]) + Copy(primary.Duplex, 2, Length(primary.Duplex)) + ' Duplex)';
+    end
+    else if not primary.Carrier then
+      speedStr := 'Cable unplugged'
+    else
+      speedStr := 'Unknown link speed';
+
+    if Assigned(FLblWiredSpeed) then
+      FLblWiredSpeed.Text := speedStr;
+
+    // IPv4 & Gateway
+    if primary.IpAddress <> '' then
+    begin
+      ipStr := primary.IpAddress;
+      if primary.Gateway <> '' then
+        ipStr := ipStr + ' (Gateway: ' + primary.Gateway + ')';
+    end
+    else
+      ipStr := 'Not assigned';
+
+    if Assigned(FLblWiredIp) then
+      FLblWiredIp.Text := ipStr;
+
+    // DNS
+    if Assigned(FLblWiredDns) then
+    begin
+      if primary.Dns <> '' then
+        FLblWiredDns.Text := primary.Dns
+      else
+        FLblWiredDns.Text := 'Not assigned';
+    end;
+
+    // MAC
+    if Assigned(FLblWiredMac) then
+    begin
+      if primary.HwAddr <> '' then
+        FLblWiredMac.Text := primary.HwAddr
+      else
+        FLblWiredMac.Text := 'Not available';
+    end;
+  end
+  else
+  begin
+    if Assigned(FLblWiredStatus) then
+      FLblWiredStatus.Text := 'No wired network adapter detected';
+    if Assigned(FLblWiredDevice) then
+      FLblWiredDevice.Text := 'No Ethernet interface';
+    if Assigned(FLblWiredSpeed) then
+      FLblWiredSpeed.Text := 'Not available';
+    if Assigned(FLblWiredIp) then
+      FLblWiredIp.Text := 'Not available';
+    if Assigned(FLblWiredDns) then
+      FLblWiredDns.Text := 'Not available';
+    if Assigned(FLblWiredMac) then
+      FLblWiredMac.Text := 'Not available';
+    if Assigned(FBtnWiredConnect) then
+      FBtnWiredConnect.Visible := False;
+  end;
+
+  Invalidate();
 end;
 
 procedure TConfigSamaWindow.HandleScaleChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);

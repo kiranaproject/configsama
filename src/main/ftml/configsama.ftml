@@ -776,53 +776,104 @@ Window {
         visible: false;
         drawFrame: false;
 
+        // Card 1: Master Toggle & Status
         Container {
-          id: cardWired;
+          id: cardWiredToggle;
           styleClass: "settings-card";
           anchors.top: parent.top;
-          anchors.topMargin: 8;
+          anchors.topMargin: 4;
           anchors.left: parent.left;
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 156;
+          height: 64;
           drawFrame: false;
 
+          Text {
+            id: lblWiredTitle;
+            anchors.top: parent.top;
+            anchors.topMargin: 14;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Wired";
+            font: "Sans:bold 13";
+            selectable: false;
+          }
+
+          Text {
+            id: lblWiredStatus;
+            anchors.top: lblWiredTitle.bottom;
+            anchors.topMargin: 2;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            text: "Connected";
+            font: "Sans 11";
+            selectable: false;
+          }
+
+          Button {
+            id: btnWiredRefresh;
+            text: "Refresh";
+            width: 76;
+            height: 26;
+            anchors.right: swWired.left;
+            anchors.rightMargin: 12;
+            anchors.verticalCenter: parent.verticalCenter;
+          }
+
+          Switch {
+            id: swWired;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 48;
+            height: 26;
+            checked: true;
+          }
+        }
+
+        // Card 2: Disabled message
+        Container {
+          id: containerWiredDisabled;
+          anchors.top: cardWiredToggle.bottom;
+          anchors.topMargin: 36;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 80;
+          visible: false;
+          drawFrame: false;
+
+          Text {
+            id: lblWiredDisabled;
+            anchors.centerIn: parent;
+            text: "Wired connection is turned off";
+            font: "Sans 13";
+            selectable: false;
+          }
+        }
+
+        // Card 3: Wired Connection Details
+        Container {
+          id: cardWired;
+          styleClass: "settings-card";
+          anchors.top: cardWiredToggle.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 242;
+          drawFrame: false;
+
+          // Row 0: Device & Connect/Disconnect
           Container {
-            id: rowWiredStatus;
+            id: rowWiredDev;
             anchors.top: parent.top;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 52;
-            padding: 0;
-            drawFrame: false;
-
-            Text {
-              anchors.left: parent.left;
-              anchors.leftMargin: 18;
-              anchors.verticalCenter: parent.verticalCenter;
-              text: "Wired Connection";
-              font: "Sans:bold 12";
-              selectable: false;
-            }
-
-            Switch {
-              id: swWired;
-              anchors.right: parent.right;
-              anchors.rightMargin: 18;
-              anchors.verticalCenter: parent.verticalCenter;
-              width: 48;
-              height: 26;
-              checked: true;
-            }
-          }
-
-          Container {
-            id: rowWiredSpeed;
-            anchors.top: rowWiredStatus.bottom;
-            anchors.left: parent.left;
-            anchors.right: parent.right;
-            height: 52;
+            height: 48;
             padding: 0;
             drawFrame: false;
 
@@ -837,21 +888,45 @@ Window {
             }
 
             Text {
+              id: lblWiredDevice;
               anchors.left: parent.left;
               anchors.leftMargin: 48;
               anchors.verticalCenter: parent.verticalCenter;
-              text: "Connected — 1000 Mb/s (Full Duplex)";
-              font: "Sans 12";
+              text: "Ethernet (enp2s0)";
+              font: "Sans:bold 12";
               selectable: false;
+            }
+
+            Button {
+              id: btnWiredConnect;
+              text: "Disconnect";
+              width: 96;
+              height: 26;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
             }
           }
 
           Container {
-            id: rowWiredHw;
-            anchors.top: rowWiredSpeed.bottom;
+            id: divWired0;
+            styleClass: "card-divider";
+            anchors.top: rowWiredDev.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 1: Link Speed
+          Container {
+            id: rowWiredSpeed;
+            anchors.top: divWired0.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
-            height: 52;
+            height: 48;
             padding: 0;
             drawFrame: false;
 
@@ -859,7 +934,151 @@ Window {
               anchors.left: parent.left;
               anchors.leftMargin: 18;
               anchors.verticalCenter: parent.verticalCenter;
-              text: "IPv4: 192.168.1.100  •  Gateway: 192.168.1.1";
+              text: "Link Speed";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblWiredSpeed;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 280;
+              height: 24;
+              text: "1000 Mb/s (Full Duplex)";
+              font: "Sans 11";
+              selectable: false;
+            }
+          }
+
+          Container {
+            id: divWired1;
+            styleClass: "card-divider";
+            anchors.top: rowWiredSpeed.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: IPv4 Address & Gateway
+          Container {
+            id: rowWiredIp;
+            anchors.top: divWired1.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "IPv4 Address";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblWiredIp;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 280;
+              height: 24;
+              text: "192.168.1.100 (Gateway: 192.168.1.1)";
+              font: "Sans 11";
+              selectable: false;
+            }
+          }
+
+          Container {
+            id: divWired2;
+            styleClass: "card-divider";
+            anchors.top: rowWiredIp.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: DNS
+          Container {
+            id: rowWiredDns;
+            anchors.top: divWired2.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "DNS";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblWiredDns;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 280;
+              height: 24;
+              text: "192.168.1.1";
+              font: "Sans 11";
+              selectable: false;
+            }
+          }
+
+          Container {
+            id: divWired3;
+            styleClass: "card-divider";
+            anchors.top: rowWiredDns.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 4: Hardware Address
+          Container {
+            id: rowWiredHw;
+            anchors.top: divWired3.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Hardware Address";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblWiredMac;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 280;
+              height: 24;
+              text: "00:00:00:00:00:00";
               font: "Sans 11";
               selectable: false;
             }
@@ -916,7 +1135,7 @@ Window {
             anchors.rightMargin: 12;
             anchors.verticalCenter: imgBrightnessLow.verticalCenter;
             height: 24;
-            min: 0;
+            min: 10;
             max: 100;
             value: 80;
           }
@@ -942,7 +1161,7 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 196;
+          height: 246;
           drawFrame: false;
 
           Text {
@@ -955,11 +1174,52 @@ Window {
             selectable: false;
           }
 
+          // Row 0: Display Output
+          Container {
+            id: rowDisplay;
+            anchors.top: parent.top;
+            anchors.topMargin: 38;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 48;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Display";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            ComboBox {
+              id: cmbDisplay;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 220;
+              height: 30;
+              items: "eDP-1";
+            }
+          }
+
+          Container {
+            id: divScreen0;
+            styleClass: "card-divider";
+            anchors.top: rowDisplay.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
           // Row 1: Resolution
           Container {
             id: rowResolution;
-            anchors.top: parent.top;
-            anchors.topMargin: 38;
+            anchors.top: divScreen0.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 48;
@@ -986,6 +1246,7 @@ Window {
           }
 
           Container {
+            id: divScreen1;
             styleClass: "card-divider";
             anchors.top: rowResolution.bottom;
             anchors.left: parent.left;
@@ -999,8 +1260,7 @@ Window {
           // Row 2: Refresh Rate
           Container {
             id: rowRefreshRate;
-            anchors.top: rowResolution.bottom;
-            anchors.topMargin: 1;
+            anchors.top: divScreen1.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 48;
@@ -1027,6 +1287,7 @@ Window {
           }
 
           Container {
+            id: divScreen2;
             styleClass: "card-divider";
             anchors.top: rowRefreshRate.bottom;
             anchors.left: parent.left;
@@ -1040,8 +1301,7 @@ Window {
           // Row 3: Rotation
           Container {
             id: rowRotation;
-            anchors.top: rowRefreshRate.bottom;
-            anchors.topMargin: 1;
+            anchors.top: divScreen2.bottom;
             anchors.left: parent.left;
             anchors.right: parent.right;
             height: 48;
@@ -1130,6 +1390,40 @@ Window {
             height: 36;
             items: "100%, 125%, 150%, 175%, 200%";
             selectedIndex: 0;
+          }
+        }
+
+        // Card 4: Display Status & Apply
+        Container {
+          id: cardDisplayStatus;
+          styleClass: "settings-card";
+          anchors.top: cardScale.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 52;
+          drawFrame: false;
+
+          Text {
+            id: lblDisplayInfo;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
+            text: "Display settings active";
+            font: "Sans 11";
+            selectable: false;
+          }
+
+          Button {
+            id: btnDisplayApply;
+            text: "Apply";
+            width: 86;
+            height: 28;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            anchors.verticalCenter: parent.verticalCenter;
           }
         }
       }

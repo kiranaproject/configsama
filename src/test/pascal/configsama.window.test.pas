@@ -11,7 +11,8 @@ uses
   Classes, SysUtils, fpcunit, testregistry,
   ftpas, ftpas.types, ftpas.api, ftpas.app, ftpas.widget, ftpas.controls,
   ftpas.layouts, ftpas.views, ftpas.ftml,
-  ConfigSama.Settings, ConfigSama.Window;
+  ConfigSama.Settings, ConfigSama.Window,
+  ConfigSama.Wlan, ConfigSama.Wired, ConfigSama.Display;
 
 type
   { TConfigWindowTest }
@@ -28,6 +29,8 @@ type
     procedure TestCategoryNavigation();
     procedure TestSearchFiltering();
     procedure TestDarkModeInteraction();
+    procedure TestWiredControlsAndToggle();
+    procedure TestDisplayControlsAndInteraction();
   end;
 
 implementation
@@ -47,6 +50,11 @@ begin
       Fail('FtApp.Initialize failed: ' + E.Message);
   end;
 
+  // Enforce mock mode during tests to isolate from live X11 and network adapters
+  DisplayService().EnableMockMode(True);
+  WiredService().EnableMockMode(True);
+  WlanService().EnableMockMode(True);
+
   FTestIniPath := Format('/tmp/configsama_win_test_%d_%d.ini', [GetProcessID(), Random(100000)]);
   FWindow := TConfigSamaWindow.Create(FTestIniPath);
 end;
@@ -60,6 +68,10 @@ begin
   end;
   if (FTestIniPath <> '') and FileExists(FTestIniPath) then
     DeleteFile(FTestIniPath);
+
+  DisplayService().EnableMockMode(False);
+  WiredService().EnableMockMode(False);
+  WlanService().EnableMockMode(False);
 end;
 
 procedure TConfigWindowTest.TestWindowCreationAndFTMLResolution();
@@ -130,6 +142,46 @@ begin
   // Revert back
   FWindow.SwDarkMode.Checked := initialMode;
   AssertEquals('Settings DarkMode reverted', initialMode, FWindow.Settings.DarkMode);
+end;
+
+procedure TConfigWindowTest.TestWiredControlsAndToggle();
+begin
+  FWindow.SelectCategoryByName('Wired');
+  AssertEquals('Section title updated to Wired', 'Wired', FWindow.SectionTitle.Text);
+
+  AssertNotNull('SwWired must exist', FWindow.SwWired);
+  AssertNotNull('LblWiredStatus must exist', FWindow.LblWiredStatus);
+
+  // Toggle wired off
+  FWindow.SwWired.Checked := False;
+  AssertFalse('Wired switch must be unchecked', FWindow.SwWired.Checked);
+  AssertEquals('Wired status must show turned off', 'Wired is turned off', FWindow.LblWiredStatus.Text);
+
+  // Toggle wired back on
+  FWindow.SwWired.Checked := True;
+  AssertTrue('Wired switch must be checked', FWindow.SwWired.Checked);
+end;
+
+procedure TConfigWindowTest.TestDisplayControlsAndInteraction();
+begin
+  FWindow.SelectCategoryByName('Displays');
+  AssertEquals('Section title updated to Displays', 'Displays', FWindow.SectionTitle.Text);
+
+  AssertNotNull('CmbDisplay must exist', FWindow.CmbDisplay);
+  AssertNotNull('CmbResolution must exist', FWindow.CmbResolution);
+  AssertNotNull('CmbRefreshRate must exist', FWindow.CmbRefreshRate);
+  AssertNotNull('SldBrightness must exist', FWindow.SldBrightness);
+  AssertNotNull('BtnDisplayApply must exist', FWindow.BtnDisplayApply);
+  AssertNotNull('LblDisplayInfo must exist', FWindow.LblDisplayInfo);
+  AssertNotNull('SegScale must exist', FWindow.SegScale);
+
+  // Test brightness slider interaction
+  FWindow.SldBrightness.Value := 75.0;
+  AssertEquals('Brightness value must be 75', 75, Round(FWindow.SldBrightness.Value));
+
+  // Test scale segmented control
+  FWindow.SegScale.SelectedIndex := 2; // 150%
+  AssertEquals('Settings Scale updated to 150', 150, FWindow.Settings.Scale);
 end;
 
 initialization
