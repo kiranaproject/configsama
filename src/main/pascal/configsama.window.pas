@@ -230,6 +230,18 @@ type
     FTxtAboutKernel: TFtEntry;
     FTxtAboutCpu: TFtEntry;
     FTxtAboutMem: TFtEntry;
+    FImgAboutLogo: TFtImage;
+    FLblAboutOsTitle: TFtLabel;
+    FLblAboutOsSubtitle: TFtLabel;
+    FLblAboutDeviceName: TFtLabel;
+    FLblAboutHardware: TFtLabel;
+    FLblAboutCpu: TFtLabel;
+    FLblAboutMem: TFtLabel;
+    FLblAboutDisk: TFtLabel;
+    FLblAboutOs: TFtLabel;
+    FLblAboutWindowing: TFtLabel;
+    FLblAboutDesktopSuite: TFtLabel;
+    FLblAboutKernel: TFtLabel;
 
     procedure SetupUI();
     procedure PopulateControls();
@@ -1198,26 +1210,77 @@ begin
   end;
 
   // About controls
-  w := FindWidget('txtAboutOs');
-  if w is TFtEntry then FTxtAboutOs := TFtEntry(w);
+  w := FindWidget('imgAboutLogo');
+  if w is TFtImage then FImgAboutLogo := TFtImage(w);
 
-  w := FindWidget('txtAboutShell');
-  if w is TFtEntry then FTxtAboutShell := TFtEntry(w);
+  w := FindWidget('lblAboutOsTitle');
+  if w is TFtLabel then FLblAboutOsTitle := TFtLabel(w);
 
-  w := FindWidget('txtAboutWm');
-  if w is TFtEntry then FTxtAboutWm := TFtEntry(w);
+  w := FindWidget('lblAboutOsSubtitle');
+  if w is TFtLabel then FLblAboutOsSubtitle := TFtLabel(w);
 
-  w := FindWidget('txtAboutToolkit');
-  if w is TFtEntry then FTxtAboutToolkit := TFtEntry(w);
+  w := FindWidget('lblAboutDeviceName');
+  if w is TFtLabel then
+  begin
+    FLblAboutDeviceName := TFtLabel(w);
+    FLblAboutDeviceName.Alignment := ftaRight;
+  end;
 
-  w := FindWidget('txtAboutKernel');
-  if w is TFtEntry then FTxtAboutKernel := TFtEntry(w);
+  w := FindWidget('lblAboutHardware');
+  if w is TFtLabel then
+  begin
+    FLblAboutHardware := TFtLabel(w);
+    FLblAboutHardware.Alignment := ftaRight;
+  end;
 
-  w := FindWidget('txtAboutCpu');
-  if w is TFtEntry then FTxtAboutCpu := TFtEntry(w);
+  w := FindWidget('lblAboutCpu');
+  if w is TFtLabel then
+  begin
+    FLblAboutCpu := TFtLabel(w);
+    FLblAboutCpu.Alignment := ftaRight;
+  end;
 
-  w := FindWidget('txtAboutMem');
-  if w is TFtEntry then FTxtAboutMem := TFtEntry(w);
+  w := FindWidget('lblAboutMem');
+  if w is TFtLabel then
+  begin
+    FLblAboutMem := TFtLabel(w);
+    FLblAboutMem.Alignment := ftaRight;
+  end;
+
+  w := FindWidget('lblAboutDisk');
+  if w is TFtLabel then
+  begin
+    FLblAboutDisk := TFtLabel(w);
+    FLblAboutDisk.Alignment := ftaRight;
+  end;
+
+  w := FindWidget('lblAboutOs');
+  if w is TFtLabel then
+  begin
+    FLblAboutOs := TFtLabel(w);
+    FLblAboutOs.Alignment := ftaRight;
+  end;
+
+  w := FindWidget('lblAboutWindowing');
+  if w is TFtLabel then
+  begin
+    FLblAboutWindowing := TFtLabel(w);
+    FLblAboutWindowing.Alignment := ftaRight;
+  end;
+
+  w := FindWidget('lblAboutDesktopSuite');
+  if w is TFtLabel then
+  begin
+    FLblAboutDesktopSuite := TFtLabel(w);
+    FLblAboutDesktopSuite.Alignment := ftaRight;
+  end;
+
+  w := FindWidget('lblAboutKernel');
+  if w is TFtLabel then
+  begin
+    FLblAboutKernel := TFtLabel(w);
+    FLblAboutKernel.Alignment := ftaRight;
+  end;
 end;
 
 procedure TConfigSamaWindow.PopulateControls();
@@ -1369,17 +1432,32 @@ begin
       FCmbEditor.Text := FSettings.DefaultTextEditor;
 
     // About
-    if Assigned(FTxtAboutOs) then
-      FTxtAboutOs.Text := FSettings.GetOsName() + ' ' + FSettings.GetOsVersion();
+    if Assigned(FLblAboutDeviceName) then
+      FLblAboutDeviceName.Text := FSettings.GetDeviceName();
 
-    if Assigned(FTxtAboutKernel) then
-      FTxtAboutKernel.Text := FSettings.GetKernelVersion();
+    if Assigned(FLblAboutHardware) then
+      FLblAboutHardware.Text := FSettings.GetHardwareModel();
 
-    if Assigned(FTxtAboutCpu) then
-      FTxtAboutCpu.Text := FSettings.GetCpuModel();
+    if Assigned(FLblAboutCpu) then
+      FLblAboutCpu.Text := FSettings.GetCpuModel();
 
-    if Assigned(FTxtAboutMem) then
-      FTxtAboutMem.Text := FSettings.GetMemoryTotal();
+    if Assigned(FLblAboutMem) then
+      FLblAboutMem.Text := FSettings.GetMemoryTotal();
+
+    if Assigned(FLblAboutDisk) then
+      FLblAboutDisk.Text := FSettings.GetDiskCapacity();
+
+    if Assigned(FLblAboutOs) then
+      FLblAboutOs.Text := FSettings.GetOsName() + ' ' + FSettings.GetOsVersion();
+
+    if Assigned(FLblAboutWindowing) then
+      FLblAboutWindowing.Text := FSettings.GetWindowingSystem();
+
+    if Assigned(FLblAboutDesktopSuite) then
+      FLblAboutDesktopSuite.Text := FSettings.GetDesktopSuite();
+
+    if Assigned(FLblAboutKernel) then
+      FLblAboutKernel.Text := FSettings.GetKernelVersion();
   finally
     FUpdatingControls := False;
   end;
@@ -1555,6 +1633,9 @@ begin
   if w is TFtButton then TFtButton(w).SetIconSVG(FtApp.GetIconSvg('rotate-180', FtApp.DarkMode));
   w := FindWidget('btnRotate270');
   if w is TFtButton then TFtButton(w).SetIconSVG(FtApp.GetIconSvg('rotate-270', FtApp.DarkMode));
+
+  if FImgAboutLogo <> nil then
+    FImgAboutLogo.LoadSVGString(FtApp.GetIconSvg('distro-logo', FtApp.DarkMode));
 
   if FCategoryTree <> nil then FCategoryTree.Invalidate();
 end;

@@ -3365,8 +3365,9 @@ Window {
         visible: false;
         drawFrame: false;
 
+        // Hero Card: Distro Emblem & OS Title
         Container {
-          id: cardAbout;
+          id: cardAboutHero;
           styleClass: "settings-card";
           anchors.top: parent.top;
           anchors.topMargin: 8;
@@ -3374,88 +3375,468 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 380;
+          height: 88;
           drawFrame: false;
 
-          FormGrid {
-            anchors.fill: parent;
+          Image {
+            id: imgAboutLogo;
+            anchors.left: parent.left;
+            anchors.leftMargin: 24;
+            anchors.verticalCenter: parent.verticalCenter;
+            width: 56;
+            height: 56;
+          }
+
+          Text {
+            id: lblAboutOsTitle;
+            anchors.left: imgAboutLogo.right;
             anchors.leftMargin: 20;
-            anchors.topMargin: 16;
-            anchors.rightMargin: 20;
-            anchors.bottomMargin: 16;
+            anchors.top: parent.top;
+            anchors.topMargin: 20;
+            text: "Samarinda OS";
+            font: "Sans:bold 18";
+            selectable: false;
+          }
 
-            FormSection { title: "System Details"; }
-            FormRow {
-              label: "Operating System";
-              Entry {
-                id: txtAboutOs;
-                width: 300;
-                height: 30;
-                text: "Samarinda OS 1.0 (Kutai Edition)";
-                readOnly: true;
-              }
-            }
-            FormRow {
-              label: "Desktop Shell";
-              Entry {
-                id: txtAboutShell;
-                width: 300;
-                height: 30;
-                text: "shellsama (Native X11 Shell)";
-                readOnly: true;
-              }
-            }
-            FormRow {
-              label: "Window Manager";
-              Entry {
-                id: txtAboutWm;
-                width: 300;
-                height: 30;
-                text: "wmsama (Compositing Window Manager)";
-                readOnly: true;
-              }
-            }
-            FormRow {
-              label: "Toolkit";
-              Entry {
-                id: txtAboutToolkit;
-                width: 300;
-                height: 30;
-                text: "Floria Toolkit 0.0.1 (libft / ftpas)";
-                readOnly: true;
-              }
+          Text {
+            id: lblAboutOsSubtitle;
+            anchors.left: lblAboutOsTitle.left;
+            anchors.top: lblAboutOsTitle.bottom;
+            anchors.topMargin: 4;
+            text: "Version 1.0 (Kutai Edition) • 64-bit";
+            font: "Sans 10";
+            opacity: 0.65;
+            selectable: false;
+          }
+        }
+
+        // Hardware Information Section
+        Text {
+          id: lblAboutHwSection;
+          anchors.top: cardAboutHero.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 38;
+          text: "Hardware Information";
+          font: "Sans:bold 12";
+          selectable: false;
+        }
+
+        Container {
+          id: cardAboutHardware;
+          styleClass: "settings-card";
+          anchors.top: lblAboutHwSection.bottom;
+          anchors.topMargin: 6;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 194;
+          drawFrame: false;
+
+          // Row 0: Device Name
+          Container {
+            id: rowAboutDevice;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Device Name";
+              font: "Sans 12";
+              selectable: false;
             }
 
-            FormSection { title: "Hardware Information"; }
-            FormRow {
-              label: "Linux Kernel";
-              Entry {
-                id: txtAboutKernel;
-                width: 300;
-                height: 30;
-                text: "Linux";
-                readOnly: true;
-              }
+            Text {
+              id: lblAboutDeviceName;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 340;
+              height: 22;
+              text: "samarinda-desktop";
+              font: "Sans 11";
+              opacity: 0.85;
+              selectable: false;
             }
-            FormRow {
-              label: "Processor";
-              Entry {
-                id: txtAboutCpu;
-                width: 300;
-                height: 30;
-                text: "x86_64 Processor";
-                readOnly: true;
-              }
+          }
+
+          Container {
+            id: divAboutHw0;
+            styleClass: "card-divider";
+            anchors.top: rowAboutDevice.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 1: Hardware Model
+          Container {
+            id: rowAboutHardware;
+            anchors.top: divAboutHw0.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Hardware Model";
+              font: "Sans 12";
+              selectable: false;
             }
-            FormRow {
-              label: "System Memory";
-              Entry {
-                id: txtAboutMem;
-                width: 300;
-                height: 30;
-                text: "8.0 GiB";
-                readOnly: true;
-              }
+
+            Text {
+              id: lblAboutHardware;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 340;
+              height: 22;
+              text: "Standard PC";
+              font: "Sans 11";
+              opacity: 0.85;
+              selectable: false;
+            }
+          }
+
+          Container {
+            id: divAboutHw1;
+            styleClass: "card-divider";
+            anchors.top: rowAboutHardware.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Processor
+          Container {
+            id: rowAboutCpu;
+            anchors.top: divAboutHw1.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Processor";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblAboutCpu;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 340;
+              height: 22;
+              text: "x86_64 Processor";
+              font: "Sans 11";
+              opacity: 0.85;
+              selectable: false;
+            }
+          }
+
+          Container {
+            id: divAboutHw2;
+            styleClass: "card-divider";
+            anchors.top: rowAboutCpu.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: Memory
+          Container {
+            id: rowAboutMem;
+            anchors.top: divAboutHw2.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Memory";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblAboutMem;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 340;
+              height: 22;
+              text: "8.0 GiB";
+              font: "Sans 11";
+              opacity: 0.85;
+              selectable: false;
+            }
+          }
+
+          Container {
+            id: divAboutHw3;
+            styleClass: "card-divider";
+            anchors.top: rowAboutMem.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 4: Disk Capacity
+          Container {
+            id: rowAboutDisk;
+            anchors.top: divAboutHw3.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Disk Capacity";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblAboutDisk;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 340;
+              height: 22;
+              text: "128.0 GB";
+              font: "Sans 11";
+              opacity: 0.85;
+              selectable: false;
+            }
+          }
+        }
+
+        // Software Details Section
+        Text {
+          id: lblAboutSwSection;
+          anchors.top: cardAboutHardware.bottom;
+          anchors.topMargin: 14;
+          anchors.left: parent.left;
+          anchors.leftMargin: 38;
+          text: "Software Details";
+          font: "Sans:bold 12";
+          selectable: false;
+        }
+
+        Container {
+          id: cardAboutSoftware;
+          styleClass: "settings-card";
+          anchors.top: lblAboutSwSection.bottom;
+          anchors.topMargin: 6;
+          anchors.left: parent.left;
+          anchors.leftMargin: 36;
+          anchors.right: parent.right;
+          anchors.rightMargin: 36;
+          height: 155;
+          drawFrame: false;
+
+          // Row 0: OS Name
+          Container {
+            id: rowAboutOs;
+            anchors.top: parent.top;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "OS Name";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblAboutOs;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 340;
+              height: 22;
+              text: "Samarinda OS 1.0 (Kutai Edition)";
+              font: "Sans 11";
+              opacity: 0.85;
+              selectable: false;
+            }
+          }
+
+          Container {
+            id: divAboutSw0;
+            styleClass: "card-divider";
+            anchors.top: rowAboutOs.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 1: Windowing System
+          Container {
+            id: rowAboutWindowing;
+            anchors.top: divAboutSw0.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Windowing System";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblAboutWindowing;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 340;
+              height: 22;
+              text: "X11 (Native XCB)";
+              font: "Sans 11";
+              opacity: 0.85;
+              selectable: false;
+            }
+          }
+
+          Container {
+            id: divAboutSw1;
+            styleClass: "card-divider";
+            anchors.top: rowAboutWindowing.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 2: Desktop Suite
+          Container {
+            id: rowAboutDesktopSuite;
+            anchors.top: divAboutSw1.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Desktop Suite";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblAboutDesktopSuite;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 340;
+              height: 22;
+              text: "shellsama & wmsama (Floria Toolkit)";
+              font: "Sans 11";
+              opacity: 0.85;
+              selectable: false;
+            }
+          }
+
+          Container {
+            id: divAboutSw2;
+            styleClass: "card-divider";
+            anchors.top: rowAboutDesktopSuite.bottom;
+            anchors.left: parent.left;
+            anchors.leftMargin: 18;
+            anchors.right: parent.right;
+            anchors.rightMargin: 18;
+            height: 1;
+            drawFrame: false;
+          }
+
+          // Row 3: Linux Kernel
+          Container {
+            id: rowAboutKernel;
+            anchors.top: divAboutSw2.bottom;
+            anchors.left: parent.left;
+            anchors.right: parent.right;
+            height: 38;
+            padding: 0;
+            drawFrame: false;
+
+            Text {
+              anchors.left: parent.left;
+              anchors.leftMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              text: "Linux Kernel";
+              font: "Sans 12";
+              selectable: false;
+            }
+
+            Text {
+              id: lblAboutKernel;
+              anchors.right: parent.right;
+              anchors.rightMargin: 18;
+              anchors.verticalCenter: parent.verticalCenter;
+              width: 340;
+              height: 22;
+              text: "Linux";
+              font: "Sans 11";
+              opacity: 0.85;
+              selectable: false;
             }
           }
         }

@@ -121,6 +121,16 @@ begin
   AssertTrue('Kernel version non empty', Length(FSettings.GetKernelVersion()) > 0);
   AssertTrue('CPU model non empty', Length(FSettings.GetCpuModel()) > 0);
   AssertTrue('Memory total non empty', Length(FSettings.GetMemoryTotal()) > 0);
+  AssertTrue('Device name non empty', Length(FSettings.GetDeviceName()) > 0);
+  AssertTrue('Hardware model non empty', Length(FSettings.GetHardwareModel()) > 0);
+  AssertTrue('Disk capacity non empty', Length(FSettings.GetDiskCapacity()) > 0);
+  AssertTrue('GPU model non empty', Length(FSettings.GetGpuModel()) > 0);
+  AssertEquals('Windowing system is X11', 'X11 (Native XCB)', FSettings.GetWindowingSystem());
+  AssertTrue('Desktop shell non empty', Length(FSettings.GetDesktopShell()) > 0);
+  AssertTrue('Window manager non empty', Length(FSettings.GetWindowManager()) > 0);
+  AssertTrue('Toolkit non empty', Length(FSettings.GetToolkit()) > 0);
+  AssertTrue('Desktop suite non empty', Length(FSettings.GetDesktopSuite()) > 0);
+  AssertTrue('OS architecture non empty', Length(FSettings.GetOsArchitecture()) > 0);
 end;
 
 initialization

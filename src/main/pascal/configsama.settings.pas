@@ -91,6 +91,16 @@ type
     function GetMemoryTotal(): string;
     function GetOsName(): string;
     function GetOsVersion(): string;
+    function GetDeviceName(): string;
+    function GetHardwareModel(): string;
+    function GetDiskCapacity(): string;
+    function GetGpuModel(): string;
+    function GetWindowingSystem(): string;
+    function GetDesktopShell(): string;
+    function GetWindowManager(): string;
+    function GetToolkit(): string;
+    function GetDesktopSuite(): string;
+    function GetOsArchitecture(): string;
 
     // Properties
     property IniPath: string read FIniPath;
@@ -553,6 +563,152 @@ end;
 function TConfigSettings.GetOsVersion(): string;
 begin
   Result := '1.0 "Kutai"';
+end;
+
+function TConfigSettings.GetDeviceName(): string;
+var
+  lines: TStringList;
+begin
+  Result := 'samarinda-desktop';
+  if FileExists('/etc/hostname') then
+  begin
+    lines := TStringList.Create();
+    try
+      lines.LoadFromFile('/etc/hostname');
+      if lines.Count > 0 then
+        Result := Trim(lines[0]);
+    finally
+      lines.Free();
+    end;
+  end;
+  if (Result = '') or (Result = 'samarinda-desktop') then
+  begin
+    if GetEnvironmentVariable('HOSTNAME') <> '' then
+      Result := GetEnvironmentVariable('HOSTNAME');
+  end;
+end;
+
+function TConfigSettings.GetHardwareModel(): string;
+var
+  vendor, product: string;
+  lines: TStringList;
+begin
+  vendor := '';
+  product := '';
+  lines := TStringList.Create();
+  try
+    if FileExists('/sys/class/dmi/id/sys_vendor') then
+    begin
+      lines.LoadFromFile('/sys/class/dmi/id/sys_vendor');
+      if lines.Count > 0 then vendor := Trim(lines[0]);
+    end;
+    if FileExists('/sys/class/dmi/id/product_name') then
+    begin
+      lines.Clear();
+      lines.LoadFromFile('/sys/class/dmi/id/product_name');
+      if lines.Count > 0 then product := Trim(lines[0]);
+    end;
+  finally
+    lines.Free();
+  end;
+
+  if (vendor <> '') and (product <> '') then
+    Result := vendor + ' ' + product
+  else if vendor <> '' then
+    Result := vendor
+  else if product <> '' then
+    Result := product
+  else
+    Result := 'Standard PC (x86_64)';
+end;
+
+function TConfigSettings.GetDiskCapacity(): string;
+var
+  sz: Int64;
+  gb: Double;
+begin
+  Result := '128.0 GB';
+  sz := DiskSize(0);
+  if sz > 0 then
+  begin
+    gb := sz / (1000.0 * 1000.0 * 1000.0);
+    Result := Format('%.1f GB', [gb]);
+  end;
+end;
+
+function TConfigSettings.GetGpuModel(): string;
+var
+  p: TProcess;
+  lines: TStringList;
+  line: string;
+  colPos: Integer;
+begin
+  Result := 'Intel Graphics';
+  p := TProcess.Create(nil);
+  try
+    p.Executable := '/bin/sh';
+    p.Parameters.Add('-c');
+    p.Parameters.Add('lspci 2>/dev/null | grep -i "vga\|3d\|display" | head -n 1');
+    p.Options := [poUsePipes, poWaitOnExit];
+    p.ShowWindow := swoNone;
+    p.Execute();
+    lines := TStringList.Create();
+    try
+      lines.LoadFromStream(p.Output);
+      if lines.Count > 0 then
+      begin
+        line := Trim(lines[0]);
+        colPos := Pos(':', line);
+        if colPos > 0 then
+        begin
+          Delete(line, 1, colPos);
+          colPos := Pos(':', line);
+          if colPos > 0 then
+            Result := Trim(Copy(line, colPos + 1, Length(line)))
+          else
+            Result := Trim(line);
+        end;
+      end;
+    finally
+      lines.Free();
+    end;
+  except
+  end;
+  p.Free();
+end;
+
+function TConfigSettings.GetWindowingSystem(): string;
+begin
+  Result := 'X11 (Native XCB)';
+end;
+
+function TConfigSettings.GetDesktopShell(): string;
+begin
+  Result := 'shellsama 0.0.1';
+end;
+
+function TConfigSettings.GetWindowManager(): string;
+begin
+  Result := 'wmsama 0.0.1 (Compositing SSD)';
+end;
+
+function TConfigSettings.GetToolkit(): string;
+begin
+  Result := 'Floria Toolkit 0.0.1 (libft / ftpas)';
+end;
+
+function TConfigSettings.GetDesktopSuite(): string;
+begin
+  Result := 'shellsama & wmsama (Floria Toolkit)';
+end;
+
+function TConfigSettings.GetOsArchitecture(): string;
+begin
+{ CPU64}
+  Result := '64-bit';
+{}
+  Result := '32-bit';
+{}
 end;
 
 end.
