@@ -164,7 +164,19 @@ type
     property DefaultTextEditor: string read FDefaultTextEditor write FDefaultTextEditor;
   end;
 
+function ConfigSettings(): TConfigSettings;
+
 implementation
+
+var
+  GConfigSettings: TConfigSettings = nil;
+
+function ConfigSettings(): TConfigSettings;
+begin
+  if GConfigSettings = nil then
+    GConfigSettings := TConfigSettings.Create();
+  Result := GConfigSettings;
+end;
 
 { TConfigSettings }
 
@@ -182,6 +194,8 @@ var
   d: string;
 begin
   inherited Create();
+  if GConfigSettings = nil then
+    GConfigSettings := Self;
   if ACustomIniPath <> '' then
   begin
     FIniPath := ACustomIniPath;
@@ -202,6 +216,8 @@ end;
 
 destructor TConfigSettings.Destroy();
 begin
+  if GConfigSettings = Self then
+    GConfigSettings := nil;
   inherited Destroy();
 end;
 

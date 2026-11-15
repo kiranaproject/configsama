@@ -13,7 +13,7 @@ uses
   ftpas.layouts, ftpas.views, ftpas.ftml,
   ConfigSama.Settings, ConfigSama.Window,
   ConfigSama.Wlan, ConfigSama.Wired, ConfigSama.Display,
-  ConfigSama.Bluetooth, ConfigSama.Sound, ConfigSama.Power;
+  ConfigSama.Bluetooth, ConfigSama.Sound, ConfigSama.Power, ConfigSama.Desktop;
 
 type
   { TConfigWindowTest }
@@ -35,6 +35,7 @@ type
     procedure TestBluetoothControlsAndToggle();
     procedure TestSoundControlsAndInteraction();
     procedure TestPowerControlsAndInteraction();
+    procedure TestDesktopAndDockControls();
     procedure TestAppearanceControlsAndFonts();
     procedure TestPageContainersScrollableAndResetOnNavigation();
   end;
@@ -63,6 +64,9 @@ begin
   BluetoothService().EnableMockMode(True);
   SoundService().EnableMockMode(True);
   PowerService().EnableMockMode(True);
+  DesktopService().EnableMockMode(True);
+  DesktopService().SetMockDockSettings('Bottom', 48, False, 3);
+  DesktopService().SetMockPanelSettings(True, '24h');
 
   FTestIniPath := Format('/tmp/configsama_win_test_%d_%d.ini', [GetProcessID(), Random(100000)]);
   FWindow := TConfigSamaWindow.Create(FTestIniPath);
@@ -84,6 +88,9 @@ begin
   BluetoothService().EnableMockMode(False);
   SoundService().EnableMockMode(False);
   PowerService().EnableMockMode(False);
+  DesktopService().SetMockDockSettings('Bottom', 48, False, 3);
+  DesktopService().SetMockPanelSettings(True, '24h');
+  DesktopService().EnableMockMode(False);
 end;
 
 procedure TConfigWindowTest.TestWindowCreationAndFTMLResolution();
@@ -285,6 +292,67 @@ begin
 
   FWindow.SegPowerMode.SelectedIndex := 2; // Performance
   AssertEquals('Settings PowerMode updated to Performance', 'Performance', FWindow.Settings.PowerMode);
+end;
+
+procedure TConfigWindowTest.TestDesktopAndDockControls();
+begin
+  FWindow.SelectCategoryByName('Desktop & Dock');
+  AssertEquals('Section title updated to Desktop & Dock', 'Desktop & Dock', FWindow.SectionTitle.Text);
+
+  AssertNotNull('PageDesktop must exist', FWindow.PageDesktop);
+  AssertTrue('PageDesktop must be visible', FWindow.PageDesktop.Visible);
+  AssertNotNull('SegDockPosition must exist', FWindow.SegDockPosition);
+  AssertNotNull('CmbDockPosition must exist', FWindow.CmbDockPosition);
+  AssertNotNull('CmbDockIconSize must exist', FWindow.CmbDockIconSize);
+  AssertNotNull('SwDockAutoHide must exist', FWindow.SwDockAutoHide);
+  AssertNotNull('CmbDockMargin must exist', FWindow.CmbDockMargin);
+  AssertNotNull('SwShowDesktopBtn must exist', FWindow.SwShowDesktopBtn);
+  AssertNotNull('SwClock24h must exist', FWindow.SwClock24h);
+
+  // Initial mock values
+  AssertEquals('Default dock position is Bottom', 'Bottom', DesktopService().GetDockPosition());
+  AssertEquals('SegDockPosition selected index is 1 (Bottom)', 1, FWindow.SegDockPosition.SelectedIndex);
+  AssertEquals('Icon size text is 48 px', '48 px', FWindow.CmbDockIconSize.Text);
+  AssertFalse('Dock auto-hide is False', FWindow.SwDockAutoHide.Checked);
+  AssertEquals('Dock margin is 3 px (Standard)', '3 px (Standard)', FWindow.CmbDockMargin.Text);
+  AssertTrue('Show desktop button is True', FWindow.SwShowDesktopBtn.Checked);
+  AssertTrue('24-Hour time format is True', FWindow.SwClock24h.Checked);
+
+  // Position change via SegmentedControl
+  FWindow.SegDockPosition.SelectedIndex := 0; // Left
+  AssertEquals('Dock position updated to Left', 'Left', DesktopService().GetDockPosition());
+  AssertEquals('CmbDockPosition text updated to Left', 'Left', FWindow.CmbDockPosition.Text);
+
+  FWindow.SegDockPosition.SelectedIndex := 2; // Right
+  AssertEquals('Dock position updated to Right', 'Right', DesktopService().GetDockPosition());
+  AssertEquals('CmbDockPosition text updated to Right', 'Right', FWindow.CmbDockPosition.Text);
+
+  // Icon size change
+  FWindow.CmbDockIconSize.Text := '32 px';
+  AssertEquals('Dock icon size updated to 32', 32, DesktopService().GetDockIconSize());
+
+  // Auto-hide toggle
+  FWindow.SwDockAutoHide.Checked := True;
+  AssertTrue('Dock auto-hide enabled', DesktopService().GetDockAutoHide());
+
+  // Margin change
+  FWindow.CmbDockMargin.Text := '5 px';
+  AssertEquals('Dock margin updated to 5', 5, DesktopService().GetDockMargin());
+
+  // Show desktop button toggle
+  FWindow.SwShowDesktopBtn.Checked := False;
+  AssertFalse('Show desktop button disabled', DesktopService().GetShowDesktopButton());
+
+  // Clock format toggle
+  FWindow.SwClock24h.Checked := False;
+  AssertEquals('Clock format updated to 12h', '12h', DesktopService().GetClockFormat());
+
+  // External update through service triggers UI refresh
+  DesktopService().SetMockDockSettings('Bottom', 64, True, 8);
+  AssertEquals('SegDockPosition updated to 1 on external change', 1, FWindow.SegDockPosition.SelectedIndex);
+  AssertEquals('CmbDockIconSize updated to 64 px on external change', '64 px', FWindow.CmbDockIconSize.Text);
+  AssertTrue('SwDockAutoHide updated on external change', FWindow.SwDockAutoHide.Checked);
+  AssertEquals('CmbDockMargin updated on external change', '8 px', FWindow.CmbDockMargin.Text);
 end;
 
 procedure TConfigWindowTest.TestAppearanceControlsAndFonts();

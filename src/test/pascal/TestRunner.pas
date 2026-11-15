@@ -14,6 +14,7 @@ uses
   ConfigSama.Bluetooth.Test,
   ConfigSama.Sound.Test,
   ConfigSama.Power.Test,
+  ConfigSama.Desktop.Test,
   ConfigSama.Window.Test;
 
 var

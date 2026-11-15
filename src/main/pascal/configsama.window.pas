@@ -12,7 +12,7 @@ uses
   ftpas, ftpas.types, ftpas.api, ftpas.app, ftpas.canvas, ftpas.widget, ftpas.controls,
   ftpas.layouts, ftpas.views, ftpas.dialogs, ftpas.ftml,
   ConfigSama.Wlan, ConfigSama.Wired, ConfigSama.Display,
-  ConfigSama.Bluetooth, ConfigSama.Sound, ConfigSama.Power,
+  ConfigSama.Bluetooth, ConfigSama.Sound, ConfigSama.Power, ConfigSama.Desktop,
   ConfigSama.Settings, ConfigSama.Styles;
 
 type
@@ -324,6 +324,8 @@ type
     procedure HandleDockMarginChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleShowDesktopToggle(Sender: TFtSwitch; AToggled: Boolean);
     procedure HandleClock24hToggle(Sender: TFtSwitch; AToggled: Boolean);
+    procedure RefreshDesktopUI();
+    procedure HandleDesktopServiceChange(Sender: TObject);
     procedure HandleDisplayLanguageChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleRegionalFormatsChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleOutputDeviceChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
@@ -426,6 +428,15 @@ type
     property SwAutoSuspend: TFtSwitch read FSwAutoSuspend;
     property LblMaxCapacity: TFtLabel read FLblMaxCapacity;
 
+    // Desktop & Dock
+    property CmbDockPosition: TFtComboBox read FCmbDockPosition;
+    property SegDockPosition: TFtSegmentedControl read FSegDockPosition;
+    property CmbDockIconSize: TFtComboBox read FCmbDockIconSize;
+    property SwDockAutoHide: TFtSwitch read FSwDockAutoHide;
+    property CmbDockMargin: TFtComboBox read FCmbDockMargin;
+    property SwShowDesktopBtn: TFtSwitch read FSwShowDesktopBtn;
+    property SwClock24h: TFtSwitch read FSwClock24h;
+
     // Appearance
     property PageAppearance: TFtWidget read FPageAppearance;
     property BtnThemeLight: TFtButton read FBtnThemeLight;
@@ -452,6 +463,8 @@ end;
 
 destructor TConfigSamaWindow.Destroy();
 begin
+  if DesktopService().OnChange = @HandleDesktopServiceChange then
+    DesktopService().OnChange := nil;
   if Assigned(FSettings) then
   begin
     FSettings.Free();
@@ -1050,6 +1063,8 @@ begin
     FSwClock24h.OnToggle := @HandleClock24hToggle;
   end;
 
+  DesktopService().OnChange := @HandleDesktopServiceChange;
+
   // Language controls
   w := FindWidget('cmbDisplayLanguage');
   if w is TFtComboBox then
@@ -1405,33 +1420,7 @@ begin
       FSwNightLight.Checked := FSettings.NightLight;
 
     // Desktop & Dock
-    if Assigned(FCmbDockPosition) then
-      FCmbDockPosition.Text := FSettings.DockPosition;
-
-    if Assigned(FSegDockPosition) then
-    begin
-      if SameText(FSettings.DockPosition, 'Left') then
-        FSegDockPosition.SelectedIndex := 0
-      else if SameText(FSettings.DockPosition, 'Right') then
-        FSegDockPosition.SelectedIndex := 2
-      else
-        FSegDockPosition.SelectedIndex := 1;
-    end;
-
-    if Assigned(FCmbDockIconSize) then
-      FCmbDockIconSize.Text := IntToStr(FSettings.DockIconSize) + ' px';
-
-    if Assigned(FSwDockAutoHide) then
-      FSwDockAutoHide.Checked := FSettings.DockAutoHide;
-
-    if Assigned(FCmbDockMargin) then
-      FCmbDockMargin.Text := IntToStr(FSettings.DockMargin) + ' px';
-
-    if Assigned(FSwShowDesktopBtn) then
-      FSwShowDesktopBtn.Checked := FSettings.ShowDesktopButton;
-
-    if Assigned(FSwClock24h) then
-      FSwClock24h.Checked := (FSettings.ClockFormat = '24h');
+    RefreshDesktopUI();
 
     // Sound
     if Assigned(FCmbOutputDevice) then
@@ -1601,7 +1590,10 @@ begin
     begin
       FPageDesktop.Visible := SameText(AName, 'Dock') or SameText(AName, 'Desktop & Dock');
       if FPageDesktop.Visible then
+      begin
         ResetPageScroll(FPageDesktop);
+        RefreshDesktopUI();
+      end;
     end;
     if FPageUser <> nil then
     begin
@@ -2422,33 +2414,79 @@ begin
   FSettings.Save();
 end;
 
+procedure TConfigSamaWindow.HandleDesktopServiceChange(Sender: TObject);
+begin
+  RefreshDesktopUI();
+end;
+
+procedure TConfigSamaWindow.RefreshDesktopUI();
+var
+  ds: TConfigDesktopService;
+  posStr: string;
+  sizeVal, marginVal: Integer;
+begin
+  if FUpdatingControls then Exit();
+  FUpdatingControls := True;
+  try
+    ds := DesktopService();
+    if ds = nil then Exit();
+
+    posStr := ds.GetDockPosition();
+    if Assigned(FCmbDockPosition) then
+      FCmbDockPosition.Text := posStr;
+
+    if Assigned(FSegDockPosition) then
+    begin
+      if SameText(posStr, 'Left') then
+        FSegDockPosition.SelectedIndex := 0
+      else if SameText(posStr, 'Right') then
+        FSegDockPosition.SelectedIndex := 2
+      else
+        FSegDockPosition.SelectedIndex := 1;
+    end;
+
+    sizeVal := ds.GetDockIconSize();
+    if Assigned(FCmbDockIconSize) then
+      FCmbDockIconSize.Text := IntToStr(sizeVal) + ' px';
+
+    if Assigned(FSwDockAutoHide) then
+      FSwDockAutoHide.Checked := ds.GetDockAutoHide();
+
+    marginVal := ds.GetDockMargin();
+    if Assigned(FCmbDockMargin) then
+    begin
+      if marginVal = 3 then
+        FCmbDockMargin.Text := '3 px (Standard)'
+      else
+        FCmbDockMargin.Text := IntToStr(marginVal) + ' px';
+    end;
+
+    if Assigned(FSwShowDesktopBtn) then
+      FSwShowDesktopBtn.Checked := ds.GetShowDesktopButton();
+
+    if Assigned(FSwClock24h) then
+      FSwClock24h.Checked := (ds.GetClockFormat() = '24h');
+  finally
+    FUpdatingControls := False;
+  end;
+end;
+
 procedure TConfigSamaWindow.HandleDockPositionChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
 begin
-  if FSettings = nil then Exit();
-  FSettings.DockPosition := AText;
-  if Assigned(FSegDockPosition) then
-  begin
-    if SameText(AText, 'Left') then
-      FSegDockPosition.SelectedIndex := 0
-    else if SameText(AText, 'Right') then
-      FSegDockPosition.SelectedIndex := 2
-    else
-      FSegDockPosition.SelectedIndex := 1;
-  end;
-  FSettings.Save();
+  if FUpdatingControls then Exit();
+  DesktopService().SetDockPosition(AText);
+  RefreshDesktopUI();
 end;
 
 procedure TConfigSamaWindow.HandleSegmentDockPositionSelect(Sender: TFtSegmentedControl; AIndex: Integer; const AText: string);
 begin
-  if FUpdatingControls or (FSettings = nil) then Exit();
+  if FUpdatingControls then Exit();
   case AIndex of
-    0: FSettings.DockPosition := 'Left';
-    1: FSettings.DockPosition := 'Bottom';
-    2: FSettings.DockPosition := 'Right';
+    0: DesktopService().SetDockPosition('Left');
+    1: DesktopService().SetDockPosition('Bottom');
+    2: DesktopService().SetDockPosition('Right');
   end;
-  if Assigned(FCmbDockPosition) then
-    FCmbDockPosition.Text := FSettings.DockPosition;
-  FSettings.Save();
+  RefreshDesktopUI();
 end;
 
 procedure TConfigSamaWindow.HandleDisplayLanguageChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
@@ -2466,21 +2504,21 @@ var
   p, sizeVal: Integer;
   sizeStr: string;
 begin
-  if FSettings = nil then Exit();
+  if FUpdatingControls then Exit();
   sizeStr := AText;
   p := Pos(' ', sizeStr);
   if p > 0 then
     sizeStr := Copy(sizeStr, 1, p - 1);
   sizeVal := StrToIntDef(sizeStr, 48);
-  FSettings.DockIconSize := sizeVal;
-  FSettings.Save();
+  DesktopService().SetDockIconSize(sizeVal);
+  RefreshDesktopUI();
 end;
 
 procedure TConfigSamaWindow.HandleDockAutoHideToggle(Sender: TFtSwitch; AToggled: Boolean);
 begin
-  if FSettings = nil then Exit();
-  FSettings.DockAutoHide := AToggled;
-  FSettings.Save();
+  if FUpdatingControls then Exit();
+  DesktopService().SetDockAutoHide(AToggled);
+  RefreshDesktopUI();
 end;
 
 procedure TConfigSamaWindow.HandleDockMarginChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
@@ -2488,31 +2526,31 @@ var
   p, marginVal: Integer;
   mStr: string;
 begin
-  if FSettings = nil then Exit();
+  if FUpdatingControls then Exit();
   mStr := AText;
   p := Pos(' ', mStr);
   if p > 0 then
     mStr := Copy(mStr, 1, p - 1);
   marginVal := StrToIntDef(mStr, 3);
-  FSettings.DockMargin := marginVal;
-  FSettings.Save();
+  DesktopService().SetDockMargin(marginVal);
+  RefreshDesktopUI();
 end;
 
 procedure TConfigSamaWindow.HandleShowDesktopToggle(Sender: TFtSwitch; AToggled: Boolean);
 begin
-  if FSettings = nil then Exit();
-  FSettings.ShowDesktopButton := AToggled;
-  FSettings.Save();
+  if FUpdatingControls then Exit();
+  DesktopService().SetShowDesktopButton(AToggled);
+  RefreshDesktopUI();
 end;
 
 procedure TConfigSamaWindow.HandleClock24hToggle(Sender: TFtSwitch; AToggled: Boolean);
 begin
-  if FSettings = nil then Exit();
+  if FUpdatingControls then Exit();
   if AToggled then
-    FSettings.ClockFormat := '24h'
+    DesktopService().SetClockFormat('24h')
   else
-    FSettings.ClockFormat := '12h';
-  FSettings.Save();
+    DesktopService().SetClockFormat('12h');
+  RefreshDesktopUI();
 end;
 
 procedure TConfigSamaWindow.HandleOutputDeviceChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
