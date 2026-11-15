@@ -98,8 +98,26 @@ const
     '    box-shadow: none;' + LineEnding +
     '}' + LineEnding +
     'container.battery-banner-card, .battery-banner-card {' + LineEnding +
-    '    background: #3b82f6;' + LineEnding +
+    '    background-color: #94bdfd;' + LineEnding +
     '    border-radius: 12px;' + LineEnding +
+    '    border: none;' + LineEnding +
+    '    box-shadow: none;' + LineEnding +
+    '}' + LineEnding +
+    'container.battery-banner-card.dark, .battery-banner-card.dark, window.dark .battery-banner-card {' + LineEnding +
+    '    background-color: #1e3a5f;' + LineEnding +
+    '    border-radius: 12px;' + LineEnding +
+    '    border: none;' + LineEnding +
+    '    box-shadow: none;' + LineEnding +
+    '}' + LineEnding +
+    'container.battery-fill-bar, .battery-fill-bar {' + LineEnding +
+    '    background-color: #3b82f6;' + LineEnding +
+    '    border-radius: 0px;' + LineEnding +
+    '    border: none;' + LineEnding +
+    '    box-shadow: none;' + LineEnding +
+    '}' + LineEnding +
+    'container.battery-fill-bar.dark, .battery-fill-bar.dark, window.dark .battery-fill-bar {' + LineEnding +
+    '    background-color: #3b82f6;' + LineEnding +
+    '    border-radius: 0px;' + LineEnding +
     '    border: none;' + LineEnding +
     '    box-shadow: none;' + LineEnding +
     '}' + LineEnding +

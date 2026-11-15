@@ -19,6 +19,7 @@ begin
   ApplyConfigSamaStyles();
   AppWindow := TConfigSamaWindow.Create();
   try
+    AppWindow.Show();
     for i := 1 to ParamCount() do
     begin
       arg := ParamStr(i);
@@ -29,7 +30,6 @@ begin
       else
         AppWindow.SelectCategoryByName(arg);
     end;
-    AppWindow.Show();
     FtApp().Run();
   finally
     AppWindow.Free();

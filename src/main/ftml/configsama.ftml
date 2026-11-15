@@ -3153,6 +3153,16 @@ Window {
           height: 120;
           drawFrame: false;
 
+          Container {
+            id: cardBatteryFill;
+            styleClass: "battery-fill-bar";
+            x: 0;
+            y: 0;
+            width: 0;
+            height: 120;
+            drawFrame: false;
+          }
+
           Text {
             id: lblBatteryPercent;
             anchors.top: parent.top;
@@ -4239,14 +4249,6 @@ Window {
             checked: true;
           }
         }
-      }
-
-      Container {
-        id: pagePower;
-        anchors.fill: parent;
-        visible: false;
-        drawFrame: false;
-        scrollBarMode: "vertical";
       }
 
       Container {

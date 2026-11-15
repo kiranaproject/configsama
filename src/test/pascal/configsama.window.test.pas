@@ -253,11 +253,31 @@ begin
 
   AssertNotNull('PageBattery must exist', FWindow.PageBattery);
   AssertTrue('PageBattery must be visible', FWindow.PageBattery.Visible);
+  AssertNotNull('CardBatteryBanner must exist', FWindow.CardBatteryBanner);
+  AssertNotNull('CardBatteryFill must exist', FWindow.CardBatteryFill);
+  AssertNotNull('ImgBatteryBolt must exist', FWindow.ImgBatteryBolt);
   AssertNotNull('LblBatteryPercent must exist', FWindow.LblBatteryPercent);
   AssertNotNull('LblBatteryRemaining must exist', FWindow.LblBatteryRemaining);
   AssertNotNull('SegPowerMode must exist', FWindow.SegPowerMode);
   AssertNotNull('CmbScreenBlank must exist', FWindow.CmbScreenBlank);
   AssertNotNull('SwAutoSuspend must exist', FWindow.SwAutoSuspend);
+
+  // Battery icon must not show charging bolt when discharging
+  AssertEquals('Battery icon must be battery-outline-white when discharging', 'battery-outline-white', FWindow.BatteryIconName);
+
+  // Card fill width must be proportional to battery percentage
+  AssertTrue('CardBatteryFill width should be > 0 when battery percentage > 0', FWindow.CardBatteryFill.Width > 0);
+  AssertTrue('CardBatteryFill width should be <= CardBatteryBanner width', FWindow.CardBatteryFill.Width <= FWindow.CardBatteryBanner.Width);
+
+  // When charging, battery icon switches to battery-bolt
+  PowerService().SetMockBattery(True, 85, 'Charging', True);
+  FWindow.SelectCategoryByName('Power');
+  AssertEquals('Battery icon must be battery-bolt when charging', 'battery-bolt', FWindow.BatteryIconName);
+
+  // Restore discharging state
+  PowerService().SetMockBattery(True, 85, 'Discharging', False);
+  FWindow.SelectCategoryByName('Power');
+  AssertEquals('Battery icon must return to battery-outline-white when discharging', 'battery-outline-white', FWindow.BatteryIconName);
 
   // Test Power Mode segmented select
   FWindow.SegPowerMode.SelectedIndex := 0; // Power Saver

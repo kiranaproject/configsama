@@ -194,9 +194,12 @@ type
     FSwSoundEffects: TFtSwitch;
 
     // Power page controls
+    FCardBatteryBanner: TFtContainer;
+    FCardBatteryFill: TFtContainer;
     FLblBatteryPercent: TFtLabel;
     FLblBatteryRemaining: TFtLabel;
     FImgBatteryBolt: TFtImage;
+    FBatteryIconName: string;
     FSegPowerMode: TFtSegmentedControl;
     FCmbPowerMode: TFtComboBox;
     FCmbScreenBlank: TFtComboBox;
@@ -344,6 +347,7 @@ type
     procedure HandleEditorChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
   protected
     procedure DoMouseDown(AX, AY, AButton: Integer); override;
+    procedure DoResize(ANewWidth, ANewHeight: Integer); override;
   public
     constructor Create(const ACustomIniPath: string = ''); reintroduce;
     destructor Destroy(); override;
@@ -410,8 +414,12 @@ type
     // Power
     property PagePower: TFtWidget read FPagePower;
     property PageBattery: TFtWidget read FPageBattery;
+    property CardBatteryBanner: TFtContainer read FCardBatteryBanner;
+    property CardBatteryFill: TFtContainer read FCardBatteryFill;
     property LblBatteryPercent: TFtLabel read FLblBatteryPercent;
     property LblBatteryRemaining: TFtLabel read FLblBatteryRemaining;
+    property ImgBatteryBolt: TFtImage read FImgBatteryBolt;
+    property BatteryIconName: string read FBatteryIconName;
     property SegPowerMode: TFtSegmentedControl read FSegPowerMode;
     property CmbPowerMode: TFtComboBox read FCmbPowerMode;
     property CmbScreenBlank: TFtComboBox read FCmbScreenBlank;
@@ -464,6 +472,12 @@ begin
     GetPosition(wx, wy);
     BeginWindowMove(wx + AX, wy + AY);
   end;
+end;
+
+procedure TConfigSamaWindow.DoResize(ANewWidth, ANewHeight: Integer);
+begin
+  inherited DoResize(ANewWidth, ANewHeight);
+  RefreshPowerUI();
 end;
 
 procedure TConfigSamaWindow.EnablePageScrolling(APage: TFtWidget);
@@ -530,7 +544,7 @@ begin
   FPageLanguage := FindWidget('pageLanguage');
   FPageBattery := FindWidget('pageBattery');
   FPageSound := FindWidget('pageSound');
-  FPagePower := FindWidget('pagePower');
+  FPagePower := FPageBattery;
   FPageMouse := FindWidget('pageMouse');
   FPageKeyboard := FindWidget('pageKeyboard');
   FPageApps := FindWidget('pageApps');
@@ -547,7 +561,6 @@ begin
   EnablePageScrolling(FPageLanguage);
   EnablePageScrolling(FPageBattery);
   EnablePageScrolling(FPageSound);
-  EnablePageScrolling(FPagePower);
   EnablePageScrolling(FPageMouse);
   EnablePageScrolling(FPageKeyboard);
   EnablePageScrolling(FPageApps);
@@ -1118,6 +1131,12 @@ begin
   end;
 
   // Power controls
+  w := FindWidget('cardBatteryBanner');
+  if w is TFtContainer then FCardBatteryBanner := TFtContainer(w);
+
+  w := FindWidget('cardBatteryFill');
+  if w is TFtContainer then FCardBatteryFill := TFtContainer(w);
+
   w := FindWidget('lblBatteryPercent');
   if w is TFtLabel then FLblBatteryPercent := TFtLabel(w);
 
@@ -1614,15 +1633,6 @@ begin
         RefreshSoundUI();
       end;
     end;
-    if FPagePower <> nil then
-    begin
-      FPagePower.Visible := SameText(AName, 'Power') or SameText(AName, 'Battery');
-      if FPagePower.Visible then
-      begin
-        ResetPageScroll(FPagePower);
-        RefreshPowerUI();
-      end;
-    end;
     if FPageMouse <> nil then
     begin
       FPageMouse.Visible := SameText(AName, 'Mouse & Touchpad');
@@ -1740,6 +1750,9 @@ begin
 
   if FImgAboutLogo <> nil then
     FImgAboutLogo.LoadSVGString(FtApp.GetIconSvg('distro-logo', FtApp.DarkMode));
+
+  if (FImgBatteryBolt <> nil) and (FBatteryIconName <> '') then
+    FImgBatteryBolt.LoadSVGString(FtApp.GetIconSvg(FBatteryIconName, FtApp.DarkMode));
 
   if FCategoryTree <> nil then FCategoryTree.Invalidate();
 end;
@@ -2725,19 +2738,37 @@ end;
 
 procedure TConfigSamaWindow.RefreshPowerUI();
 var
-  pct: Integer;
-  st, pmode: string;
+  pct, fillW: Integer;
+  st, bStatus, pmode: string;
   delayMins, selIdx: Integer;
 begin
   FUpdatingControls := True;
   try
     pct := PowerService().GetBatteryPercentage();
+    if pct < 0 then pct := 0;
+    if pct > 100 then pct := 100;
+
+    if Assigned(FCardBatteryBanner) and Assigned(FCardBatteryFill) then
+    begin
+      fillW := Round(FCardBatteryBanner.Width * (pct / 100.0));
+      FCardBatteryFill.SetBounds(FCardBatteryBanner.X, FCardBatteryBanner.Y, fillW, FCardBatteryBanner.Height);
+    end;
+
     if Assigned(FLblBatteryPercent) then
       FLblBatteryPercent.Text := IntToStr(pct) + '%';
 
-    st := PowerService().GetBatteryStatus() + ' • ' + PowerService().GetTimeRemaining();
+    bStatus := PowerService().GetBatteryStatus();
+    st := bStatus + ' • ' + PowerService().GetTimeRemaining();
     if Assigned(FLblBatteryRemaining) then
       FLblBatteryRemaining.Text := st;
+
+    if SameText(bStatus, 'Charging') then
+      FBatteryIconName := 'battery-bolt'
+    else
+      FBatteryIconName := 'battery-outline-white';
+
+    if Assigned(FImgBatteryBolt) then
+      FImgBatteryBolt.LoadSVGString(FtApp.GetIconSvg(FBatteryIconName, FtApp.DarkMode));
 
     pmode := PowerService().GetPowerMode();
     if Assigned(FSegPowerMode) then

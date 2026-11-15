@@ -79,9 +79,9 @@ begin
   inherited Create();
   FMockMode := False;
   FMockBatteryPresent := True;
-  FMockBatteryPercentage := 92;
-  FMockBatteryStatus := 'Charging';
-  FMockAcOnline := True;
+  FMockBatteryPercentage := 85;
+  FMockBatteryStatus := 'Discharging';
+  FMockAcOnline := False;
   FMockPowerMode := 'Balanced';
   FMockScreenBlankDelay := 10;
   FMockAutoSuspend := True;
@@ -181,7 +181,7 @@ var
   info: TSearchRec;
 begin
   Result := '';
-  if FindFirst('/sys/class/power_supply/BAT*', faDirectory, info) = 0 then
+  if FindFirst('/sys/class/power_supply/BAT*', faAnyFile, info) = 0 then
   begin
     repeat
       if (info.Name <> '.') and (info.Name <> '..') then
@@ -199,7 +199,7 @@ var
   info: TSearchRec;
 begin
   Result := '';
-  if FindFirst('/sys/class/power_supply/AC*', faDirectory, info) = 0 then
+  if FindFirst('/sys/class/power_supply/AC*', faAnyFile, info) = 0 then
   begin
     repeat
       if (info.Name <> '.') and (info.Name <> '..') then
