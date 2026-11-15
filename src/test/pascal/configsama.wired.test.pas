@@ -24,6 +24,7 @@ type
     procedure TestMockModeToggle();
     procedure TestMockInterfaces();
     procedure TestConnectAndDisconnect();
+    procedure TestQueryDeviceDetailsPreservesDevice();
   end;
 
 implementation
@@ -127,6 +128,16 @@ begin
   AssertTrue('Disconnect must succeed', FService.Disconnect('eth0'));
   primary := FService.GetPrimaryInterface();
   AssertFalse('Device must report disconnected after disconnect', primary.IsConnected);
+end;
+
+procedure TConfigWiredTest.TestQueryDeviceDetailsPreservesDevice();
+var
+  details: TWiredInterface;
+begin
+  details := Default(TWiredInterface);
+  details.Device := 'ethTest';
+  FService.QueryDeviceDetails(details.Device, details);
+  AssertEquals('Device name must be preserved and not erased by parameter aliasing', 'ethTest', details.Device);
 end;
 
 initialization

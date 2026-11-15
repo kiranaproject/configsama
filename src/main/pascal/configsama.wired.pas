@@ -38,11 +38,11 @@ type
     function SplitNmcliLine(const ALine: string): TStringList;
     function ReadSysfsString(const APath: string): string;
     function ReadSysfsInteger(const APath: string; ADefault: Integer = 0): Integer;
-    function QueryDeviceDetails(const ADevice: string; out ADetails: TWiredInterface): Boolean;
   public
     constructor Create();
     destructor Destroy(); override;
 
+    function QueryDeviceDetails(const ADevice: string; var ADetails: TWiredInterface): Boolean;
     function IsAvailable(): Boolean;
     function IsWiredEnabled(): Boolean;
     function SetWiredEnabled(AEnable: Boolean): Boolean;
@@ -199,17 +199,16 @@ begin
     Result := ADefault;
 end;
 
-function TConfigWiredService.QueryDeviceDetails(const ADevice: string; out ADetails: TWiredInterface): Boolean;
+function TConfigWiredService.QueryDeviceDetails(const ADevice: string; var ADetails: TWiredInterface): Boolean;
 var
   raw, key, val, sysPath: string;
   lines: TStringList;
   i, p: Integer;
 begin
   Result := True;
-  FillChar(ADetails, SizeOf(ADetails), 0);
   ADetails.Device := ADevice;
-  ADetails.Mtu := 1500;
-  ADetails.Duplex := 'unknown';
+  if ADetails.Mtu <= 0 then ADetails.Mtu := 1500;
+  if ADetails.Duplex = '' then ADetails.Duplex := 'unknown';
 
   sysPath := '/sys/class/net/' + ADevice;
   if DirectoryExists(sysPath) then
@@ -332,10 +331,11 @@ end;
 
 function TConfigWiredService.GetInterfaces(): TWiredInterfaceArray;
 var
-  raw: string;
+  raw, devName: string;
   lines, parts: TStringList;
   i, count: Integer;
   item: TWiredInterface;
+  info: TSearchRec;
 begin
   if FMockMode then
   begin
@@ -344,36 +344,63 @@ begin
   end;
 
   SetLength(Result, 0);
-  if not RunCommandOutput('nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device status 2>/dev/null', raw) then
-    Exit();
+  count := 0;
 
-  lines := TStringList.Create();
-  try
-    lines.Text := raw;
-    count := 0;
-    for i := 0 to lines.Count - 1 do
+  if RunCommandOutput('nmcli -t -f DEVICE,TYPE,STATE,CONNECTION device status 2>/dev/null', raw) then
+  begin
+    lines := TStringList.Create();
+    try
+      lines.Text := raw;
+      for i := 0 to lines.Count - 1 do
+      begin
+        parts := SplitNmcliLine(lines[i]);
+        try
+          if (parts.Count >= 2) and (LowerCase(parts[1]) = 'ethernet') then
+          begin
+            item := Default(TWiredInterface);
+            item.Device := parts[0];
+            if parts.Count >= 3 then item.State := parts[2];
+            if parts.Count >= 4 then item.ConnectionName := parts[3];
+
+            QueryDeviceDetails(parts[0], item);
+
+            Inc(count);
+            SetLength(Result, count);
+            Result[count - 1] := item;
+          end;
+        finally
+          parts.Free();
+        end;
+      end;
+    finally
+      lines.Free();
+    end;
+  end;
+
+  // Fallback: if nmcli found no ethernet interfaces, scan sysfs
+  if Length(Result) = 0 then
+  begin
+    if FindFirst('/sys/class/net/*', faAnyFile, info) = 0 then
     begin
-      parts := SplitNmcliLine(lines[i]);
-      try
-        if (parts.Count >= 2) and (LowerCase(parts[1]) = 'ethernet') then
+      repeat
+        devName := info.Name;
+        if (devName <> '.') and (devName <> '..') and (devName <> 'lo') and
+           (Pos('wl', devName) <> 1) and (Pos('ww', devName) <> 1) and
+           (Pos('docker', devName) <> 1) and (Pos('veth', devName) <> 1) and
+           (Pos('virbr', devName) <> 1) and (Pos('br-', devName) <> 1) then
         begin
-          FillChar(item, SizeOf(item), 0);
-          item.Device := parts[0];
-          if parts.Count >= 3 then item.State := parts[2];
-          if parts.Count >= 4 then item.ConnectionName := parts[3];
-
-          QueryDeviceDetails(item.Device, item);
+          item := Default(TWiredInterface);
+          item.Device := devName;
+          item.State := 'unavailable';
+          QueryDeviceDetails(devName, item);
 
           Inc(count);
           SetLength(Result, count);
           Result[count - 1] := item;
         end;
-      finally
-        parts.Free();
-      end;
+      until FindNext(info) <> 0;
+      FindClose(info);
     end;
-  finally
-    lines.Free();
   end;
 end;
 
@@ -382,7 +409,7 @@ var
   list: TWiredInterfaceArray;
   i: Integer;
 begin
-  FillChar(Result, SizeOf(Result), 0);
+  Result := Default(TWiredInterface);
   list := GetInterfaces();
   if Length(list) = 0 then Exit();
 
