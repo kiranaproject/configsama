@@ -36,6 +36,7 @@ type
     procedure TestSoundControlsAndInteraction();
     procedure TestPowerControlsAndInteraction();
     procedure TestAppearanceControlsAndFonts();
+    procedure TestPageContainersScrollableAndResetOnNavigation();
   end;
 
 implementation
@@ -285,6 +286,67 @@ begin
 
   FWindow.CycleMonospaceFont();
   AssertTrue('Monospace font updated', FWindow.Settings.MonospaceFont <> '');
+end;
+
+procedure TConfigWindowTest.TestPageContainersScrollableAndResetOnNavigation();
+var
+  pages: array[0..15] of TFtWidget;
+  i: Integer;
+  w, h: Double;
+  child: TFtWidget;
+begin
+  pages[0] := FWindow.PageWlan;
+  pages[1] := FWindow.PageWired;
+  pages[2] := FWindow.PageBluetooth;
+  pages[3] := FWindow.PageDisplays;
+  pages[4] := FWindow.PageAppearance;
+  pages[5] := FWindow.PageBackground;
+  pages[6] := FWindow.PageDesktop;
+  pages[7] := FWindow.PageUser;
+  pages[8] := FWindow.PageLanguage;
+  pages[9] := FWindow.PageBattery;
+  pages[10] := FWindow.PageAbout;
+  pages[11] := FWindow.PageSound;
+  pages[12] := FWindow.PagePower;
+  pages[13] := FWindow.PageMouse;
+  pages[14] := FWindow.PageKeyboard;
+  pages[15] := FWindow.PageApps;
+
+  for i := 0 to 15 do
+  begin
+    AssertNotNull(Format('Page container %d must not be nil', [i]), pages[i]);
+    AssertTrue(Format('Page %d must be TFtContainer', [i]), pages[i] is TFtContainer);
+    AssertTrue(Format('Page %d must have vertical scrollbar mode', [i]),
+      TFtContainer(pages[i]).ScrollBarMode = ftsbmVerticalOnly);
+    TFtContainer(pages[i]).GetContentSize(w, h);
+    WriteLn(Format('Page %d (%s): W=%d H=%d ContentW=%.1f ContentH=%.1f Overflows=%s',
+      [i, pages[i].ClassName, pages[i].Width, pages[i].Height, w, h, BoolToStr(h > pages[i].Height, True)]));
+  end;
+
+  // Test Appearance page scrolling and scroll position reset on category switch
+  FWindow.SelectCategoryByName('Appearance');
+  AssertTrue('PageAppearance must be visible', FWindow.PageAppearance.Visible);
+
+  // Resize window so content (486px) overflows the window viewport
+  FWindow.SetSize(960, 450);
+
+  TFtContainer(FWindow.PageAppearance).GetContentSize(w, h);
+  AssertTrue('Appearance page content height must overflow window height', h > FWindow.PageAppearance.Height);
+
+  // Scroll down
+  TFtContainer(FWindow.PageAppearance).SetScrollPos(0.0, 50.0);
+  AssertTrue('Page scroll offset must be scrolled down', TFtContainer(FWindow.PageAppearance).ScrollY > 0.0);
+
+  // Switch away to WLAN and then back to Appearance
+  FWindow.SelectCategoryByName('WLAN');
+  AssertTrue('PageWlan must be visible', FWindow.PageWlan.Visible);
+
+  FWindow.SelectCategoryByName('Appearance');
+  AssertTrue('PageAppearance must be visible again', FWindow.PageAppearance.Visible);
+  AssertEquals('Page scroll offset must reset to top on navigation', 0.0, TFtContainer(FWindow.PageAppearance).ScrollY);
+
+  // Restore window height
+  FWindow.SetSize(960, 640);
 end;
 
 initialization

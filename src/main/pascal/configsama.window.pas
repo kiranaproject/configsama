@@ -246,6 +246,8 @@ type
     procedure SetupUI();
     procedure PopulateControls();
     procedure UpdateThemeIcons();
+    procedure EnablePageScrolling(APage: TFtWidget);
+    procedure ResetPageScroll(APage: TFtWidget);
 
     // WLAN Event Handlers
     procedure HandleWlanToggle(Sender: TFtSwitch; AToggled: Boolean);
@@ -370,6 +372,17 @@ type
     property SldBrightness: TFtSlider read FSldBrightness;
     property BtnWiredConnect: TFtButton read FBtnWiredConnect;
     property BtnDisplayApply: TFtButton read FBtnDisplayApply;
+    property PageWlan: TFtWidget read FPageWlan;
+    property PageWired: TFtWidget read FPageWired;
+    property PageDisplays: TFtWidget read FPageDisplays;
+    property PageBackground: TFtWidget read FPageBackground;
+    property PageDesktop: TFtWidget read FPageDesktop;
+    property PageUser: TFtWidget read FPageUser;
+    property PageLanguage: TFtWidget read FPageLanguage;
+    property PageAbout: TFtWidget read FPageAbout;
+    property PageMouse: TFtWidget read FPageMouse;
+    property PageKeyboard: TFtWidget read FPageKeyboard;
+    property PageApps: TFtWidget read FPageApps;
     property LblWiredStatus: TFtLabel read FLblWiredStatus;
     property LblDisplayInfo: TFtLabel read FLblDisplayInfo;
 
@@ -453,6 +466,18 @@ begin
   end;
 end;
 
+procedure TConfigSamaWindow.EnablePageScrolling(APage: TFtWidget);
+begin
+  if (APage <> nil) and (APage is TFtContainer) then
+    TFtContainer(APage).ScrollBarMode := ftsbmVerticalOnly;
+end;
+
+procedure TConfigSamaWindow.ResetPageScroll(APage: TFtWidget);
+begin
+  if (APage <> nil) and (APage is TFtContainer) then
+    TFtContainer(APage).SetScrollPos(0.0, 0.0);
+end;
+
 procedure TConfigSamaWindow.SetupUI();
 var
   w: TFtWidget;
@@ -510,6 +535,23 @@ begin
   FPageKeyboard := FindWidget('pageKeyboard');
   FPageApps := FindWidget('pageApps');
   FPageAbout := FindWidget('pageAbout');
+
+  EnablePageScrolling(FPageWlan);
+  EnablePageScrolling(FPageWired);
+  EnablePageScrolling(FPageBluetooth);
+  EnablePageScrolling(FPageDisplays);
+  EnablePageScrolling(FPageAppearance);
+  EnablePageScrolling(FPageBackground);
+  EnablePageScrolling(FPageDesktop);
+  EnablePageScrolling(FPageUser);
+  EnablePageScrolling(FPageLanguage);
+  EnablePageScrolling(FPageBattery);
+  EnablePageScrolling(FPageSound);
+  EnablePageScrolling(FPagePower);
+  EnablePageScrolling(FPageMouse);
+  EnablePageScrolling(FPageKeyboard);
+  EnablePageScrolling(FPageApps);
+  EnablePageScrolling(FPageAbout);
 
   // WLAN controls
   w := FindWidget('cardWlanToggle');
@@ -1489,60 +1531,122 @@ begin
     begin
       FPageWlan.Visible := SameText(AName, 'WLAN') or SameText(AName, 'Wi-Fi');
       if FPageWlan.Visible then
+      begin
+        ResetPageScroll(FPageWlan);
         RefreshWlanUI(False);
+      end;
     end;
     if FPageWired <> nil then
     begin
       FPageWired.Visible := SameText(AName, 'Wired');
       if FPageWired.Visible then
+      begin
+        ResetPageScroll(FPageWired);
         RefreshWiredUI();
+      end;
     end;
     if FPageBluetooth <> nil then
     begin
       FPageBluetooth.Visible := SameText(AName, 'Bluetooth');
       if FPageBluetooth.Visible then
+      begin
+        ResetPageScroll(FPageBluetooth);
         RefreshBluetoothUI();
+      end;
     end;
     if FPageDisplays <> nil then
     begin
       FPageDisplays.Visible := SameText(AName, 'Display') or SameText(AName, 'Displays');
       if FPageDisplays.Visible then
+      begin
+        ResetPageScroll(FPageDisplays);
         RefreshDisplayUI();
+      end;
     end;
     if FPageAppearance <> nil then
     begin
       FPageAppearance.Visible := SameText(AName, 'Appearance');
       if FPageAppearance.Visible then
+      begin
+        ResetPageScroll(FPageAppearance);
         RefreshAppearanceUI();
+      end;
     end;
-    if FPageBackground <> nil then FPageBackground.Visible := SameText(AName, 'Background');
-    if FPageDesktop <> nil then FPageDesktop.Visible := SameText(AName, 'Dock') or SameText(AName, 'Desktop & Dock');
-    if FPageUser <> nil then FPageUser.Visible := SameText(AName, 'User') or SameText(AName, 'Users');
-    if FPageLanguage <> nil then FPageLanguage.Visible := SameText(AName, 'Language');
+    if FPageBackground <> nil then
+    begin
+      FPageBackground.Visible := SameText(AName, 'Background');
+      if FPageBackground.Visible then
+        ResetPageScroll(FPageBackground);
+    end;
+    if FPageDesktop <> nil then
+    begin
+      FPageDesktop.Visible := SameText(AName, 'Dock') or SameText(AName, 'Desktop & Dock');
+      if FPageDesktop.Visible then
+        ResetPageScroll(FPageDesktop);
+    end;
+    if FPageUser <> nil then
+    begin
+      FPageUser.Visible := SameText(AName, 'User') or SameText(AName, 'Users');
+      if FPageUser.Visible then
+        ResetPageScroll(FPageUser);
+    end;
+    if FPageLanguage <> nil then
+    begin
+      FPageLanguage.Visible := SameText(AName, 'Language');
+      if FPageLanguage.Visible then
+        ResetPageScroll(FPageLanguage);
+    end;
     if FPageBattery <> nil then
     begin
       FPageBattery.Visible := SameText(AName, 'Battery') or SameText(AName, 'Power');
       if FPageBattery.Visible then
+      begin
+        ResetPageScroll(FPageBattery);
         RefreshPowerUI();
+      end;
     end;
     if FPageSound <> nil then
     begin
       FPageSound.Visible := SameText(AName, 'Sound') or SameText(AName, 'Audio');
       if FPageSound.Visible then
+      begin
+        ResetPageScroll(FPageSound);
         RefreshSoundUI();
+      end;
     end;
     if FPagePower <> nil then
     begin
       FPagePower.Visible := SameText(AName, 'Power') or SameText(AName, 'Battery');
       if FPagePower.Visible then
+      begin
+        ResetPageScroll(FPagePower);
         RefreshPowerUI();
+      end;
     end;
-    if FPageMouse <> nil then FPageMouse.Visible := SameText(AName, 'Mouse & Touchpad');
+    if FPageMouse <> nil then
+    begin
+      FPageMouse.Visible := SameText(AName, 'Mouse & Touchpad');
+      if FPageMouse.Visible then
+        ResetPageScroll(FPageMouse);
+    end;
     if FPageKeyboard <> nil then
+    begin
       FPageKeyboard.Visible := SameText(AName, 'Keyboard & Shortcuts') or SameText(AName, 'Keyboard');
+      if FPageKeyboard.Visible then
+        ResetPageScroll(FPageKeyboard);
+    end;
     if FPageApps <> nil then
+    begin
       FPageApps.Visible := SameText(AName, 'Default Applications') or SameText(AName, 'Applications');
-    if FPageAbout <> nil then FPageAbout.Visible := SameText(AName, 'About');
+      if FPageApps.Visible then
+        ResetPageScroll(FPageApps);
+    end;
+    if FPageAbout <> nil then
+    begin
+      FPageAbout.Visible := SameText(AName, 'About');
+      if FPageAbout.Visible then
+        ResetPageScroll(FPageAbout);
+    end;
 
     if FSectionTitle <> nil then
       FSectionTitle.Text := AName;

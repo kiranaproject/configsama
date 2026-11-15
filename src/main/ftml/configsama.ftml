@@ -139,6 +139,7 @@ Window {
         anchors.fill: parent;
         visible: true;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: WLAN Master Toggle Card
         Container {
@@ -791,6 +792,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: Master Toggle & Status
         Container {
@@ -1112,6 +1114,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: Master Toggle & Status
         Container {
@@ -1408,6 +1411,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: Brightness
         Container {
@@ -1750,6 +1754,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: Theme
         Container {
@@ -2079,6 +2084,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: Current Wallpaper
         Container {
@@ -2265,6 +2271,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: Dock Configuration
         Container {
@@ -2619,6 +2626,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: User Profile Header
         Container {
@@ -2862,6 +2870,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: Language & Formats
         Container {
@@ -3129,6 +3138,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: Charge Status (Blue gradient banner)
         Container {
@@ -3364,6 +3374,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Hero Card: Distro Emblem & OS Title
         Container {
@@ -3848,6 +3859,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         // Card 1: Output
         Container {
@@ -4234,6 +4246,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
       }
 
       Container {
@@ -4241,6 +4254,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         FormGrid {
           anchors.fill: parent;
@@ -4274,6 +4288,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         FormGrid {
           anchors.fill: parent;
@@ -4307,6 +4322,7 @@ Window {
         anchors.fill: parent;
         visible: false;
         drawFrame: false;
+        scrollBarMode: "vertical";
 
         FormGrid {
           anchors.fill: parent;
