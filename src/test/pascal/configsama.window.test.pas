@@ -13,7 +13,8 @@ uses
   ftpas.layouts, ftpas.views, ftpas.ftml,
   ConfigSama.Settings, ConfigSama.Window,
   ConfigSama.Wlan, ConfigSama.Wired, ConfigSama.Display,
-  ConfigSama.Bluetooth, ConfigSama.Sound, ConfigSama.Power, ConfigSama.Desktop;
+  ConfigSama.Bluetooth, ConfigSama.Sound, ConfigSama.Power, ConfigSama.Desktop,
+  ConfigSama.Background;
 
 type
   { TConfigWindowTest }
@@ -36,6 +37,7 @@ type
     procedure TestSoundControlsAndInteraction();
     procedure TestPowerControlsAndInteraction();
     procedure TestDesktopAndDockControls();
+    procedure TestBackgroundControls();
     procedure TestAppearanceControlsAndFonts();
     procedure TestPageContainersScrollableAndResetOnNavigation();
   end;
@@ -67,6 +69,8 @@ begin
   DesktopService().EnableMockMode(True);
   DesktopService().SetMockDockSettings('Bottom', 48, False, 3);
   DesktopService().SetMockPanelSettings(True, '24h');
+  BackgroundService().SetMockMode(True);
+  BackgroundService().SetMockData('/usr/share/backgrounds/samarinda.jpg', 'fill');
 
   FTestIniPath := Format('/tmp/configsama_win_test_%d_%d.ini', [GetProcessID(), Random(100000)]);
   FWindow := TConfigSamaWindow.Create(FTestIniPath);
@@ -91,6 +95,8 @@ begin
   DesktopService().SetMockDockSettings('Bottom', 48, False, 3);
   DesktopService().SetMockPanelSettings(True, '24h');
   DesktopService().EnableMockMode(False);
+  BackgroundService().SetMockData('/usr/share/backgrounds/samarinda.jpg', 'fill');
+  BackgroundService().SetMockMode(False);
 end;
 
 procedure TConfigWindowTest.TestWindowCreationAndFTMLResolution();
@@ -435,6 +441,47 @@ begin
 
   // Restore window height
   FWindow.SetSize(960, 640);
+end;
+
+procedure TConfigWindowTest.TestBackgroundControls();
+begin
+  FWindow.SelectCategoryByName('Background');
+  AssertTrue('PageBackground must be visible', FWindow.PageBackground.Visible);
+
+  AssertNotNull('TxtWallpaperPath must be resolved', FWindow.TxtWallpaperPath);
+  AssertNotNull('CmbWallpaperMode must be resolved', FWindow.CmbWallpaperMode);
+  AssertNotNull('BtnChooseWallpaper must be resolved', FWindow.BtnChooseWallpaper);
+  AssertNotNull('ImgWallpaperThumb must be resolved', FWindow.ImgWallpaperThumb);
+  AssertNotNull('LblWallpaperName must be resolved', FWindow.LblWallpaperName);
+  AssertNotNull('CardWallpaperPresets must be resolved', FWindow.CardWallpaperPresets);
+
+  AssertEquals('Default wallpaper path matches mock', '/usr/share/backgrounds/samarinda.jpg', FWindow.TxtWallpaperPath.Text);
+  AssertEquals('Default wallpaper name is Samarinda', 'Samarinda', FWindow.LblWallpaperName.Text);
+  AssertEquals('Default wallpaper mode is Fill', 'Fill', FWindow.CmbWallpaperMode.Text);
+
+  // Check presets grid
+  AssertTrue('Preset buttons count >= 4 in mock mode', Length(FWindow.WallpaperPresetButtons) >= 4);
+  AssertTrue('First preset button is active', Pos('active', FWindow.WallpaperPresetButtons[0].StyleClass) > 0);
+
+  // Click second preset (Mountains)
+  FWindow.WallpaperPresetButtons[1].OnClick(FWindow.WallpaperPresetButtons[1]);
+  AssertEquals('Wallpaper path updated to Mountains', '/usr/share/backgrounds/mountains.jpg', BackgroundService().GetWallpaperPath());
+  AssertEquals('TxtWallpaperPath updated to Mountains', '/usr/share/backgrounds/mountains.jpg', FWindow.TxtWallpaperPath.Text);
+  AssertEquals('LblWallpaperName updated to Mountains', 'Mountains', FWindow.LblWallpaperName.Text);
+  AssertTrue('Second preset button is now active', Pos('active', FWindow.WallpaperPresetButtons[1].StyleClass) > 0);
+  AssertFalse('First preset button is no longer active', Pos('active', FWindow.WallpaperPresetButtons[0].StyleClass) > 0);
+
+  // Change wallpaper mode
+  FWindow.CmbWallpaperMode.Text := 'Stretch';
+  FWindow.CmbWallpaperMode.OnChange(FWindow.CmbWallpaperMode, 2, 'Stretch');
+  AssertEquals('Wallpaper mode updated to stretch', 'stretch', BackgroundService().GetWallpaperMode());
+
+  // Add custom wallpaper
+  BackgroundService().AddCustomWallpaper('/tmp/my_custom_photo.jpg');
+  FWindow.RefreshBackgroundUI();
+  AssertEquals('Custom wallpaper path active', '/tmp/my_custom_photo.jpg', BackgroundService().GetWallpaperPath());
+  AssertEquals('TxtWallpaperPath matches custom', '/tmp/my_custom_photo.jpg', FWindow.TxtWallpaperPath.Text);
+  AssertEquals('LblWallpaperName matches custom', 'My Custom Photo', FWindow.LblWallpaperName.Text);
 end;
 
 initialization

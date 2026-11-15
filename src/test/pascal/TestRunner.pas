@@ -15,6 +15,7 @@ uses
   ConfigSama.Sound.Test,
   ConfigSama.Power.Test,
   ConfigSama.Desktop.Test,
+  ConfigSama.Background.Test,
   ConfigSama.Window.Test;
 
 var

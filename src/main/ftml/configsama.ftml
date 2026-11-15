@@ -2211,7 +2211,7 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 126;
+          height: 190;
           drawFrame: false;
 
           Text {
@@ -2219,48 +2219,9 @@ Window {
             anchors.topMargin: 12;
             anchors.left: parent.left;
             anchors.leftMargin: 18;
-            text: "Default Wallpapers";
+            text: "Wallpapers";
             font: "Sans:bold 12";
             selectable: false;
-          }
-
-          Row {
-            id: rowWallpaperPresets;
-            anchors.top: parent.top;
-            anchors.topMargin: 38;
-            anchors.left: parent.left;
-            anchors.leftMargin: 18;
-            height: 72;
-            spacing: 14;
-
-            Button {
-              id: btnWallSamarinda;
-              width: 106;
-              height: 64;
-              styleClass: "theme-preview-btn";
-              text: "Samarinda";
-            }
-            Button {
-              id: btnWallMountains;
-              width: 106;
-              height: 64;
-              styleClass: "theme-preview-btn";
-              text: "Mountains";
-            }
-            Button {
-              id: btnWallSunset;
-              width: 106;
-              height: 64;
-              styleClass: "theme-preview-btn";
-              text: "Sunset";
-            }
-            Button {
-              id: btnWallAurora;
-              width: 106;
-              height: 64;
-              styleClass: "theme-preview-btn";
-              text: "Aurora";
-            }
           }
         }
       }

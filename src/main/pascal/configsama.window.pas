@@ -13,9 +13,12 @@ uses
   ftpas.layouts, ftpas.views, ftpas.dialogs, ftpas.ftml,
   ConfigSama.Wlan, ConfigSama.Wired, ConfigSama.Display,
   ConfigSama.Bluetooth, ConfigSama.Sound, ConfigSama.Power, ConfigSama.Desktop,
+  ConfigSama.Background,
   ConfigSama.Settings, ConfigSama.Styles;
 
 type
+  TFtButtonArray = array of TFtButton;
+
   { TConfigSamaWindow — GNOME Settings styled application with FTML and ECA }
   TConfigSamaWindow = class(TFtFTMLForm)
   private
@@ -150,6 +153,10 @@ type
     FCmbWallpaperMode: TFtComboBox;
     FTxtWallpaperPath: TFtEntry;
     FBtnChooseWallpaper: TFtButton;
+    FImgWallpaperThumb: TFtImage;
+    FLblWallpaperName: TFtText;
+    FCardWallpaperPresets: TFtContainer;
+    FWallpaperPresetButtons: TFtButtonArray;
 
     // Displays page controls
     FSldBrightness: TFtSlider;
@@ -311,6 +318,7 @@ type
     procedure HandleWallpaperModeChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleChooseWallpaperClick(Sender: TFtButton);
     procedure HandleWallpaperPresetClick(Sender: TFtButton);
+    procedure HandleBackgroundServiceChange(Sender: TObject);
     procedure HandleDisplayChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleResolutionChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
     procedure HandleRefreshRateChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
@@ -358,6 +366,7 @@ type
     procedure SetDarkMode(AValue: Boolean);
     procedure CycleStandardFont();
     procedure CycleMonospaceFont();
+    procedure RefreshBackgroundUI();
 
     property Settings: TConfigSettings read FSettings;
     property AppTitle: TFtLabel read FAppTitle;
@@ -367,6 +376,12 @@ type
     property SwDarkMode: TFtSwitch read FSwDarkMode;
     property CmbAccent: TFtComboBox read FCmbAccent;
     property TxtWallpaperPath: TFtEntry read FTxtWallpaperPath;
+    property ImgWallpaperThumb: TFtImage read FImgWallpaperThumb;
+    property LblWallpaperName: TFtText read FLblWallpaperName;
+    property CardWallpaperPresets: TFtContainer read FCardWallpaperPresets;
+    property CmbWallpaperMode: TFtComboBox read FCmbWallpaperMode;
+    property BtnChooseWallpaper: TFtButton read FBtnChooseWallpaper;
+    property WallpaperPresetButtons: TFtButtonArray read FWallpaperPresetButtons;
     property SlVolume: TFtSlider read FSlVolume;
     property SwMute: TFtSwitch read FSwMute;
     property SwWlan: TFtSwitch read FSwWlan;
@@ -465,6 +480,9 @@ destructor TConfigSamaWindow.Destroy();
 begin
   if DesktopService().OnChange = @HandleDesktopServiceChange then
     DesktopService().OnChange := nil;
+  if BackgroundService().OnChange = @HandleBackgroundServiceChange then
+    BackgroundService().OnChange := nil;
+  SetLength(FWallpaperPresetButtons, 0);
   if Assigned(FSettings) then
   begin
     FSettings.Free();
@@ -1003,15 +1021,17 @@ begin
     FSwNightLight.OnToggle := @HandleNightLightToggle;
   end;
 
-  // Wallpaper presets
-  w := FindWidget('btnWallSamarinda');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleWallpaperPresetClick;
-  w := FindWidget('btnWallMountains');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleWallpaperPresetClick;
-  w := FindWidget('btnWallSunset');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleWallpaperPresetClick;
-  w := FindWidget('btnWallAurora');
-  if w is TFtButton then TFtButton(w).OnClick := @HandleWallpaperPresetClick;
+  // Background & Wallpaper controls
+  w := FindWidget('imgWallpaperThumb');
+  if w is TFtImage then FImgWallpaperThumb := TFtImage(w);
+
+  w := FindWidget('lblWallpaperName');
+  if w is TFtText then FLblWallpaperName := TFtText(w);
+
+  w := FindWidget('cardWallpaperPresets');
+  if w is TFtContainer then FCardWallpaperPresets := TFtContainer(w);
+
+  BackgroundService().OnChange := @HandleBackgroundServiceChange;
 
   // Desktop & Dock controls
   w := FindWidget('cmbDockPosition');
@@ -1385,6 +1405,9 @@ begin
     // Appearance
     RefreshAppearanceUI();
 
+    // Background & Wallpaper
+    RefreshBackgroundUI();
+
     // Sound
     RefreshSoundUI();
 
@@ -1584,7 +1607,10 @@ begin
     begin
       FPageBackground.Visible := SameText(AName, 'Background');
       if FPageBackground.Visible then
+      begin
         ResetPageScroll(FPageBackground);
+        RefreshBackgroundUI();
+      end;
     end;
     if FPageDesktop <> nil then
     begin
@@ -1812,39 +1838,171 @@ end;
 
 procedure TConfigSamaWindow.HandleWallpaperModeChange(Sender: TFtComboBox; AIndex: Integer; const AText: string);
 begin
-  if FSettings = nil then Exit();
-  FSettings.WallpaperMode := AText;
-  FSettings.Save();
+  if FUpdatingControls then Exit();
+  BackgroundService().SetWallpaperMode(LowerCase(AText));
 end;
 
 procedure TConfigSamaWindow.HandleChooseWallpaperClick(Sender: TFtButton);
 var
   picked: string;
 begin
-  picked := TFtFileDialog.OpenFile('Select Desktop Wallpaper', GetEnvironmentVariable('HOME'), 'Images (*.png;*.jpg;*.jpeg)|*.png;*.jpg;*.jpeg');
-  if picked <> '' then
+  picked := TFtFileDialog.OpenFile('Select Desktop Wallpaper', GetEnvironmentVariable('HOME'), 'Images (*.png;*.jpg;*.jpeg;*.webp)|*.png;*.jpg;*.jpeg;*.webp');
+  if (picked <> '') and FileExists(picked) then
   begin
-    if FTxtWallpaperPath <> nil then
-      FTxtWallpaperPath.Text := picked;
-    if FSettings <> nil then
-    begin
-      FSettings.WallpaperPath := picked;
-      FSettings.Save();
-    end;
+    BackgroundService().AddCustomWallpaper(picked);
+    RefreshBackgroundUI();
   end;
 end;
 
 procedure TConfigSamaWindow.HandleWallpaperPresetClick(Sender: TFtButton);
 var
-  wallName, wallPath: string;
+  idx: Integer;
+  item: TWallpaperItem;
 begin
-  if FSettings = nil then Exit();
-  wallName := LowerCase(Sender.Caption);
-  wallPath := '/usr/share/backgrounds/' + wallName + '.jpg';
-  if FTxtWallpaperPath <> nil then
-    FTxtWallpaperPath.Text := wallPath;
-  FSettings.WallpaperPath := wallPath;
-  FSettings.Save();
+  if Sender = nil then Exit();
+  idx := Sender.Tag;
+  item := BackgroundService().GetWallpaper(idx);
+  if item.Path <> '' then
+    BackgroundService().SetWallpaperPath(item.Path);
+end;
+
+procedure TConfigSamaWindow.HandleBackgroundServiceChange(Sender: TObject);
+begin
+  RefreshBackgroundUI();
+end;
+
+procedure TConfigSamaWindow.RefreshBackgroundUI();
+var
+  curPath, curMode, wallTitle: string;
+  count, i, col, row, cardW, cardH, gapX, gapY, itemX, itemY, totalH: Integer;
+  item: TWallpaperItem;
+  btn: TFtButton;
+  thumb: TFtBitmap;
+begin
+  FUpdatingControls := True;
+  try
+    curPath := BackgroundService().GetWallpaperPath();
+    curMode := BackgroundService().GetWallpaperMode();
+
+    if Assigned(FTxtWallpaperPath) then
+      FTxtWallpaperPath.Text := curPath;
+
+    if Assigned(FCmbWallpaperMode) then
+    begin
+      if SameText(curMode, 'fill') then FCmbWallpaperMode.Text := 'Fill'
+      else if SameText(curMode, 'fit') then FCmbWallpaperMode.Text := 'Fit'
+      else if SameText(curMode, 'stretch') then FCmbWallpaperMode.Text := 'Stretch'
+      else if SameText(curMode, 'center') then FCmbWallpaperMode.Text := 'Center'
+      else if SameText(curMode, 'tile') then FCmbWallpaperMode.Text := 'Tile'
+      else FCmbWallpaperMode.Text := curMode;
+    end;
+
+    // Scan wallpapers if not already scanned
+    count := BackgroundService().WallpaperCount;
+    if count = 0 then
+      count := BackgroundService().ScanWallpapers();
+
+    // Fallback if current wallpaper is missing or not set
+    if (curPath = '') or (not FileExists(curPath) and not BackgroundService().MockMode) then
+    begin
+      if count > 0 then
+      begin
+        curPath := BackgroundService().GetWallpaper(0).Path;
+        BackgroundService().SetWallpaperPath(curPath);
+        if Assigned(FTxtWallpaperPath) then
+          FTxtWallpaperPath.Text := curPath;
+      end;
+    end;
+
+    // Current wallpaper preview card
+    if (curPath <> '') and (FileExists(curPath) or BackgroundService().MockMode) then
+    begin
+      wallTitle := BackgroundService().CleanWallpaperName(ExtractFileName(curPath));
+      if Assigned(FLblWallpaperName) then
+        FLblWallpaperName.Text := wallTitle;
+
+      if Assigned(FImgWallpaperThumb) then
+      begin
+        thumb := BackgroundService().GetThumbnail(curPath, 140, 80);
+        if thumb <> nil then
+          FImgWallpaperThumb.SetBitmap(thumb, True)
+        else
+          FImgWallpaperThumb.SetBitmap(nil, False);
+      end;
+    end
+    else
+    begin
+      if Assigned(FLblWallpaperName) then
+        FLblWallpaperName.Text := '(Default Backdrop)';
+      if Assigned(FImgWallpaperThumb) then
+        FImgWallpaperThumb.SetBitmap(nil, False);
+    end;
+
+    // Presets grid in FCardWallpaperPresets
+    if Assigned(FCardWallpaperPresets) then
+    begin
+
+      // If button array does not match wallpaper count, rebuild buttons
+      if Length(FWallpaperPresetButtons) <> count then
+      begin
+        // Free old buttons
+        for i := 0 to High(FWallpaperPresetButtons) do
+        begin
+          if FWallpaperPresetButtons[i] <> nil then
+            FWallpaperPresetButtons[i].Free();
+        end;
+        SetLength(FWallpaperPresetButtons, count);
+
+        cardW := 192;
+        cardH := 136;
+        gapX := 18;
+        gapY := 14;
+
+        for i := 0 to count - 1 do
+        begin
+          item := BackgroundService().GetWallpaper(i);
+          col := i mod 3;
+          row := i div 3;
+          itemX := 18 + col * (cardW + gapX);
+          itemY := 38 + row * (cardH + gapY);
+
+          btn := TFtButton.Create(FCardWallpaperPresets, itemX, itemY, cardW, cardH, item.Name);
+          btn.Tag := i;
+          btn.IconPosition := ftipTop;
+          btn.SetIconSize(180, 96);
+          btn.OnClick := @HandleWallpaperPresetClick;
+
+          thumb := BackgroundService().GetThumbnail(item.Path, 180, 96);
+          if thumb <> nil then
+            btn.SetIconBitmap(thumb, True);
+
+          FWallpaperPresetButtons[i] := btn;
+        end;
+
+        // Resize FCardWallpaperPresets to fit all rows
+        if count > 0 then
+        begin
+          totalH := 38 + ((count + 2) div 3) * (cardH + gapY) + 12;
+          FCardWallpaperPresets.Height := totalH;
+        end;
+      end;
+
+      // Update active selection state on all buttons
+      for i := 0 to High(FWallpaperPresetButtons) do
+      begin
+        if FWallpaperPresetButtons[i] <> nil then
+        begin
+          item := BackgroundService().GetWallpaper(FWallpaperPresetButtons[i].Tag);
+          if SameText(item.Path, curPath) then
+            FWallpaperPresetButtons[i].StyleClass := 'theme-preview-btn active'
+          else
+            FWallpaperPresetButtons[i].StyleClass := 'theme-preview-btn';
+        end;
+      end;
+    end;
+  finally
+    FUpdatingControls := False;
+  end;
 end;
 
 function TConfigSamaWindow.GetSelectedDisplayName(): string;
