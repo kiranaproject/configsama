@@ -2211,7 +2211,7 @@ Window {
           anchors.leftMargin: 36;
           anchors.right: parent.right;
           anchors.rightMargin: 36;
-          height: 190;
+          height: 500;
           drawFrame: false;
 
           Text {

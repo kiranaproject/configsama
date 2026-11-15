@@ -462,14 +462,35 @@ begin
   // Check presets grid
   AssertTrue('Preset buttons count >= 4 in mock mode', Length(FWindow.WallpaperPresetButtons) >= 4);
   AssertTrue('First preset button is active', Pos('active', FWindow.WallpaperPresetButtons[0].StyleClass) > 0);
+  AssertTrue('CardWallpaperPresets initial height must be >= 350', FWindow.CardWallpaperPresets.Height >= 350);
 
   // Click second preset (Mountains)
   FWindow.WallpaperPresetButtons[1].OnClick(FWindow.WallpaperPresetButtons[1]);
+  FWindow.SyncProperties();
   AssertEquals('Wallpaper path updated to Mountains', '/usr/share/backgrounds/mountains.jpg', BackgroundService().GetWallpaperPath());
   AssertEquals('TxtWallpaperPath updated to Mountains', '/usr/share/backgrounds/mountains.jpg', FWindow.TxtWallpaperPath.Text);
   AssertEquals('LblWallpaperName updated to Mountains', 'Mountains', FWindow.LblWallpaperName.Text);
   AssertTrue('Second preset button is now active', Pos('active', FWindow.WallpaperPresetButtons[1].StyleClass) > 0);
   AssertFalse('First preset button is no longer active', Pos('active', FWindow.WallpaperPresetButtons[0].StyleClass) > 0);
+  AssertTrue('CardWallpaperPresets height after click 1 and sync must remain >= 350', FWindow.CardWallpaperPresets.Height >= 350);
+
+  // Click third preset (Sunset)
+  FWindow.WallpaperPresetButtons[2].OnClick(FWindow.WallpaperPresetButtons[2]);
+  FWindow.SyncProperties();
+  AssertEquals('Wallpaper path updated to Sunset', '/usr/share/backgrounds/sunset.jpg', BackgroundService().GetWallpaperPath());
+  AssertTrue('CardWallpaperPresets height after click 2 and sync must remain >= 350', FWindow.CardWallpaperPresets.Height >= 350);
+
+  // Click fourth preset (Aurora)
+  FWindow.WallpaperPresetButtons[3].OnClick(FWindow.WallpaperPresetButtons[3]);
+  FWindow.SyncProperties();
+  AssertEquals('Wallpaper path updated to Aurora', '/usr/share/backgrounds/aurora.jpg', BackgroundService().GetWallpaperPath());
+  AssertTrue('CardWallpaperPresets height after click 3 and sync must remain >= 350', FWindow.CardWallpaperPresets.Height >= 350);
+
+  // Click first preset again (Samarinda)
+  FWindow.WallpaperPresetButtons[0].OnClick(FWindow.WallpaperPresetButtons[0]);
+  FWindow.SyncProperties();
+  AssertEquals('Wallpaper path restored to Samarinda', '/usr/share/backgrounds/samarinda.jpg', BackgroundService().GetWallpaperPath());
+  AssertTrue('CardWallpaperPresets height after click 4 and sync must remain >= 350', FWindow.CardWallpaperPresets.Height >= 350);
 
   // Change wallpaper mode
   FWindow.CmbWallpaperMode.Text := 'Stretch';

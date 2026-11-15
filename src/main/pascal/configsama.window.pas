@@ -1878,6 +1878,7 @@ var
   item: TWallpaperItem;
   btn: TFtButton;
   thumb: TFtBitmap;
+  ftmlItem: TFloriaFTMLItem;
 begin
   FUpdatingControls := True;
   try
@@ -1941,6 +1942,10 @@ begin
     // Presets grid in FCardWallpaperPresets
     if Assigned(FCardWallpaperPresets) then
     begin
+      cardW := 192;
+      cardH := 136;
+      gapX := 18;
+      gapY := 14;
 
       // If button array does not match wallpaper count, rebuild buttons
       if Length(FWallpaperPresetButtons) <> count then
@@ -1952,11 +1957,6 @@ begin
             FWallpaperPresetButtons[i].Free();
         end;
         SetLength(FWallpaperPresetButtons, count);
-
-        cardW := 192;
-        cardH := 136;
-        gapX := 18;
-        gapY := 14;
 
         for i := 0 to count - 1 do
         begin
@@ -1978,14 +1978,21 @@ begin
 
           FWallpaperPresetButtons[i] := btn;
         end;
-
-        // Resize FCardWallpaperPresets to fit all rows
-        if count > 0 then
-        begin
-          totalH := 38 + ((count + 2) div 3) * (cardH + gapY) + 12;
-          FCardWallpaperPresets.Height := totalH;
-        end;
       end;
+
+      // Always enforce full height of FCardWallpaperPresets and FTML AST item
+      if count > 0 then
+        totalH := 38 + ((count + 2) div 3) * (cardH + gapY) + 12
+      else
+        totalH := 190;
+
+      FCardWallpaperPresets.Height := totalH;
+      ftmlItem := FindItem('cardWallpaperPresets');
+      if ftmlItem <> nil then
+        ftmlItem.Height := totalH;
+
+      if (FPageBackground <> nil) and (FPageBackground is TFtContainer) then
+        TFtContainer(FPageBackground).UpdateScrollBars();
 
       // Update active selection state on all buttons
       for i := 0 to High(FWallpaperPresetButtons) do
