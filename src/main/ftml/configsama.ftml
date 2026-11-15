@@ -3393,7 +3393,7 @@ Window {
             anchors.leftMargin: 20;
             anchors.top: parent.top;
             anchors.topMargin: 20;
-            text: "Samarinda OS";
+            text: "Kirana";
             font: "Sans:bold 18";
             selectable: false;
           }
@@ -3403,7 +3403,7 @@ Window {
             anchors.left: lblAboutOsTitle.left;
             anchors.top: lblAboutOsTitle.bottom;
             anchors.topMargin: 4;
-            text: "Version 1.0 (Kutai Edition) • 64-bit";
+            text: "Version 0.0.1 (Alpha) • 64-bit";
             font: "Sans 10";
             opacity: 0.65;
             selectable: false;
@@ -3698,7 +3698,7 @@ Window {
               anchors.verticalCenter: parent.verticalCenter;
               width: 340;
               height: 22;
-              text: "Samarinda OS 1.0 (Kutai Edition)";
+              text: "Kirana 0.0.1 (Alpha)";
               font: "Sans 11";
               opacity: 0.85;
               selectable: false;

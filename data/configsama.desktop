@@ -1,6 +1,6 @@
 [Desktop Entry]
 Name=Settings
-Comment=Configure Samarinda OS desktop environment
+Comment=Configure Kirana desktop environment
 Exec=configsama
 Icon=preferences-system
 Terminal=false

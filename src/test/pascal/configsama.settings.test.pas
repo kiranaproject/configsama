@@ -116,8 +116,8 @@ end;
 
 procedure TConfigSettingsTest.TestSystemInfoHelpers();
 begin
-  AssertEquals('OS Name is Samarinda OS', 'Samarinda OS', FSettings.GetOsName());
-  AssertEquals('OS Version is 1.0 "Kutai"', '1.0 "Kutai"', FSettings.GetOsVersion());
+  AssertEquals('OS Name is Kirana', 'Kirana', FSettings.GetOsName());
+  AssertEquals('OS Version is 0.0.1 (Alpha)', '0.0.1 (Alpha)', FSettings.GetOsVersion());
   AssertTrue('Kernel version non empty', Length(FSettings.GetKernelVersion()) > 0);
   AssertTrue('CPU model non empty', Length(FSettings.GetCpuModel()) > 0);
   AssertTrue('Memory total non empty', Length(FSettings.GetMemoryTotal()) > 0);

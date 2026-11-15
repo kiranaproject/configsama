@@ -557,12 +557,12 @@ end;
 
 function TConfigSettings.GetOsName(): string;
 begin
-  Result := 'Samarinda OS';
+  Result := 'Kirana';
 end;
 
 function TConfigSettings.GetOsVersion(): string;
 begin
-  Result := '1.0 "Kutai"';
+  Result := '0.0.1 (Alpha)';
 end;
 
 function TConfigSettings.GetDeviceName(): string;
