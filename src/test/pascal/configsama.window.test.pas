@@ -154,6 +154,23 @@ begin
 
   FWindow.SearchEntry.Text := 'sys';
   AssertEquals('Search sys navigates to About', 'About', FWindow.SectionTitle.Text);
+
+  // Verify mid-string editing and cursor position preservation
+  FWindow.SearchEntry.Text := 'Network';
+  AssertEquals('Initial search text', 'Network', FWindow.SearchEntry.Text);
+  AssertEquals('Cursor at end', 7, FWindow.SearchEntry.CursorPos);
+
+  // Position cursor at 3 ('Net|work')
+  FWindow.SearchEntry.CursorPos := 3;
+  AssertEquals('Cursor moved to 3', 3, FWindow.SearchEntry.CursorPos);
+
+  // Sync pass must preserve cursor
+  FWindow.SyncProperties();
+  AssertEquals('Cursor preserved at 3 after sync pass', 3, FWindow.SearchEntry.CursorPos);
+
+  // Re-assign identical text must preserve cursor
+  FWindow.SearchEntry.Text := 'Network';
+  AssertEquals('Cursor preserved at 3 after identical text assignment', 3, FWindow.SearchEntry.CursorPos);
 end;
 
 procedure TConfigWindowTest.TestDarkModeInteraction();
