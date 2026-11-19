@@ -16,7 +16,8 @@ uses
   ConfigSama.Power.Test,
   ConfigSama.Desktop.Test,
   ConfigSama.Background.Test,
-  ConfigSama.Window.Test;
+  ConfigSama.Window.Test,
+  ConfigSama.IPC.Test;
 
 var
   Application: TTestRunner;
