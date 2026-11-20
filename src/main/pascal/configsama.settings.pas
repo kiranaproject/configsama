@@ -222,9 +222,31 @@ begin
 end;
 
 procedure TConfigSettings.SetDefaults();
+var
+  envTheme: string;
 begin
   // Appearance defaults
-  FDarkMode := False;
+  FDarkMode := True;
+  envTheme := LowerCase(GetEnvironmentVariable('FT_DARK_MODE'));
+  if (envTheme = '1') or (envTheme = 'true') then
+    FDarkMode := True
+  else if (envTheme = '0') or (envTheme = 'false') then
+    FDarkMode := False
+  else
+  begin
+    envTheme := LowerCase(GetEnvironmentVariable('FT_THEME'));
+    if envTheme = '' then
+      envTheme := LowerCase(GetEnvironmentVariable('SAMARINDA_THEME'));
+    if envTheme = '' then
+      envTheme := LowerCase(GetEnvironmentVariable('KIRANA_THEME'));
+    if envTheme = '' then
+      envTheme := LowerCase(GetEnvironmentVariable('WMSAMA_THEME'));
+
+    if (envTheme = 'light') or (envTheme = '0') or (envTheme = 'false') then
+      FDarkMode := False
+    else if (envTheme = 'dark') or (envTheme = '1') or (envTheme = 'true') then
+      FDarkMode := True;
+  end;
   FAccentColor := 'Blue';
   FWallpaperPath := '/usr/share/backgrounds/samarinda.jpg';
   FWallpaperMode := 'fill';
@@ -439,9 +461,13 @@ begin
     p.Executable := '/bin/sh';
     p.Parameters.Add('-c');
     if FDarkMode then
-      cmd := 'xprop -root -f _SAMARINDA_THEME_DARK 32c -set _SAMARINDA_THEME_DARK 1 2>/dev/null; xprop -root -f _SAMARINDA_THEME 8s -set _SAMARINDA_THEME "dark" 2>/dev/null || true'
+      cmd := 'xprop -root -f _SAMARINDA_THEME_DARK 32c -set _SAMARINDA_THEME_DARK 1 2>/dev/null; ' +
+             'xprop -root -f _SAMARINDA_THEME 8s -set _SAMARINDA_THEME "dark" 2>/dev/null; ' +
+             'xprop -root -f _NET_WM_THEME 8s -set _NET_WM_THEME "dark" 2>/dev/null || true'
     else
-      cmd := 'xprop -root -f _SAMARINDA_THEME_DARK 32c -set _SAMARINDA_THEME_DARK 0 2>/dev/null; xprop -root -f _SAMARINDA_THEME 8s -set _SAMARINDA_THEME "light" 2>/dev/null || true';
+      cmd := 'xprop -root -f _SAMARINDA_THEME_DARK 32c -set _SAMARINDA_THEME_DARK 0 2>/dev/null; ' +
+             'xprop -root -f _SAMARINDA_THEME 8s -set _SAMARINDA_THEME "light" 2>/dev/null; ' +
+             'xprop -root -f _NET_WM_THEME 8s -set _NET_WM_THEME "light" 2>/dev/null || true';
     p.Parameters.Add(cmd);
     p.Options := [poNoConsole];
     p.Execute();
